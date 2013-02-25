@@ -2,4 +2,14 @@
 
     <string name="app_name">GPVision</string>
 
-</resources>
+    <!-- login activity -->
+    <string name="login_activity_have_account_text">Alreadly have an account</string>
+    <string name="login_activity_email_hint_text">Email:</string>
+    <string name="login_activity_password_hint_text">Password:</string>
+    <string name="login_activity_forgot_button_text">Forgot?</string>
+    <string name="login_activity_log_in_button_text">Log in</string>
+    <string name="login_activity_not_have_account">Don\'t have an account?</string>
+    <string name="login_activity_sign_up_button_text">Sign up</string>
+    <string name="login_activity_email_null_toast">Email can not null!</string>
+    <string name="login_activity_password_null_toast">Password can not null!</string>
+</resources>
