@@ -41,7 +41,7 @@ public class VideoInfoFragment extends BaseFragment {
 		View view = inflater.inflate(R.layout.fragment_video_info, container,
 				false);
 		ListView videoInfoList = (ListView) view
-				.findViewById(R.id.video_info_list);
+				.findViewById(R.id.video_info_fragment_list);
 
 		adapter = new VideoInfoAdapter(videos);
 		videoInfoList.setAdapter(adapter);

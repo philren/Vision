@@ -19,6 +19,7 @@
     <string name="main_activity_settings">Settings</string>
 
     <!-- video info fragment -->
-    <string name="video_info_title">Your videos:</string>
+    <string name="video_info_fragment_title">Your videos:</string>
+    <string name="video_info_fragment_upload_more">Upload more</string>
 
 </resources>
