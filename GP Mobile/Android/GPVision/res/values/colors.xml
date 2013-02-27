@@ -7,7 +7,7 @@
 
     <!-- button -->
     <color name="button_color_black">#000000</color>
-    <color name="button_color_dodger_blue">#1E90FF</color>
+    <color name="button_color_blue">#1E90FF</color>
     <color name="button_color_green">#00C78C</color>
     <color name="button_color_orange">#FF6100</color>
 
