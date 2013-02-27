@@ -1,14 +1,20 @@
 package com.gpvision.adapter;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.gpvision.R;
 import com.gpvision.datamodel.Video;
+import com.gpvision.ui.VideoButtons;
 
 import java.util.ArrayList;
 
 public class VideoInfoAdapter extends BaseAdapter {
 	private ArrayList<Video> videos;
+	private LayoutInflater inflater;
 
 	public VideoInfoAdapter(ArrayList<Video> videos) {
 		this.videos = videos;
@@ -33,7 +39,35 @@ public class VideoInfoAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View view, ViewGroup viewGroup) {
-		return null;
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View view = convertView;
+		ViewHolder holder;
+		if (view == null) {
+			if (inflater == null)
+				inflater = LayoutInflater.from(parent.getContext());
+			view = inflater.inflate(R.layout.layout_video_info_list_item,
+					parent, false);
+			holder = new ViewHolder();
+			holder.videoName = (TextView) view
+					.findViewById(R.id.video_info_list_video_name);
+			holder.videoStatus = (TextView) view
+					.findViewById(R.id.video_info_list_video_status);
+			holder.videoButtons = (VideoButtons) view
+					.findViewById(R.id.video_info_list_videoButtons);
+			view.setTag(holder);
+		} else {
+			holder = (ViewHolder) view.getTag();
+		}
+		Video video = videos.get(position);
+		holder.videoName.setText(video.getName());
+		holder.videoStatus.setText(video.getStatus().toString());
+		holder.videoButtons.setVideo(video);
+		return view;
+	}
+
+	private static class ViewHolder {
+		TextView videoName;
+		TextView videoStatus;
+		VideoButtons videoButtons;
 	}
 }
