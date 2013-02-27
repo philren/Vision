@@ -13,10 +13,11 @@ public class MainActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        VideoInfoFragment fragment = new VideoInfoFragment();
-        transaction.replace(R.id.main_activity_fragment_content,fragment);
-        transaction.addToBackStack(null).commit();
+		FragmentTransaction transaction = getSupportFragmentManager()
+				.beginTransaction();
+		VideoInfoFragment fragment = new VideoInfoFragment();
+		transaction.replace(R.id.main_activity_fragment_content, fragment);
+		transaction.addToBackStack(null).commit();
 	}
 
 }
