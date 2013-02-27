@@ -22,8 +22,8 @@ public class VideoButtons extends LinearLayout {
 		case Uploading:
 			getUploadingButtons();
 			break;
-		case Uploaded:
-			getUploadedButtons();
+		case Indexed:
+			getIndexedButtons();
 			break;
 		case Deleted:
 			getDeleteedButtons();
@@ -43,7 +43,7 @@ public class VideoButtons extends LinearLayout {
 		addView(uploadButton);
 	}
 
-	private void getUploadedButtons() {
+	private void getIndexedButtons() {
 		Button playButton = new Button(getContext());
 		playButton.setBackgroundResource(R.drawable.icon_button_play);
 		addView(playButton);
