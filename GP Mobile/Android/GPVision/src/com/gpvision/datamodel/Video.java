@@ -1,6 +1,5 @@
 package com.gpvision.datamodel;
 
-
 public class Video {
     private long id;
     private String name;
@@ -31,6 +30,6 @@ public class Video {
     }
 
     public enum Status {
-        Uploading, Uploaded, Indexing, Indexed, Fail, Deleted
+        Uploading, Paused, Indexing, Indexed, Fail, Deleted
     }
 }

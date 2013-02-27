@@ -26,7 +26,7 @@ public class VideoInfoFragment extends BaseFragment {
 		video1.setStatus(Status.Uploading);
 		Video video2 = new Video();
 		video2.setName("second.avi");
-		video2.setStatus(Status.Uploaded);
+		video2.setStatus(Status.Indexed);
 		Video video3 = new Video();
 		video3.setName("third.ogg");
 		video3.setStatus(Status.Deleted);
