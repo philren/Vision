@@ -30,6 +30,6 @@ public class Video {
 	}
 
 	public enum Status {
-		Uploading, Paused, Indexing, Indexed, Fail, Deleted
+		Uploading, Paused, Indexing, Indexed, Failed, Deleted
 	}
 }
