@@ -1,12 +1,17 @@
 package com.gpvision.ui;
 
 import com.gpvision.R;
+import com.gpvision.activity.MainActivity;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.fragment.VideoPlayFragment;
+import com.gpvision.utils.Message;
+import com.gpvision.utils.MessageCenter;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -77,6 +82,7 @@ public class VideoButtons extends LinearLayout {
 		playButton.setBackgroundResource(R.drawable.icon_button_play);
 		Button deletedButton = new Button(getContext());
 		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
+		playButton.setOnClickListener(playListener);
 		deletedButton.setOnClickListener(deletedListener);
 		addView(playButton);
 		addView(deletedButton);
@@ -156,6 +162,21 @@ public class VideoButtons extends LinearLayout {
 		public void onClick(View v) {
 			video.setStatus(Status.Uploading);
 			listener.statusChanged();
+		}
+	};
+
+	private OnClickListener playListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			VideoPlayFragment fragment = new VideoPlayFragment();
+			Bundle args = new Bundle();
+			args.putParcelable(VideoPlayFragment.ARGS_VIDEO_KEY, video);
+			fragment.setArguments(args);
+			MessageCenter.getInstance()
+					.sendMessage(
+							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+									fragment));
 		}
 	};
 
