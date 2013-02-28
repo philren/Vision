@@ -2,7 +2,9 @@ package com.gpvision.fragment;
 
 import com.gpvision.R;
 import com.gpvision.datamodel.Video;
+import com.gpvision.ui.MediaPlayUI;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ public class VideoPlayFragment extends BaseFragment {
 
 	public static final String ARGS_VIDEO_KEY = "video";
 	private Video video;
+	private MediaPlayUI mediaPlayer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,12 @@ public class VideoPlayFragment extends BaseFragment {
 		TextView videoName = (TextView) view
 				.findViewById(R.id.video_play_fragment_video_name);
 		videoName.setText(video.getName());
+
+		mediaPlayer = (MediaPlayUI) view
+				.findViewById(R.id.video_play_fragment_media_play);
+		// test only
+		mediaPlayer.setVideo(Uri
+				.parse("http://192.168.1.100:8080/video/test.mp4"));
 		return view;
 	}
 

@@ -12,4 +12,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/text_color_gray" />
 
+    <com.gpvision.ui.MediaPlayUI
+        android:id="@+id/video_play_fragment_media_play"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
