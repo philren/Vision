@@ -69,7 +69,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
 
 		@Override
-		public void statusChanged(Video video) {
+		public void statusChanged() {
 			notifyDataSetChanged();
 		}
 
