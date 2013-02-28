@@ -1,6 +1,8 @@
 <resources>
 
     <string name="app_name">GPVision</string>
+    <string name="base_ok">OK</string>
+    <string name="base_cancel">Cancel</string>
 
     <!-- login activity -->
     <string name="login_activity_have_account_text">Alreadly have an account</string>
@@ -21,5 +23,8 @@
     <!-- video info fragment -->
     <string name="video_info_fragment_title">Your videos:</string>
     <string name="video_info_fragment_upload_more">Upload more</string>
+    <string name="video_info_fragment_alert_dialog_title_warning">Warning!</string>
+    <string name="video_info_fragment_alert_dialog_message_delete">Are your sure to delete %s ?</string>
+    <string name="video_info_fragment_alert_dialog_message_abort">Are your sure to abort %s ?</string>
 
 </resources>

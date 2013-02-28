@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.gpvision.R;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.VideoButtons;
+import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 
 import java.util.ArrayList;
 
@@ -61,9 +62,23 @@ public class VideoInfoAdapter extends BaseAdapter {
 		Video video = videos.get(position);
 		holder.videoName.setText(video.getName());
 		holder.videoStatus.setText(video.getStatus().toString());
-		holder.videoButtons.setVideo(video);
+		holder.videoButtons.setVideo(video, listener);
 		return view;
 	}
+
+	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
+
+		@Override
+		public void statusChanged() {
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public void remove(Video video) {
+			videos.remove(video);
+			notifyDataSetChanged();
+		}
+	};
 
 	private static class ViewHolder {
 		TextView videoName;
