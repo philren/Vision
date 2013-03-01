@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.MediaController.MediaPlayerControl;
 
@@ -22,23 +23,19 @@ public class MediaPlayUI extends SurfaceView implements MediaPlayerControl {
 
 	public MediaPlayUI(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
 	}
 
 	public MediaPlayUI(Context context) {
 		super(context);
-		init();
 	}
 
-	private void init() {
-		mController = new MediaController(getContext());
-		mController.setMediaPlayer(this);
-		mController.setAnchorView(this);
-		mController.setEnabled(true);
-	}
-
-	public void setVideo(final Uri uri) {
-
+	public void setVideo(final Uri uri, boolean showMediaController) {
+		if (showMediaController) {
+			mController = new MediaController(getContext());
+			mController.setMediaPlayer(this);
+			mController.setAnchorView(this);
+			mController.setEnabled(true);
+		}
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(new Callback() {
 
@@ -55,6 +52,8 @@ public class MediaPlayUI extends SurfaceView implements MediaPlayerControl {
 			@Override
 			public void surfaceChanged(SurfaceHolder holder, int format,
 					int width, int height) {
+				setLayoutParams(new LinearLayout.LayoutParams(width,
+						width * 9 / 16));
 			}
 		});
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -95,7 +94,9 @@ public class MediaPlayUI extends SurfaceView implements MediaPlayerControl {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		mController.show();
+		if (mController != null) {
+			mController.show();
+		}
 		return super.onTouchEvent(event);
 	}
 

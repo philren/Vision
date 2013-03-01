@@ -27,4 +27,8 @@
     <string name="video_info_fragment_alert_dialog_message_delete">Are your sure to delete %s ?</string>
     <string name="video_info_fragment_alert_dialog_message_abort">Are your sure to abort %s ?</string>
 
+    <!-- video play fragment -->
+    <string name="video_play_fragment_slash">/</string>
+    <string name="video_play_fragment_init_time">00:00</string>
+
 </resources>

@@ -38,8 +38,8 @@ public class VideoPlayFragment extends BaseFragment {
 		mediaPlayer = (MediaPlayUI) view
 				.findViewById(R.id.video_play_fragment_media_play);
 		// test only
-		mediaPlayer.setVideo(Uri
-				.parse("http://192.168.1.100:8080/video/test.mp4"));
+		mediaPlayer.setVideo(
+				Uri.parse("http://192.168.1.100:8080/video/test.mp4"), false);
 		return view;
 	}
 

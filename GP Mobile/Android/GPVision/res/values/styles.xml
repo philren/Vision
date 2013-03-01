@@ -5,4 +5,13 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme"></style>
 
+    <!-- video play seek bar style -->
+    <style name="video_play_seek_bar" parent="android:style/Widget.SeekBar">
+        <item name="android:progressDrawable">@drawable/video_play_seek_bar</item>
+        <item name="android:maxHeight">5dip</item>
+        <item name="android:minHeight">5dip</item>
+        <item name="android:thumb">@drawable/video_play_seek_bar_thumb</item>
+        <item name="android:thumbOffset">0dip</item>
+    </style>
+
 </resources>
