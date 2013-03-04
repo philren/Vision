@@ -25,6 +25,8 @@ public class MediaController extends FrameLayout {
 	private MediaPlayerControl mPlayer;
 	private View mRoot;
 	private ImageButton mPauseButton;
+	private ImageButton mVolumeButton;
+	private ImageButton mFullScreenButton;
 	private SeekBar mSeekBar;
 	private TextView mEndTime, mCurrentTime;
 
@@ -66,6 +68,9 @@ public class MediaController extends FrameLayout {
 		mFormatBuilder = new StringBuilder();
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
+		mFullScreenButton = (ImageButton) mRoot
+				.findViewById(R.id.media_controller_full_screen_btn);
+		mFullScreenButton.setOnClickListener(mFullScreenListener);
 		addView(mRoot);
 	}
 
@@ -143,6 +148,11 @@ public class MediaController extends FrameLayout {
 			doPauseResume();
 		}
 	};
+	private View.OnClickListener mFullScreenListener = new View.OnClickListener() {
+		public void onClick(View v) {
+			mPlayer.fullScreenModel();
+		}
+	};
 
 	private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
 		public void onStartTrackingTouch(SeekBar bar) {
@@ -204,6 +214,8 @@ public class MediaController extends FrameLayout {
 		boolean isPlaying();
 
 		int getBufferPercentage();
+
+		void fullScreenModel();
 		// boolean canPause();
 		// boolean canSeekBackward();
 		// boolean canSeekForward();

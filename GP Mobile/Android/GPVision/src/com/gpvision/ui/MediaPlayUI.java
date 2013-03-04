@@ -18,11 +18,12 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class MediaPlayUI extends LinearLayout {
+public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private SurfaceView mSurfaceView;
 	private MediaPlayer mPlayer;
 	private MediaController mController;
 	private int mCurrentPosition = 0;
+	private FullScreenModelListener fullScreenModel;
 
 	public enum Model {
 		Normal, FullScreen
@@ -30,19 +31,18 @@ public class MediaPlayUI extends LinearLayout {
 
 	public MediaPlayUI(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
 	}
 
 	public MediaPlayUI(Context context) {
 		super(context);
-		init();
 	}
 
-	private void init() {
-		setOrientation(LinearLayout.VERTICAL);
+	public void setOnFullScreenModelListener(
+			FullScreenModelListener fullScreenModel) {
+		this.fullScreenModel = fullScreenModel;
 	}
 
-	public void setVideo(final Uri uri, Model model) {
+	public void setVideo(final Uri uri, final Model model, final int position) {
 
 		mSurfaceView = new SurfaceView(getContext());
 		SurfaceHolder holder = mSurfaceView.getHolder();
@@ -55,37 +55,39 @@ public class MediaPlayUI extends LinearLayout {
 
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
-				startPlay(uri, holder);
+				startPlay(uri, holder, position);
 			}
 
 			@Override
 			public void surfaceChanged(SurfaceHolder holder, int format,
 					int width, int height) {
-				mSurfaceView.setLayoutParams(new LayoutParams(width,
-						width * 9 / 16));
+				if (model == Model.Normal) {
+					mSurfaceView.setLayoutParams(new LinearLayout.LayoutParams(
+							width, width * 9 / 16));
+				}
 			}
 		});
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		holder.setSizeFromLayout();
 
 		mController = new MediaController(getContext());
-		mController.setMediaPlayer(mediaPlayerControl);
+		mController.setMediaPlayer(this);
 		mController.setEnabled(true);
 
 		if (model == Model.Normal) {
-			addView(mSurfaceView);
-			addView(mController);
+			LinearLayout linearLayout = new LinearLayout(getContext());
+			linearLayout.setOrientation(LinearLayout.VERTICAL);
+			linearLayout.addView(mSurfaceView);
+			linearLayout.addView(mController);
+			addView(linearLayout);
 		} else {
-			FrameLayout frameLayout = new FrameLayout(getContext());
-			frameLayout.addView(mSurfaceView);
-			frameLayout.addView(mController, new FrameLayout.LayoutParams(
+			addView(mSurfaceView);
+			addView(mController, new FrameLayout.LayoutParams(
 					FrameLayout.LayoutParams.FILL_PARENT,
 					FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
-			addView(frameLayout);
 		}
 	}
 
-	private void startPlay(Uri uri, SurfaceHolder holder) {
+	private void startPlay(Uri uri, SurfaceHolder holder, final int position) {
 		try {
 			mPlayer = new MediaPlayer();
 			mPlayer.setDataSource(getContext(), uri);
@@ -97,6 +99,7 @@ public class MediaPlayUI extends LinearLayout {
 				public void onPrepared(MediaPlayer mp) {
 					mp.start();
 					mController.updatePausePlay();
+					seekTo(position);
 				}
 			});
 			mPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -125,68 +128,97 @@ public class MediaPlayUI extends LinearLayout {
 		return super.onTouchEvent(event);
 	}
 
-	private MediaPlayerControl mediaPlayerControl = new MediaPlayerControl() {
-
-		@Override
-		public int getBufferPercentage() {
-			if (mPlayer != null) {
-				return (mPlayer.getCurrentPosition() * 100)
-						/ mPlayer.getDuration();
-			}
-			return 0;
+	@Override
+	public int getBufferPercentage() {
+		if (mPlayer != null) {
+			return (mPlayer.getCurrentPosition() * 100) / mPlayer.getDuration();
 		}
+		return 0;
+	}
 
-		@Override
-		public int getCurrentPosition() {
-			if (mPlayer != null) {
-				mCurrentPosition = mPlayer.getCurrentPosition();
-			}
-			return mCurrentPosition;
+	@Override
+	public int getCurrentPosition() {
+		if (mPlayer != null) {
+			mCurrentPosition = mPlayer.getCurrentPosition();
 		}
+		return mCurrentPosition;
+	}
 
-		@Override
-		public int getDuration() {
-			if (mPlayer != null) {
-				return mPlayer.getDuration();
-			}
-			return 0;
+	@Override
+	public int getDuration() {
+		if (mPlayer != null) {
+			return mPlayer.getDuration();
 		}
+		return 0;
+	}
 
-		@Override
-		public boolean isPlaying() {
-			if (mPlayer != null) {
+	@Override
+	public boolean isPlaying() {
+		if (mPlayer != null) {
+			try {
 				return mPlayer.isPlaying();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
 			}
-			return false;
 		}
+		return false;
+	}
 
-		@Override
-		public void pause() {
-			if (mPlayer != null) {
+	@Override
+	public void pause() {
+		if (mPlayer != null) {
+			try {
 				if (mPlayer.isPlaying()) {
 					mPlayer.pause();
 					mCurrentPosition = getCurrentPosition();
 				}
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
 			}
 		}
+	}
 
-		@Override
-		public void seekTo(int pos) {
-			if (mPlayer != null) {
+	@Override
+	public void seekTo(int pos) {
+		if (mPlayer != null) {
+			try {
 				mPlayer.seekTo(pos);
 				mCurrentPosition = getCurrentPosition();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
 			}
-
 		}
+	}
 
-		@Override
-		public void start() {
-			if (mPlayer != null) {
+	@Override
+	public void start() {
+		if (mPlayer != null) {
+			try {
 				if (!mPlayer.isPlaying()) {
 					mPlayer.start();
 				}
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
 			}
 		}
-	};
+	}
 
+	@Override
+	public void fullScreenModel() {
+		stopPlayer();
+		fullScreenModel.onFullScreenModel();
+	}
+
+	public void stopPlayer() {
+		try {
+			mPlayer.pause();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+		mController.updatePausePlay();
+	}
+
+	public interface FullScreenModelListener {
+		void onFullScreenModel();
+	}
 }
