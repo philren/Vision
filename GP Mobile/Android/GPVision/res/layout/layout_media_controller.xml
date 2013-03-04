@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="@dimen/padding_small"
+    android:paddingTop="@dimen/padding_small" >
+
+    <ImageButton
+        android:id="@+id/media_controller_play_pause_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_media_controller_button_play" />
+
+    <SeekBar
+        android:id="@+id/media_controller_play_seek_bar"
+        style="@style/video_play_seek_bar"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_tiny"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/media_controller_current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/video_play_fragment_init_time"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/video_play_fragment_slash"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/media_controller_end_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/video_play_fragment_init_time"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageButton
+        android:id="@+id/media_controller_volume_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/padding_small"
+        android:background="@drawable/icon_media_controller_button_volume" />
+
+    <ImageButton
+        android:id="@+id/media_controller_full_screen_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_media_controller_button_full_screen" />
+
+</LinearLayout>

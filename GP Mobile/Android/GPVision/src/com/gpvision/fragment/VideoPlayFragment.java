@@ -3,6 +3,7 @@ package com.gpvision.fragment;
 import com.gpvision.R;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
+import com.gpvision.ui.MediaPlayUI.Model;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,7 +40,8 @@ public class VideoPlayFragment extends BaseFragment {
 				.findViewById(R.id.video_play_fragment_media_play);
 		// test only
 		mediaPlayer.setVideo(
-				Uri.parse("http://192.168.1.100:8080/video/test.mp4"), false);
+				Uri.parse("http://192.168.1.100:8080/video/test.mp4"),
+				Model.Normal);
 		return view;
 	}
 
