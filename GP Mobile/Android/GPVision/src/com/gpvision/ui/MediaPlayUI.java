@@ -97,9 +97,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 				@Override
 				public void onPrepared(MediaPlayer mp) {
+					seekTo(position);
 					mp.start();
 					mController.updatePausePlay();
-					seekTo(position);
 				}
 			});
 			mPlayer.setOnCompletionListener(new OnCompletionListener() {
