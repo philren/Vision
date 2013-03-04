@@ -4,7 +4,9 @@ import java.util.Formatter;
 import java.util.Locale;
 import com.gpvision.R;
 
+import android.app.Service;
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -20,15 +23,19 @@ public class MediaController extends FrameLayout {
 
 	private static final int UPDATE_PROGRESS = 1417;
 	private static final int CANCEL_UPDATE = 1418;
-	private static final int DELAY = 1000;
+	private static final int CANCEL_VOLUME_BAR = 1419;
+	private static final int UPDATE_PROGRESS_DELAY = 1000;
+	private static final int VOLUME_BAR_SHOW_TIME = 1000 * 10;
 
 	private MediaPlayerControl mPlayer;
 	private View mRoot;
 	private ImageButton mPauseButton;
 	private ImageButton mVolumeButton;
 	private ImageButton mFullScreenButton;
-	private SeekBar mSeekBar;
+	private SeekBar mPlaySeekBar;
+	private SeekBar mVolumeSeekBar;
 	private TextView mEndTime, mCurrentTime;
+	private LinearLayout mPlayLayout, mVolumeLayout;
 
 	private StringBuilder mFormatBuilder;
 	private Formatter mFormatter;
@@ -51,15 +58,19 @@ public class MediaController extends FrameLayout {
 	private void init() {
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		mRoot = inflater.inflate(R.layout.layout_media_controller, null);
+		mPlayLayout = (LinearLayout) mRoot
+				.findViewById(R.id.media_controller_play_layout);
+		mVolumeLayout = (LinearLayout) mRoot
+				.findViewById(R.id.media_controller_volume_layout);
 
 		mPauseButton = (ImageButton) mRoot
 				.findViewById(R.id.media_controller_play_pause_btn);
 		mPauseButton.setOnClickListener(mPauseListener);
 
-		mSeekBar = (SeekBar) mRoot
+		mPlaySeekBar = (SeekBar) mRoot
 				.findViewById(R.id.media_controller_play_seek_bar);
-		mSeekBar.setMax(1000);
-		mSeekBar.setOnSeekBarChangeListener(mSeekListener);
+		mPlaySeekBar.setMax(1000);
+		mPlaySeekBar.setOnSeekBarChangeListener(mPlaySeekListener);
 
 		mCurrentTime = (TextView) mRoot
 				.findViewById(R.id.media_controller_current_time);
@@ -67,6 +78,14 @@ public class MediaController extends FrameLayout {
 				.findViewById(R.id.media_controller_end_time);
 		mFormatBuilder = new StringBuilder();
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+
+		mVolumeButton = (ImageButton) mRoot
+				.findViewById(R.id.media_controller_volume_btn);
+		mVolumeButton.setOnClickListener(mVolumeListener);
+		mVolumeSeekBar = (SeekBar) mRoot
+				.findViewById(R.id.media_controller_volume_seekBar);
+		mVolumeSeekBar.setMax(1000);
+		mVolumeSeekBar.setOnSeekBarChangeListener(mVolumeSeekListener);
 
 		mFullScreenButton = (ImageButton) mRoot
 				.findViewById(R.id.media_controller_full_screen_btn);
@@ -100,14 +119,14 @@ public class MediaController extends FrameLayout {
 		}
 		int position = mPlayer.getCurrentPosition();
 		int duration = mPlayer.getDuration();
-		if (mSeekBar != null) {
+		if (mPlaySeekBar != null) {
 			if (duration > 0) {
 				// use long to avoid overflow
 				long pos = 1000L * position / duration;
-				mSeekBar.setProgress((int) pos);
+				mPlaySeekBar.setProgress((int) pos);
 			}
 			int percent = mPlayer.getBufferPercentage();
-			mSeekBar.setSecondaryProgress(percent * 10);
+			mPlaySeekBar.setSecondaryProgress(percent * 10);
 		}
 
 		if (mEndTime != null)
@@ -143,18 +162,70 @@ public class MediaController extends FrameLayout {
 		}
 	}
 
+	private void setVolume(float precent) {
+		AudioManager audioManager = (AudioManager) getContext()
+				.getSystemService(Service.AUDIO_SERVICE);
+		audioManager
+				.setStreamVolume(
+						AudioManager.STREAM_MUSIC,
+						(int) (audioManager
+								.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * precent),
+						AudioManager.FLAG_VIBRATE);
+	}
+
+	private float getVolume() {
+		AudioManager audioManager = (AudioManager) getContext()
+				.getSystemService(Service.AUDIO_SERVICE);
+		return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) * 1.0f
+				/ audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+	}
+
 	private View.OnClickListener mPauseListener = new View.OnClickListener() {
 		public void onClick(View v) {
 			doPauseResume();
 		}
 	};
+
+	private View.OnClickListener mVolumeListener = new View.OnClickListener() {
+		public void onClick(View v) {
+			mPlayLayout.setVisibility(View.GONE);
+			mVolumeLayout.setVisibility(View.VISIBLE);
+
+			mVolumeSeekBar.setProgress((int) (getVolume() * 1000));
+			handler.sendEmptyMessageDelayed(CANCEL_VOLUME_BAR,
+					VOLUME_BAR_SHOW_TIME);
+		}
+	};
+
 	private View.OnClickListener mFullScreenListener = new View.OnClickListener() {
 		public void onClick(View v) {
 			mPlayer.fullScreenModel();
 		}
 	};
 
-	private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
+	private OnSeekBarChangeListener mVolumeSeekListener = new OnSeekBarChangeListener() {
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+
+		}
+
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			if (!fromUser) {
+				return;
+			}
+			setVolume(progress * 1.0f / 1000);
+		}
+	};
+
+	private OnSeekBarChangeListener mPlaySeekListener = new OnSeekBarChangeListener() {
 		public void onStartTrackingTouch(SeekBar bar) {
 
 		}
@@ -188,10 +259,14 @@ public class MediaController extends FrameLayout {
 			switch (msg.what) {
 			case UPDATE_PROGRESS:
 				setProgress();
-				sendEmptyMessageDelayed(UPDATE_PROGRESS, DELAY);
+				sendEmptyMessageDelayed(UPDATE_PROGRESS, UPDATE_PROGRESS_DELAY);
 				break;
 			case CANCEL_UPDATE:
 				removeMessages(UPDATE_PROGRESS);
+				break;
+			case CANCEL_VOLUME_BAR:
+				mPlayLayout.setVisibility(View.VISIBLE);
+				mVolumeLayout.setVisibility(View.GONE);
 				break;
 			default:
 				break;

@@ -44,7 +44,10 @@ public class FullScreenPlayActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		mediaPlayer.stopPlayer();
-		super.onBackPressed();
+		Intent intent = new Intent();
+		intent.putExtra(ARGS_POSITION_KEY, mediaPlayer.getCurrentPosition());
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 
 }
