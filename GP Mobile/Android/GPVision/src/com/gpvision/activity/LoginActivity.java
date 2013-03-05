@@ -1,6 +1,9 @@
 package com.gpvision.activity;
 
 import com.gpvision.R;
+import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.GetAppTokenRequest;
+import com.gpvision.api.response.GetAppTokenResponse;
 import com.gpvision.utils.AppUtils;
 
 import android.content.Intent;
@@ -58,6 +61,19 @@ public class LoginActivity extends BaseActivity {
 		}
 
 		// TODO call API
+		new GetAppTokenRequest()
+				.start(new APIResponseHandler<GetAppTokenResponse>() {
+
+					@Override
+					public void handleResponse(GetAppTokenResponse response) {
+
+					}
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+
+					}
+				});
 		Intent intent = new Intent();
 		intent.setClass(LoginActivity.this, MainActivity.class);
 		startActivity(intent);

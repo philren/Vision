@@ -110,7 +110,7 @@ public class VideoButtons extends LinearLayout {
 			dialog.setTitle(R.string.video_info_fragment_alert_dialog_title_warning);
 			String message = getResources().getString(
 					R.string.video_info_fragment_alert_dialog_message_delete);
-			dialog.setMessage(String.format(message, video.getName()));
+			dialog.setMessage(String.format(message, video.getOriginalName()));
 			dialog.setPositiveButton(R.string.base_ok,
 					new DialogInterface.OnClickListener() {
 
@@ -132,7 +132,7 @@ public class VideoButtons extends LinearLayout {
 			dialog.setTitle(R.string.video_info_fragment_alert_dialog_title_warning);
 			String message = getResources().getString(
 					R.string.video_info_fragment_alert_dialog_message_abort);
-			dialog.setMessage(String.format(message, video.getName()));
+			dialog.setMessage(String.format(message, video.getOriginalName()));
 			dialog.setPositiveButton(R.string.base_ok,
 					new DialogInterface.OnClickListener() {
 

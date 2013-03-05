@@ -41,7 +41,7 @@ public class VideoPlayFragment extends BaseFragment {
 				false);
 		TextView videoName = (TextView) view
 				.findViewById(R.id.video_play_fragment_video_name);
-		videoName.setText(video.getName());
+		videoName.setText(video.getOriginalName());
 
 		mediaPlayer = (MediaPlayUI) view
 				.findViewById(R.id.video_play_fragment_media_play);

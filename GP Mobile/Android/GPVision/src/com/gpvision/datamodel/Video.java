@@ -4,28 +4,37 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Video implements Parcelable {
-	private long id;
-	private String name;
+	private String uuid;
+	private String storeName;
+	private String originalName;
 	private Status status;
 
 	public Video() {
 		super();
 	}
 
-	public long getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
-	public String getName() {
-		return name;
+	public String getStoreName() {
+		return storeName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setStoreName(String storeName) {
+		this.storeName = storeName;
+	}
+
+	public String getOriginalName() {
+		return originalName;
+	}
+
+	public void setOriginalName(String name) {
+		this.originalName = name;
 	}
 
 	public Status getStatus() {
@@ -47,14 +56,16 @@ public class Video implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(id);
-		dest.writeString(name);
+		dest.writeString(uuid);
+		dest.writeString(storeName);
+		dest.writeString(originalName);
 		dest.writeString(status.name());
 	}
 
 	public Video(Parcel source) {
-		id = source.readLong();
-		name = source.readString();
+		uuid = source.readString();
+		storeName = source.readString();
+		originalName = source.readString();
 		status = Status.valueOf(source.readString());
 	}
 
