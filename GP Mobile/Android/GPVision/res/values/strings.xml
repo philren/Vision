@@ -31,4 +31,7 @@
     <string name="video_play_fragment_slash">/</string>
     <string name="video_play_fragment_init_time">00:00</string>
 
+    <!-- dialog strings -->
+    <string name="dialog_message_loading">Loading...</string>
+
 </resources>

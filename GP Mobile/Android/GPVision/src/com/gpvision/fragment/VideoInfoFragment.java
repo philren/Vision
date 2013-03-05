@@ -22,13 +22,13 @@ public class VideoInfoFragment extends BaseFragment {
 		// TODO call API
 		videos = new ArrayList<Video>();// test only
 		Video video1 = new Video();
-		video1.setName("first.mp4");
+		video1.setOriginalName("first.mp4");
 		video1.setStatus(Status.Uploading);
 		Video video2 = new Video();
-		video2.setName("second.avi");
+		video2.setOriginalName("second.avi");
 		video2.setStatus(Status.Indexed);
 		Video video3 = new Video();
-		video3.setName("third.ogg");
+		video3.setOriginalName("third.ogg");
 		video3.setStatus(Status.Deleted);
 		videos.add(video1);
 		videos.add(video2);

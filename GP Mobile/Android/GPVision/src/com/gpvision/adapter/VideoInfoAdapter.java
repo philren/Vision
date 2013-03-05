@@ -60,7 +60,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 			holder = (ViewHolder) view.getTag();
 		}
 		Video video = videos.get(position);
-		holder.videoName.setText(video.getName());
+		holder.videoName.setText(video.getOriginalName());
 		holder.videoStatus.setText(video.getStatus().toString());
 		holder.videoButtons.setVideo(video, listener);
 		return view;
