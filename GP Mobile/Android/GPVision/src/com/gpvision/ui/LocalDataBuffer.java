@@ -1,32 +1,25 @@
 package com.gpvision.ui;
 
+import com.gpvision.datamodel.Account;
+
 public class LocalDataBuffer {
 	private static LocalDataBuffer instance = new LocalDataBuffer();
 
 	private LocalDataBuffer() {
 	}
 
-	public LocalDataBuffer getInstance() {
+	public static LocalDataBuffer getInstance() {
 		return instance;
 	}
 
-	private String appToken = null;
-	private String userToken = null;
+	private Account account;
 
-	public String getAppToken() {
-		return appToken;
+	public Account getAccount() {
+		return account;
 	}
 
-	public void setAppToken(String appToken) {
-		this.appToken = appToken;
-	}
-
-	public String getUserToken() {
-		return userToken;
-	}
-
-	public void setUserToken(String userToken) {
-		this.userToken = userToken;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 }

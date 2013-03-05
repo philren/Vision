@@ -3,8 +3,14 @@ package com.gpvision.activity;
 import com.gpvision.R;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.GetAppTokenRequest;
+import com.gpvision.api.request.GetUserTokenResquest;
 import com.gpvision.api.response.GetAppTokenResponse;
+import com.gpvision.api.response.GetUserTokenResponse;
+import com.gpvision.datamodel.Account;
+import com.gpvision.ui.LoadingDialog;
+import com.gpvision.ui.LocalDataBuffer;
 import com.gpvision.utils.AppUtils;
+import com.gpvision.utils.LogUtil;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +24,7 @@ public class LoginActivity extends BaseActivity {
 	private EditText mPassword;
 
 	private Button mLogIn;
+	private LoadingDialog dialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +37,10 @@ public class LoginActivity extends BaseActivity {
 		mLogIn = (Button) findViewById(R.id.login_activity_log_in);
 
 		mLogIn.setOnClickListener(this);
+
+		// test only
+		mEmail.setText("test002");
+		mPassword.setText("123456");
 	}
 
 	@Override
@@ -60,20 +71,69 @@ public class LoginActivity extends BaseActivity {
 			return;
 		}
 
-		// TODO call API
+		dialog = new LoadingDialog(LoginActivity.this);
+		dialog.show();
+		Account account = LocalDataBuffer.getInstance().getAccount();
+		if (account == null) {
+			account = new Account();
+			LocalDataBuffer.getInstance().setAccount(account);
+		}
+		if (account.getAppToken() == null) {
+			getAppToken();
+		} else {
+			if (account.getUserToken() == null) {
+				getUserToken();
+			} else {
+				logined();
+			}
+		}
+
+	}
+
+	private void getAppToken() {
 		new GetAppTokenRequest()
 				.start(new APIResponseHandler<GetAppTokenResponse>() {
 
 					@Override
 					public void handleResponse(GetAppTokenResponse response) {
-
+						Account account = LocalDataBuffer.getInstance()
+								.getAccount();
+						account.setAppToken(response.getAppToken());
+						getUserToken();
 					}
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
-
+						LogUtil.logE(errorMessage);
 					}
 				});
+	}
+
+	private void getUserToken() {
+		final String userName = mEmail.getText().toString().trim();
+		String password = mPassword.getText().toString().trim();
+		new GetUserTokenResquest(userName, password)
+				.start(new APIResponseHandler<GetUserTokenResponse>() {
+
+					@Override
+					public void handleResponse(GetUserTokenResponse response) {
+						Account account = LocalDataBuffer.getInstance()
+								.getAccount();
+						account.setAccount(userName);
+						account.setUserToken(response.getUserToken());
+						logined();
+						dialog.dismiss();
+					}
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+						LogUtil.logE(errorMessage);
+						dialog.dismiss();
+					}
+				});
+	}
+
+	private void logined() {
 		Intent intent = new Intent();
 		intent.setClass(LoginActivity.this, MainActivity.class);
 		startActivity(intent);

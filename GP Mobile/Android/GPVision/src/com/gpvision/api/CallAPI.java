@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.gpvision.http.HttpRequest;
 import com.gpvision.http.HttpResponse;
+import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.Environment;
 import com.gpvision.utils.LogUtil;
 
@@ -30,10 +32,7 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 
 	protected HashMap<String, String> getHeaders() {
 		HashMap<String, String> headers = new HashMap<String, String>();
-
-		// default Accept and Content-Type headers
 		headers.put(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
-
 		return headers;
 	}
 
@@ -50,8 +49,10 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 	private String getUrl() {
 		Uri.Builder builder = new Uri.Builder();
 		builder.encodedPath(String.format("%s://%s", SCHEME,
-				Environment.E0.getHost()));
-		builder.appendPath(Environment.E0.getBasePath());
+				Environment.E9.getHost()));
+		if (!AppUtils.isEmpty(Environment.E9.getBasePath())) {
+			builder.appendPath(Environment.E9.getBasePath());
+		}
 		getComponent(builder);
 		addGetParams(builder);
 		return builder.toString();
@@ -98,12 +99,31 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 		if (responseHandler == null)
 			return;
 
-		if (result.isSuccess())
+		if (result.isSuccess()) {
 			try {
 				onResponseReceived(result.getData());
 			} catch (JSONException e) {
 				e.printStackTrace();
+				handleError(result.getData());
 			}
+		} else {
+			responseHandler.handleError(APIError.NETWORK_ERROR.first,
+					APIError.NETWORK_ERROR.second);
+		}
+	}
+
+	private void handleError(String response) {
+		JSONObject json;
+		try {
+			json = new JSONObject(response);
+			long errorCode = json.getLong("errorCode");
+			String errorMessage = json.getString("error");
+			responseHandler.handleError(errorCode, errorMessage);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			responseHandler.handleError(APIError.UNKOOW_ERROR.first,
+					APIError.UNKOOW_ERROR.second);
+		}
 	}
 
 	protected abstract void onResponseReceived(String respString)

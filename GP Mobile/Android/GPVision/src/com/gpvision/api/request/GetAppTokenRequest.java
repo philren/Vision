@@ -17,8 +17,8 @@ public class GetAppTokenRequest extends CallAPI<GetAppTokenResponse> {
 
 	@Override
 	protected void onResponseReceived(String respString) throws JSONException {
-		// TODO Auto-generated method stub
-
+		GetAppTokenResponse response = new GetAppTokenResponse(respString);
+		responseHandler.handleResponse(response);
 	}
 
 }

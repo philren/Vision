@@ -7,12 +7,12 @@ import android.content.Context;
 
 public class LoadingDialog extends ProgressDialog {
 
-	private LoadingDialog(Context context, int theme) {
+	public LoadingDialog(Context context, int theme) {
 		super(context, theme);
 		init();
 	}
 
-	private LoadingDialog(Context context) {
+	public LoadingDialog(Context context) {
 		super(context);
 		init();
 	}
