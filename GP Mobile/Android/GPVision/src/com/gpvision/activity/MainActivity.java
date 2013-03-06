@@ -2,10 +2,13 @@ package com.gpvision.activity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.widget.TextView;
+
 import com.gpvision.R;
 
 import android.os.Bundle;
 import com.gpvision.fragment.VideoInfoFragment;
+import com.gpvision.ui.LocalDataBuffer;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 import com.gpvision.utils.MessageCenter.MessageListener;
@@ -19,11 +22,14 @@ public class MainActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		TextView account = (TextView) findViewById(R.id.main_activity_logined_user_name);
+		account.setText(LocalDataBuffer.getInstance().getAccount().getAccount());
+
 		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction();
 		VideoInfoFragment fragment = new VideoInfoFragment();
 		transaction.replace(R.id.main_activity_fragment_content, fragment);
-		transaction.addToBackStack(null).commit();
+		transaction.commit();
 	}
 
 	@Override

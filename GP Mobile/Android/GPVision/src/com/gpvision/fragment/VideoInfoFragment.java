@@ -9,8 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import com.gpvision.R;
 import com.gpvision.adapter.VideoInfoAdapter;
+import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.GetMediaListRequset;
+import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.ui.LoadingDialog;
+import com.gpvision.utils.LogUtil;
 
 public class VideoInfoFragment extends BaseFragment {
 	private VideoInfoAdapter adapter;
@@ -19,20 +24,7 @@ public class VideoInfoFragment extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// TODO call API
-		videos = new ArrayList<Video>();// test only
-		Video video1 = new Video();
-		video1.setOriginalName("first.mp4");
-		video1.setStatus(Status.Uploading);
-		Video video2 = new Video();
-		video2.setOriginalName("second.avi");
-		video2.setStatus(Status.Indexed);
-		Video video3 = new Video();
-		video3.setOriginalName("third.ogg");
-		video3.setStatus(Status.Deleted);
-		videos.add(video1);
-		videos.add(video2);
-		videos.add(video3);
+		getVideoList();
 	}
 
 	@Override
@@ -46,5 +38,30 @@ public class VideoInfoFragment extends BaseFragment {
 		adapter = new VideoInfoAdapter(videos);
 		videoInfoList.setAdapter(adapter);
 		return view;
+	}
+
+	private void getVideoList() {
+		final LoadingDialog dialog = new LoadingDialog(getActivity());
+		dialog.show();
+		new GetMediaListRequset()
+				.start(new APIResponseHandler<GetMediaListResponse>() {
+
+					@Override
+					public void handleResponse(GetMediaListResponse response) {
+						videos = response.getVideos();
+						videos.get(0).setStatus(Status.Indexed);// test only
+						videos.get(1).setStatus(Status.Uploading);
+						videos.get(2).setStatus(Status.Failed);
+						adapter.setVideos(videos);
+						adapter.notifyDataSetChanged();
+						dialog.dismiss();
+					}
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+						LogUtil.logE(errorMessage);
+						dialog.dismiss();
+					}
+				});
 	}
 }

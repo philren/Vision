@@ -30,6 +30,9 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	public void setVideo(Video video, VideoStatusChangedListener listener) {
+		if (video.getStatus() == null) {
+			return;
+		}
 		this.video = video;
 		this.listener = listener;
 		removeAllViews();

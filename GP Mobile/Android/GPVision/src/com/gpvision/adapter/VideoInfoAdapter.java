@@ -21,6 +21,14 @@ public class VideoInfoAdapter extends BaseAdapter {
 		this.videos = videos;
 	}
 
+	public ArrayList<Video> getVideos() {
+		return videos;
+	}
+
+	public void setVideos(ArrayList<Video> videos) {
+		this.videos = videos;
+	}
+
 	@Override
 	public int getCount() {
 		if (videos != null) {
@@ -61,7 +69,9 @@ public class VideoInfoAdapter extends BaseAdapter {
 		}
 		Video video = videos.get(position);
 		holder.videoName.setText(video.getOriginalName());
-		holder.videoStatus.setText(video.getStatus().toString());
+		if (video.getStatus() != null) {
+			holder.videoStatus.setText(video.getStatus().toString());
+		}
 		holder.videoButtons.setVideo(video, listener);
 		return view;
 	}
