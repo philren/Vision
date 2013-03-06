@@ -2,10 +2,13 @@ package com.gpvision.fragment;
 
 import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
+import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
+import com.gpvision.utils.Environment;
+import com.gpvision.utils.LogUtil;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -14,6 +17,9 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Gallery;
 import android.widget.TextView;
 
 public class VideoPlayFragment extends BaseFragment {
@@ -45,10 +51,8 @@ public class VideoPlayFragment extends BaseFragment {
 
 		mediaPlayer = (MediaPlayUI) view
 				.findViewById(R.id.video_play_fragment_media_play);
-		// test only
-		mediaPlayer.setVideo(
-				Uri.parse("http://192.168.1.100:8080/video/test.mp4"),
-				Model.Normal, currentPosition);
+		mediaPlayer.setVideo(getVideoUri(video.getStoreName()), Model.Normal,
+				currentPosition);
 		mediaPlayer.setOnFullScreenModelListener(new FullScreenModelListener() {
 
 			@Override
@@ -56,8 +60,8 @@ public class VideoPlayFragment extends BaseFragment {
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), FullScreenPlayActivity.class);
 				Bundle extras = new Bundle();
-				extras.putParcelable(FullScreenPlayActivity.ARGS_VIDEO_KEY,
-						video);
+				extras.putParcelable(FullScreenPlayActivity.ARGS_VIDEO_URI_KEY,
+						getVideoUri(video.getStoreName()));
 				currentPosition = mediaPlayer.getCurrentPosition();
 				extras.putInt(FullScreenPlayActivity.ARGS_POSITION_KEY,
 						currentPosition);
@@ -65,6 +69,11 @@ public class VideoPlayFragment extends BaseFragment {
 				startActivityForResult(intent, REQUEST_CODE_FULL_SCREEN);
 			}
 		});
+
+		Gallery gallery = (Gallery) view
+				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
+		gallery.setAdapter(new ImageAdapter());
+		gallery.setOnItemClickListener(listener);
 		return view;
 	}
 
@@ -77,4 +86,26 @@ public class VideoPlayFragment extends BaseFragment {
 					FullScreenPlayActivity.ARGS_POSITION_KEY, 0);
 		}
 	}
+
+	private Uri getVideoUri(String storeName) {
+		Uri.Builder builder = new Uri.Builder();
+		builder.encodedPath(String.format("%s://%s", "http",
+				Environment.E9.getHost()));
+		if (Environment.E9.getBasePath() != null) {
+			builder.appendEncodedPath(Environment.E9.getBasePath());
+		}
+		builder.appendEncodedPath("api");
+		builder.appendEncodedPath("getvideo");
+		builder.appendEncodedPath(storeName);
+		return builder.build();
+	}
+
+	private OnItemClickListener listener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			LogUtil.logI("click:" + position);
+		}
+	};
 }

@@ -11,7 +11,6 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -50,6 +49,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 			@Override
 			public void surfaceDestroyed(SurfaceHolder holder) {
+				mPlayer.stop();
+				mPlayer.reset();
 				mPlayer.release();
 			}
 
@@ -97,9 +98,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 				@Override
 				public void onPrepared(MediaPlayer mp) {
-					seekTo(position);
 					mp.start();
 					mController.updatePausePlay();
+					seekTo(position);
 				}
 			});
 			mPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -118,14 +119,6 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (mController != null) {
-			// mController.show();
-		}
-		return super.onTouchEvent(event);
 	}
 
 	@Override
@@ -170,7 +163,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			try {
 				if (mPlayer.isPlaying()) {
 					mPlayer.pause();
-					mCurrentPosition = getCurrentPosition();
+					mCurrentPosition = mPlayer.getCurrentPosition();
 				}
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
@@ -183,7 +176,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		if (mPlayer != null) {
 			try {
 				mPlayer.seekTo(pos);
-				mCurrentPosition = getCurrentPosition();
+				mCurrentPosition = mPlayer.getCurrentPosition();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
@@ -205,17 +198,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public void fullScreenModel() {
-		stopPlayer();
+		pause();
 		fullScreenModel.onFullScreenModel();
-	}
-
-	public void stopPlayer() {
-		try {
-			mPlayer.pause();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-		mController.updatePausePlay();
 	}
 
 	public interface FullScreenModelListener {

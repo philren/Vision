@@ -20,6 +20,10 @@
     <Gallery
         android:id="@+id/video_play_fragment_indexing_images_gallery"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dip"
+        android:layout_marginBottom="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_large"
+        android:layout_weight="1"
+        android:spacing="@dimen/padding_small" />
 
 </LinearLayout>

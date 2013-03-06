@@ -1,7 +1,6 @@
 package com.gpvision.activity;
 
 import com.gpvision.R;
-import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
@@ -12,10 +11,9 @@ import android.os.Bundle;
 
 public class FullScreenPlayActivity extends BaseActivity {
 
-	public static final String ARGS_VIDEO_KEY = "video";
+	public static final String ARGS_VIDEO_URI_KEY = "video uri";
 	public static final String ARGS_POSITION_KEY = "position";
 
-	private Video video;
 	private int position;
 	private MediaPlayUI mediaPlayer;
 
@@ -25,12 +23,10 @@ public class FullScreenPlayActivity extends BaseActivity {
 		setContentView(R.layout.activity_full_screen_play);
 
 		Intent args = getIntent();
-		video = args.getParcelableExtra(ARGS_VIDEO_KEY);
+		Uri uri = args.getParcelableExtra(ARGS_VIDEO_URI_KEY);
 		position = args.getIntExtra(ARGS_POSITION_KEY, 0);
 		mediaPlayer = (MediaPlayUI) findViewById(R.id.full_screen_play_activity_media_play_ui);
-		mediaPlayer.setVideo(
-				Uri.parse("http://192.168.1.100:8080/video/test.mp4"),
-				Model.FullScreen, position);
+		mediaPlayer.setVideo(uri, Model.FullScreen, position);
 		mediaPlayer.seekTo(position);
 		mediaPlayer.setOnFullScreenModelListener(new FullScreenModelListener() {
 
@@ -43,7 +39,7 @@ public class FullScreenPlayActivity extends BaseActivity {
 
 	@Override
 	public void onBackPressed() {
-		mediaPlayer.stopPlayer();
+		mediaPlayer.pause();
 		Intent intent = new Intent();
 		intent.putExtra(ARGS_POSITION_KEY, mediaPlayer.getCurrentPosition());
 		setResult(RESULT_OK, intent);
