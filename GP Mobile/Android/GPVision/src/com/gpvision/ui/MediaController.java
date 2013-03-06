@@ -143,7 +143,6 @@ public class MediaController extends FrameLayout {
 		} else {
 			mPlayer.start();
 		}
-		updatePausePlay();
 	}
 
 	private String stringForTime(int timeMs) {
