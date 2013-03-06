@@ -124,7 +124,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	@Override
 	public int getBufferPercentage() {
 		if (mPlayer != null) {
-			return (mPlayer.getCurrentPosition() * 100) / mPlayer.getDuration();
+			try {
+				return (mPlayer.getCurrentPosition() * 100)
+						/ mPlayer.getDuration();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			}
 		}
 		return 0;
 	}
@@ -132,7 +137,11 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	@Override
 	public int getCurrentPosition() {
 		if (mPlayer != null) {
-			mCurrentPosition = mPlayer.getCurrentPosition();
+			try {
+				mCurrentPosition = mPlayer.getCurrentPosition();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			}
 		}
 		return mCurrentPosition;
 	}
@@ -140,7 +149,11 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	@Override
 	public int getDuration() {
 		if (mPlayer != null) {
-			return mPlayer.getDuration();
+			try {
+				return mPlayer.getDuration();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			}
 		}
 		return 0;
 	}
@@ -167,6 +180,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				}
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
+			} finally {
+				mController.updatePausePlay();
 			}
 		}
 	}
@@ -192,6 +207,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				}
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
+			} finally {
+				mController.updatePausePlay();
 			}
 		}
 	}

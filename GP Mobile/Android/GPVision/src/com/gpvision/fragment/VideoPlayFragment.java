@@ -2,6 +2,7 @@ package com.gpvision.fragment;
 
 import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
+import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
@@ -9,6 +10,8 @@ import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
 import com.gpvision.utils.Environment;
 import com.gpvision.utils.LogUtil;
+import com.gpvision.utils.Message;
+import com.gpvision.utils.MessageCenter;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -87,6 +90,12 @@ public class VideoPlayFragment extends BaseFragment {
 		}
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		mediaPlayer.pause();
+	}
+
 	private Uri getVideoUri(String storeName) {
 		Uri.Builder builder = new Uri.Builder();
 		builder.encodedPath(String.format("%s://%s", "http",
@@ -106,6 +115,11 @@ public class VideoPlayFragment extends BaseFragment {
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			LogUtil.logI("click:" + position);
+			SaveAndShareFragment fragment = new SaveAndShareFragment();
+			MessageCenter.getInstance()
+					.sendMessage(
+							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+									fragment));
 		}
 	};
 }

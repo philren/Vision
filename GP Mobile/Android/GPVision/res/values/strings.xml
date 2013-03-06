@@ -31,6 +31,10 @@
     <string name="video_play_fragment_slash">/</string>
     <string name="video_play_fragment_init_time">00:00</string>
 
+    <!-- save and share fragment -->
+    <string name="save_and_share_fragment_save_button_text">Save</string>
+    <string name="save_and_share_fragment_share_button_text">Share</string>
+
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>
 
