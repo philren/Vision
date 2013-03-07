@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import com.gpvision.R;
@@ -16,6 +17,7 @@ import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.ui.LoadingDialog;
 import com.gpvision.utils.LogUtil;
+import com.gpvision.utils.UploadUtil;
 
 public class VideoInfoFragment extends BaseFragment {
 	private VideoInfoAdapter adapter;
@@ -37,6 +39,15 @@ public class VideoInfoFragment extends BaseFragment {
 
 		adapter = new VideoInfoAdapter(videos);
 		videoInfoList.setAdapter(adapter);
+
+		view.findViewById(R.id.video_info_fragment_upload_more_button)
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						new UploadUtil().upload();
+					}
+				});
 		return view;
 	}
 
