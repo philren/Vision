@@ -2,8 +2,6 @@ package com.gpvision.ui;
 
 import java.io.IOException;
 
-import com.gpvision.ui.MediaController.MediaPlayerControl;
-
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -14,15 +12,20 @@ import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.gpvision.ui.MediaController.MediaPlayerControl;
+
 public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
+
 	private SurfaceView mSurfaceView;
 	private MediaPlayer mPlayer;
 	private MediaController mController;
 	private int mCurrentPosition = 0;
 	private FullScreenModelListener fullScreenModel;
+	private FaceBox mFaceBox;
 
 	public enum Model {
 		Normal, FullScreen
@@ -63,8 +66,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			public void surfaceChanged(SurfaceHolder holder, int format,
 					int width, int height) {
 				if (model == Model.Normal) {
-					mSurfaceView.setLayoutParams(new LinearLayout.LayoutParams(
-							width, width * 9 / 16));
+					View view = (View) mSurfaceView.getParent();
+					view.setLayoutParams(new LinearLayout.LayoutParams(width,
+							width * 9 / 16));
 				}
 			}
 		});
@@ -74,14 +78,24 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		mController.setMediaPlayer(this);
 		mController.setEnabled(true);
 
+		mFaceBox = new FaceBox(getContext());
+
 		if (model == Model.Normal) {
 			LinearLayout linearLayout = new LinearLayout(getContext());
 			linearLayout.setOrientation(LinearLayout.VERTICAL);
-			linearLayout.addView(mSurfaceView);
+
+			FrameLayout frameLayout = new FrameLayout(getContext());
+			frameLayout.addView(mSurfaceView, new LayoutParams(
+					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			frameLayout.addView(mFaceBox, new LayoutParams(
+					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+			linearLayout.addView(frameLayout);
 			linearLayout.addView(mController);
 			addView(linearLayout);
 		} else {
 			addView(mSurfaceView);
+			addView(mFaceBox);
 			addView(mController, new FrameLayout.LayoutParams(
 					FrameLayout.LayoutParams.FILL_PARENT,
 					FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
