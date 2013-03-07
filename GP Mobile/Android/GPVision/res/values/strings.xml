@@ -35,6 +35,12 @@
     <string name="save_and_share_fragment_save_button_text">Save</string>
     <string name="save_and_share_fragment_share_button_text">Share</string>
 
+    <!-- notification fragment -->
+    <string name="notification_fragment_remove_button_text">Remove</string>
+    <string name="notification_fragment_clean_button_text">Clean</string>
+    <string name="notification_fragment_alert_dialog_title_Clean">Clean!</string>
+    <string name="notification_fragment_alert_dialog_message_clean">Are you sure to clean the notifications?</string>
+
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>
 

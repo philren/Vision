@@ -39,7 +39,7 @@ public class LoginActivity extends BaseActivity {
 		mLogIn.setOnClickListener(this);
 
 		// test only
-		mEmail.setText("test002");
+		mEmail.setText("mobile001");
 		mPassword.setText("123456");
 	}
 
