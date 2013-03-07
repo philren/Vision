@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.gpvision.R;
 import com.gpvision.datamodel.Notification;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ public class NotificationAdapter extends BaseAdapter {
 
 	private ArrayList<Notification> notifications;
 	private LayoutInflater inflater;
+	private int selected = -1;
 
 	public NotificationAdapter(ArrayList<Notification> notifications) {
 		super();
@@ -27,6 +29,14 @@ public class NotificationAdapter extends BaseAdapter {
 
 	public void setNotifications(ArrayList<Notification> notifications) {
 		this.notifications = notifications;
+	}
+
+	public int getSelected() {
+		return selected;
+	}
+
+	public void setSelected(int selected) {
+		this.selected = selected;
 	}
 
 	@Override
@@ -70,6 +80,11 @@ public class NotificationAdapter extends BaseAdapter {
 
 		holder.title.setText(notification.getTitle());
 		holder.message.setText(notification.getMessage());
+		if (position == selected) {
+			view.setBackgroundColor(Color.RED);
+		} else {
+			view.setBackgroundColor(Color.WHITE);
+		}
 		return view;
 	}
 
