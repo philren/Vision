@@ -1,8 +1,11 @@
 package com.gpvision.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import org.apache.http.client.ClientProtocolException;
 
 import com.gpvision.http.HttpRequest;
 
@@ -29,7 +32,6 @@ public class UploadUtil {
 						android.os.Environment.getExternalStorageDirectory()
 								+ "/test/test.mp4");
 				request.setPostBody(file);
-				
 
 				String response = null;
 				int responseCode = 0;
@@ -37,8 +39,10 @@ public class UploadUtil {
 					request.execute();
 					response = request.getString();
 					responseCode = request.getStatusCode();
-					LogUtil.logI(response);
-				} catch (Exception e) {
+					LogUtil.logI(response + responseCode);
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				return null;
