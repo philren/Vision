@@ -2,11 +2,15 @@ package com.gpvision.activity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.gpvision.R;
 
 import android.os.Bundle;
+
+import com.gpvision.fragment.NotificationFragment;
 import com.gpvision.fragment.VideoInfoFragment;
 import com.gpvision.ui.LocalDataBuffer;
 import com.gpvision.utils.Message;
@@ -25,6 +29,8 @@ public class MainActivity extends BaseActivity {
 		TextView account = (TextView) findViewById(R.id.main_activity_logined_user_name);
 		account.setText(LocalDataBuffer.getInstance().getAccount().getAccount());
 
+		Button notification = (Button) findViewById(R.id.main_activity_notifications_btn);
+		notification.setOnClickListener(this);
 		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction();
 		VideoInfoFragment fragment = new VideoInfoFragment();
@@ -60,4 +66,24 @@ public class MainActivity extends BaseActivity {
 			}
 		}
 	};
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.main_activity_notifications_btn:
+			Fragment fragment = getSupportFragmentManager().findFragmentById(
+					R.id.main_activity_fragment_content);
+			if (!(fragment instanceof NotificationFragment)) {
+				NotificationFragment notificationFragment = new NotificationFragment();
+				MessageCenter.getInstance().sendMessage(
+						new Message(MESSAGE_UPDATE_FRAGMENT,
+								notificationFragment));
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
 }

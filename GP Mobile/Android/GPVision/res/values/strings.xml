@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">GPVision</string>
+    <string name="app_name">Video indexing</string>
     <string name="base_ok">OK</string>
     <string name="base_cancel">Cancel</string>
 
@@ -30,6 +30,16 @@
     <!-- video play fragment -->
     <string name="video_play_fragment_slash">/</string>
     <string name="video_play_fragment_init_time">00:00</string>
+
+    <!-- save and share fragment -->
+    <string name="save_and_share_fragment_save_button_text">Save</string>
+    <string name="save_and_share_fragment_share_button_text">Share</string>
+
+    <!-- notification fragment -->
+    <string name="notification_fragment_remove_button_text">Remove</string>
+    <string name="notification_fragment_clean_button_text">Clean</string>
+    <string name="notification_fragment_alert_dialog_title_Clean">Clean!</string>
+    <string name="notification_fragment_alert_dialog_message_clean">Are you sure to clean the notifications?</string>
 
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>
