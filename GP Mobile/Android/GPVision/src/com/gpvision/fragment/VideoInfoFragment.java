@@ -59,7 +59,7 @@ public class VideoInfoFragment extends BaseFragment {
 					@Override
 					public void handleResponse(GetMediaListResponse response) {
 						videos = response.getVideos();
-						videos.get(0).setStatus(Status.Indexed);// test only
+						videos.get(0).setStatus(Status.indexed);// test only
 						// videos.get(1).setStatus(Status.Uploading);
 						// videos.get(2).setStatus(Status.Failed);
 						adapter.setVideos(videos);
@@ -86,7 +86,7 @@ public class VideoInfoFragment extends BaseFragment {
 				public void onChose(File file) {
 					Video video = new Video();
 					video.setOriginalName(file.getName());
-					video.setStatus(Status.Indexing);
+					video.setStatus(Status.indexing);
 					if (videos == null) {
 						videos = new ArrayList<Video>();
 					}
