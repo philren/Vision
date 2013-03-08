@@ -1,6 +1,9 @@
 package com.gpvision.http;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -20,6 +23,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -74,6 +78,19 @@ public class HttpRequest {
 		try {
 			mBody = new StringEntity(body);
 		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setPostBody(File file) {
+		FileInputStream instream = null;
+		try {
+			instream = new FileInputStream(file);
+			InputStreamEntity entity = new InputStreamEntity(instream,
+					file.length());
+			entity.setContentType("binary/octet-stream");
+			mBody = entity;
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

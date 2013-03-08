@@ -1,5 +1,7 @@
 package com.gpvision.api.request;
 
+import java.util.HashMap;
+
 import org.json.JSONException;
 
 import android.net.Uri.Builder;
@@ -20,6 +22,14 @@ public class GetMediaListRequset extends CallAPI<GetMediaListResponse> {
 	protected void addGetParams(Builder builder) {
 		builder.appendQueryParameter("endUserToken", LocalDataBuffer
 				.getInstance().getAccount().getUserToken());
+	}
+
+	@Override
+	protected HashMap<String, String> getHeaders() {
+		HashMap<String, String> headers = super.getHeaders();
+		headers.put("endUserToken", LocalDataBuffer.getInstance().getAccount()
+				.getUserToken());
+		return headers;
 	}
 
 	@Override

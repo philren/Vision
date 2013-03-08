@@ -27,6 +27,12 @@
     <string name="video_info_fragment_alert_dialog_message_delete">Are your sure to delete %s ?</string>
     <string name="video_info_fragment_alert_dialog_message_abort">Are your sure to abort %s ?</string>
 
+    <!-- choose file fragment -->
+    <string name="choose_file_fragment_choose_file">Choose a file</string>
+    <string name="choose_file_fragment_max_file">1GB max per file</string>
+    <string name="choose_file_fragment_upload_button_text">Upload</string>
+    <string name="choose_file_fragment_cancel_button_text">Cancel</string>
+
     <!-- video play fragment -->
     <string name="video_play_fragment_slash">/</string>
     <string name="video_play_fragment_init_time">00:00</string>
