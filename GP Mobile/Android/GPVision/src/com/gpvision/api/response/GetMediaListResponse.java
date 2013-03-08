@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import com.gpvision.api.APIResponse;
 import com.gpvision.datamodel.Video;
+import com.gpvision.datamodel.Video.Status;
 
 public class GetMediaListResponse extends APIResponse {
 	private ArrayList<Video> videos;
@@ -22,6 +23,7 @@ public class GetMediaListResponse extends APIResponse {
 			video.setUuid(jsonObject.getString("videoUUID"));
 			video.setStoreName(jsonObject.getString("videoStoreName"));
 			video.setOriginalName(jsonObject.getString("videoOriginalName"));
+			video.setStatus(Status.valueOf(jsonObject.getString("status")));
 			videos.add(video);
 		}
 	}

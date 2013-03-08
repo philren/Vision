@@ -1,21 +1,27 @@
 package com.gpvision.fragment;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import com.gpvision.R;
+import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.VideoInfoAdapter;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.GetMediaListRequset;
 import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.ui.LoadingDialog;
 import com.gpvision.utils.LogUtil;
+import com.gpvision.utils.Message;
+import com.gpvision.utils.MessageCenter;
 
 public class VideoInfoFragment extends BaseFragment {
 	private VideoInfoAdapter adapter;
@@ -37,6 +43,10 @@ public class VideoInfoFragment extends BaseFragment {
 
 		adapter = new VideoInfoAdapter(videos);
 		videoInfoList.setAdapter(adapter);
+
+		Button uploadButton = (Button) view
+				.findViewById(R.id.video_info_fragment_upload_more_button);
+		uploadButton.setOnClickListener(this);
 		return view;
 	}
 
@@ -49,9 +59,10 @@ public class VideoInfoFragment extends BaseFragment {
 					@Override
 					public void handleResponse(GetMediaListResponse response) {
 						videos = response.getVideos();
-						videos.get(0).setStatus(Status.Indexed);// test only
-//						videos.get(1).setStatus(Status.Uploading);
-//						videos.get(2).setStatus(Status.Failed);
+						if (videos.get(0) != null)
+							videos.get(0).setStatus(Status.indexed);// test only
+						// videos.get(1).setStatus(Status.Uploading);
+						// videos.get(2).setStatus(Status.Failed);
 						adapter.setVideos(videos);
 						adapter.notifyDataSetChanged();
 						dialog.dismiss();
@@ -64,4 +75,35 @@ public class VideoInfoFragment extends BaseFragment {
 					}
 				});
 	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.video_info_fragment_upload_more_button:
+			ChooseFileFragment fragment = new ChooseFileFragment();
+			fragment.setOnChoseListener(new OnChoseListener() {
+
+				@Override
+				public void onChose(File file) {
+					Video video = new Video();
+					video.setOriginalName(file.getName());
+					video.setStatus(Status.indexing);
+					if (videos == null) {
+						videos = new ArrayList<Video>();
+					}
+					videos.add(0, video);
+					adapter.notifyDataSetChanged();
+				}
+			});
+			MessageCenter.getInstance()
+					.sendMessage(
+							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+									fragment));
+			break;
+
+		default:
+			break;
+		}
+	}
+
 }

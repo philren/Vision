@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -20,30 +22,61 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import android.util.Log;
+
+/**
+ * get HTTP response by given URL, config and parameters
+ * 
+ * @author damien_dai
+ */
 public class HttpRequest {
 
-	private static final String CHAR_SET = "utf-8";
+	private static final String CHARSET = "utf-8";
 
 	private String mUrl;
-	private UserAgentConfig mConfig = null;
 	private HashMap<String, String> mHeaders = null;
 	private HttpEntity mBody = null;
-	private int mStatus = -1;
+	private int mStatusCode = -1;
+
+	private String mHost = "";
+	private String mScheme = "";
+	private int mPort = 80;
+	private int mTimeoutConnection = 10000;
+	private String mUsername = "";
+	private String mPassword = "";
+
+	private static DefaultHttpClient client = null;
 
 	public HttpRequest(String url) {
+
+		// check URL
 		if (isEmpty(url))
-			throw new IllegalArgumentException("url is empty");
+			throw new IllegalArgumentException("invalid url");
+
 		mUrl = url;
+
+		// parse scheme
+		int pos = url.indexOf("://");
+		if (pos > 0) {
+			setScheme(url.substring(0, pos));
+		}
 	}
 
 	public void addHeader(String key, String value) {
@@ -54,17 +87,63 @@ public class HttpRequest {
 	}
 
 	public void clearHeader() {
-		mHeaders.clear();
+		if (mHeaders != null)
+			mHeaders.clear();
+
 		mHeaders = null;
 	}
 
-	public void setConfig(UserAgentConfig config) {
-		mConfig = config;
+	public void setCredential(String host, int port, String username,
+			String password) {
+		mHost = host;
+		mPort = port;
+		mUsername = username;
+		mPassword = password;
+	}
+
+	public void setScheme(String scheme) {
+		mScheme = scheme;
+	}
+
+	public void setTimeout(int timeout) {
+		mTimeoutConnection = timeout;
+
+		if (client != null) {
+			createHttpClient();
+		}
+	}
+
+	private void createHttpClient() {
+		BasicHttpParams httpParameters = new BasicHttpParams();
+
+		// set connection timeout
+		HttpConnectionParams.setConnectionTimeout(httpParameters,
+				mTimeoutConnection);
+		SchemeRegistry sr = new SchemeRegistry();
+		HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+		final SSLSocketFactory socketFactory = SSLSocketFactory
+				.getSocketFactory();
+		socketFactory
+				.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+
+		sr.register(new Scheme("http", PlainSocketFactory.getSocketFactory(),
+				80));
+		sr.register(new Scheme("https", socketFactory, 80));
+		sr.register(new Scheme("https", socketFactory, 443));
+
+		ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(
+				httpParameters, sr);
+		client = new DefaultHttpClient(cm, httpParameters);
+
+		// retry 3 times
+		DefaultHttpRequestRetryHandler retryHandler = new DefaultHttpRequestRetryHandler(
+				3, true);
+		client.setHttpRequestRetryHandler(retryHandler);
 	}
 
 	public void setPostBody(List<BasicNameValuePair> body) {
 		try {
-			mBody = new UrlEncodedFormEntity(body, CHAR_SET);
+			mBody = new UrlEncodedFormEntity(body, CHARSET);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -78,12 +157,22 @@ public class HttpRequest {
 		}
 	}
 
-	public void execute() throws ClientProtocolException, IOException {
-		httprequest();
+	public void setPostBody(byte[] body) {
+		mBody = new ByteArrayEntity(body);
+	}
+
+	public void execute() throws ClientProtocolException, IOException,
+			IllegalArgumentException {
+		HttpEntity entity = null;
+		try {
+			entity = httprequest();
+		} finally {
+			release(entity);
+		}
 	}
 
 	public int getStatusCode() {
-		return mStatus;
+		return mStatusCode;
 	}
 
 	/**
@@ -93,7 +182,8 @@ public class HttpRequest {
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 */
-	public InputStream getStream() throws ClientProtocolException, IOException {
+	public InputStream getStream() throws ClientProtocolException, IOException,
+			IllegalArgumentException {
 
 		HttpEntity entity = httprequest();
 		InputStream ret = null;
@@ -117,14 +207,15 @@ public class HttpRequest {
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 */
-	public String getString() throws ClientProtocolException, IOException {
+	public String getString() throws ClientProtocolException, IOException,
+			IllegalArgumentException {
 
 		HttpEntity entity = httprequest();
 		String ret = null;
 
 		if (entity != null) {
 			try {
-				ret = EntityUtils.toString(entity);
+				ret = EntityUtils.toString(entity, CHARSET);
 			} finally {
 				release(entity);
 			}
@@ -140,7 +231,9 @@ public class HttpRequest {
 	 */
 	private static void release(HttpEntity entity) {
 		try {
-			entity.consumeContent();
+			if (entity != null) {
+				entity.consumeContent();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,36 +249,22 @@ public class HttpRequest {
 	private HttpEntity httprequest() throws ClientProtocolException,
 			IOException {
 
-		System.out.println(mUrl);
-
-		DefaultHttpClient client = null;
 		HttpEntity entity = null;
 
-		BasicHttpParams httpParameters = new BasicHttpParams();
-
-		if (mConfig != null) {
-			// set connection timeout
-			HttpConnectionParams.setConnectionTimeout(httpParameters,
-					mConfig.timeoutConnection);
+		if (client == null) {
+			createHttpClient();
 		}
 
-		client = new DefaultHttpClient(httpParameters);
-
-		DefaultHttpRequestRetryHandler retryHandler = new DefaultHttpRequestRetryHandler(
-				3, true);
-		client.setHttpRequestRetryHandler(retryHandler);
-
-		// set username & password if available
-		if (mConfig != null
-				&& !(isEmpty(mConfig.username) && isEmpty(mConfig.password))) {
-			AuthScope as = new AuthScope(mConfig.host, mConfig.port);
+		// set certification if available
+		if (!isEmpty(mUsername)) {
+			AuthScope as = new AuthScope(mHost, mPort);
 			UsernamePasswordCredentials upc = new UsernamePasswordCredentials(
-					mConfig.username, mConfig.password);
+					mUsername, mPassword);
 
 			client.getCredentialsProvider().setCredentials(as, upc);
 		}
 
-		// check get or post method by params
+		// check get or post method by body
 		HttpRequestBase method = null;
 		if (mBody == null) {
 			method = new HttpGet(mUrl);
@@ -207,24 +286,29 @@ public class HttpRequest {
 
 		// get response
 		HttpResponse response = null;
-		if (mConfig == null || isEmpty(mConfig.host) || isEmpty(mConfig.scheme)) {
+		if (isEmpty(mHost) || isEmpty(mScheme)) {
 			// only URL is available
-			response = client.execute(method);
+			try {
+				response = client.execute(method);
+			} catch (Exception e) {
+				if (e.getMessage() != null) {
+					Log.e("HttpClient", e.getMessage());
+				}
+				return null;
+			}
 		} else {
 			BasicHttpContext localContext = new BasicHttpContext();
 
 			BasicScheme basicAuth = new BasicScheme();
 			localContext.setAttribute("preemptive-auth", basicAuth);
 
-			HttpHost targetHost = new HttpHost(mConfig.host, mConfig.port,
-					mConfig.scheme);
+			HttpHost targetHost = new HttpHost(mHost, mPort, mScheme);
 
 			response = client.execute(targetHost, method, localContext);
 		}
 
-		mStatus = response.getStatusLine().getStatusCode();
+		mStatusCode = response.getStatusLine().getStatusCode();
 		entity = response.getEntity();
-
 		return entity;
 	}
 
@@ -237,15 +321,4 @@ public class HttpRequest {
 	private boolean isEmpty(String s) {
 		return s == null || s.length() == 0;
 	}
-
-	class UserAgentConfig {
-		public String host;
-		public String scheme = "http";
-		public int port = 80;
-		public int timeoutConnection = 10000;
-		public int timeoutSocket = 20000;
-		public String username = "";
-		public String password = "";
-	}
-
 }
