@@ -31,7 +31,7 @@ public class UploadUtil {
 				File file = new File(
 						android.os.Environment.getExternalStorageDirectory()
 								+ "/test/test.mp4");
-				request.setPostBody(file);
+//				request.setPostBody(file);
 
 				String response = null;
 				int responseCode = 0;

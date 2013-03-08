@@ -13,7 +13,7 @@ import android.os.Bundle;
 import com.gpvision.fragment.NotificationFragment;
 import com.gpvision.fragment.SettingFragment;
 import com.gpvision.fragment.VideoInfoFragment;
-import com.gpvision.ui.LocalDataBuffer;
+import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 import com.gpvision.utils.MessageCenter.MessageListener;
