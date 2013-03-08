@@ -31,7 +31,7 @@ public class UploadUtil {
 				File file = new File(
 						android.os.Environment.getExternalStorageDirectory()
 								+ "/test/test.mp4");
-//				request.setPostBody(file);
+				// request.setPostBody(file);
 
 				String response = null;
 				int responseCode = 0;
@@ -52,10 +52,12 @@ public class UploadUtil {
 
 	private String getUrl() {
 		Uri.Builder builder = new Uri.Builder();
+		Environment environment = LocalDataBuffer.getInstance()
+				.getEnvironment();
 		builder.encodedPath(String.format("%s://%s", SCHEME,
-				Environment.E9.getHost()));
-		if (!AppUtils.isEmpty(Environment.E9.getBasePath())) {
-			builder.appendPath(Environment.E9.getBasePath());
+				environment.getHost()));
+		if (!AppUtils.isEmpty(environment.getBasePath())) {
+			builder.appendPath(environment.getBasePath());
 		}
 		builder.appendEncodedPath("api");
 		builder.appendEncodedPath("upload");
