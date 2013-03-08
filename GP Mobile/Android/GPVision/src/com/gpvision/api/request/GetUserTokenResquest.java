@@ -7,7 +7,7 @@ import android.net.Uri.Builder;
 
 import com.gpvision.api.CallAPI;
 import com.gpvision.api.response.GetUserTokenResponse;
-import com.gpvision.ui.LocalDataBuffer;
+import com.gpvision.utils.LocalDataBuffer;
 
 public class GetUserTokenResquest extends CallAPI<GetUserTokenResponse> {
 
@@ -20,13 +20,12 @@ public class GetUserTokenResquest extends CallAPI<GetUserTokenResponse> {
 	}
 
 	@Override
-	protected void getComponent(Builder builder) {
-		builder.appendEncodedPath("api");
-		builder.appendEncodedPath("getendusertoken");
+	protected String serviceComponent() {
+		return "/api/getendusertoken";
 	}
 
 	@Override
-	protected String getPostBody() throws JSONException {
+	protected String getContent() throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("userName", account);
 		json.put("password", password);

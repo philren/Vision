@@ -37,19 +37,19 @@ public class VideoButtons extends LinearLayout {
 		this.listener = listener;
 		removeAllViews();
 		switch (video.getStatus()) {
-		case Uploading:
+		case uploading:
 			getUploadingButtons();
 			break;
-		case Paused:
+		case paused:
 			getPausedButtons();
 			break;
-		case Indexed:
+		case indexed:
 			getIndexedButtons();
 			break;
-		case Deleted:
+		case deleted:
 			getDeletedButtons();
 			break;
-		case Failed:
+		case failed:
 			getFailedButtons();
 			break;
 		default:
@@ -141,7 +141,7 @@ public class VideoButtons extends LinearLayout {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							video.setStatus(Status.Failed);
+							video.setStatus(Status.failed);
 							listener.statusChanged();
 						}
 					});
@@ -155,7 +155,7 @@ public class VideoButtons extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			video.setStatus(Status.Paused);
+			video.setStatus(Status.paused);
 			listener.statusChanged();
 		}
 	};
@@ -163,7 +163,7 @@ public class VideoButtons extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			video.setStatus(Status.Uploading);
+			video.setStatus(Status.uploading);
 			listener.statusChanged();
 		}
 	};

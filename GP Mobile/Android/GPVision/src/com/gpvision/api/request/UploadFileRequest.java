@@ -14,7 +14,7 @@ import android.os.AsyncTask;
 import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
-import com.gpvision.ui.LocalDataBuffer;
+import com.gpvision.utils.LocalDataBuffer;
 
 public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		AsyncTask<Void, Void, Integer> {
@@ -139,8 +139,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		if (result == 200) {
 			responseHandler.handleResponse(null);
 		} else {
-			responseHandler.handleError(APIError.NETWORK_ERROR.first,
-					APIError.NETWORK_ERROR.second);
+			responseHandler.handleError(APIError.NETWORK_ERROR, "");
 		}
 	}
 }

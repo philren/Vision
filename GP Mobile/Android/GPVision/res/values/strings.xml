@@ -27,6 +27,12 @@
     <string name="video_info_fragment_alert_dialog_message_delete">Are your sure to delete %s ?</string>
     <string name="video_info_fragment_alert_dialog_message_abort">Are your sure to abort %s ?</string>
 
+    <!-- choose file fragment -->
+    <string name="choose_file_fragment_choose_file">Choose a file</string>
+    <string name="choose_file_fragment_max_file">1GB max per file</string>
+    <string name="choose_file_fragment_upload_button_text">Upload</string>
+    <string name="choose_file_fragment_cancel_button_text">Cancel</string>
+
     <!-- video play fragment -->
     <string name="video_play_fragment_slash">/</string>
     <string name="video_play_fragment_init_time">00:00</string>
@@ -40,6 +46,11 @@
     <string name="notification_fragment_clean_button_text">Clean</string>
     <string name="notification_fragment_alert_dialog_title_Clean">Clean!</string>
     <string name="notification_fragment_alert_dialog_message_clean">Are you sure to clean the notifications?</string>
+
+    <!-- setting fragment -->
+    <string name="setting_fragment_old_password">Old password</string>
+    <string name="setting_fragment_new_password">New password</string>
+    <string name="setting_fragment_confirm_password">Confirm password</string>
 
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>

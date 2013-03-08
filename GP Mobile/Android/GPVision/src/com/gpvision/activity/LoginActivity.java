@@ -8,8 +8,8 @@ import com.gpvision.api.response.GetAppTokenResponse;
 import com.gpvision.api.response.GetUserTokenResponse;
 import com.gpvision.datamodel.Account;
 import com.gpvision.ui.LoadingDialog;
-import com.gpvision.ui.LocalDataBuffer;
 import com.gpvision.utils.AppUtils;
+import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 
 import android.content.Intent;
