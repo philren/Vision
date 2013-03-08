@@ -61,17 +61,7 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 	@Override
 	protected HttpResponse doInBackground(Void... params) {
 		String url = getUrl();
-		HttpRequest request = new HttpRequest(url);
-
-		try {
-			String content = getPostBody();
-			if (content != null) {
-				request.setPostBody(content);
-				LogUtil.logI(content);
-			}
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}
+		HttpRequest request = getRequest(url);
 
 		// set request header
 		HashMap<String, String> headeres = getHeaders();
@@ -91,6 +81,23 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 		}
 
 		return new HttpResponse(response, responseCode);
+	}
+
+	protected HttpRequest getRequest(String url) {
+
+		HttpRequest request = new HttpRequest(url);
+
+		try {
+			String content = getPostBody();
+			if (content != null) {
+				request.setPostBody(content);
+				LogUtil.logI(content);
+			}
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+		return request;
 	}
 
 	@Override

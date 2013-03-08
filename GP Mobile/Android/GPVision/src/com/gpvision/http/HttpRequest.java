@@ -86,6 +86,10 @@ public class HttpRequest {
 		return mStatus;
 	}
 
+	protected HttpEntity getPostBody() {
+		return mBody;
+	}
+
 	/**
 	 * get "Stream" as response
 	 * 
@@ -187,11 +191,12 @@ public class HttpRequest {
 
 		// check get or post method by params
 		HttpRequestBase method = null;
-		if (mBody == null) {
+		HttpEntity body = getPostBody();
+		if (body == null) {
 			method = new HttpGet(mUrl);
 		} else {
 			method = new HttpPost(mUrl);
-			((HttpPost) method).setEntity(mBody);
+			((HttpPost) method).setEntity(body);
 		}
 
 		// set request header

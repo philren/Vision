@@ -2,12 +2,9 @@ package com.gpvision.fragment;
 
 import java.util.ArrayList;
 
-import com.gpvision.R;
-import com.gpvision.adapter.NotificationAdapter;
-import com.gpvision.datamodel.Notification;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +13,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+
+import com.gpvision.R;
+import com.gpvision.adapter.NotificationAdapter;
+import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.UploadFileRequest;
+import com.gpvision.api.response.UploadFileResponse;
+import com.gpvision.datamodel.Notification;
+import com.gpvision.utils.AppUtils;
+import com.gpvision.utils.Environment;
 
 public class NotificationFragment extends BaseFragment {
 
@@ -77,6 +83,7 @@ public class NotificationFragment extends BaseFragment {
 			}
 			break;
 		case R.id.notification_fragment_clean_btn:
+			upload();
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(
 					R.string.notification_fragment_alert_dialog_title_Clean)
@@ -100,4 +107,34 @@ public class NotificationFragment extends BaseFragment {
 		}
 	}
 
+	/**
+	 * function for test
+	 */
+	private void upload() {
+
+		Uri.Builder builder = new Uri.Builder();
+		builder.encodedPath(String.format("http://%s", Environment.E9.getHost()));
+		if (!AppUtils.isEmpty(Environment.E9.getBasePath())) {
+			builder.appendPath(Environment.E9.getBasePath());
+		}
+		builder.appendEncodedPath("api");
+		builder.appendEncodedPath("upload");
+
+		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>(
+				builder.toString());
+
+		request.addFile("video.ogv", "video/mp4", "/sdcard/video.ogv");
+		request.start(new APIResponseHandler<UploadFileResponse>() {
+
+			@Override
+			public void handleResponse(UploadFileResponse response) {
+
+			}
+
+			@Override
+			public void handleError(Long errorCode, String errorMessage) {
+
+			}
+		});
+	}
 }
