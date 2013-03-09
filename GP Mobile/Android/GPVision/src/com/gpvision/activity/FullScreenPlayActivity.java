@@ -1,6 +1,10 @@
 package com.gpvision.activity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.gpvision.R;
+import com.gpvision.datamodel.Location;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
@@ -13,6 +17,7 @@ public class FullScreenPlayActivity extends BaseActivity {
 
 	public static final String ARGS_VIDEO_URI_KEY = "video uri";
 	public static final String ARGS_POSITION_KEY = "position";
+	public static final String ARGS_INDEX_KEY = "index";
 
 	private int position;
 	private MediaPlayUI mediaPlayer;
@@ -25,9 +30,12 @@ public class FullScreenPlayActivity extends BaseActivity {
 		Intent args = getIntent();
 		Uri uri = args.getParcelableExtra(ARGS_VIDEO_URI_KEY);
 		position = args.getIntExtra(ARGS_POSITION_KEY, 0);
+		HashMap<Integer, ArrayList<Location>> indexMap = (HashMap<Integer, ArrayList<Location>>) args
+				.getSerializableExtra(ARGS_INDEX_KEY);
 		mediaPlayer = (MediaPlayUI) findViewById(R.id.full_screen_play_activity_media_play_ui);
 		mediaPlayer.setVideo(uri, Model.FullScreen, position);
 		mediaPlayer.seekTo(position);
+		mediaPlayer.setIndexMap(indexMap);
 		mediaPlayer.setOnFullScreenModelListener(new FullScreenModelListener() {
 
 			@Override

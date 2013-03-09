@@ -24,7 +24,7 @@ public class MediaController extends FrameLayout {
 	private static final int UPDATE_PROGRESS = 1417;
 	private static final int CANCEL_UPDATE = 1418;
 	private static final int CANCEL_VOLUME_BAR = 1419;
-	private static final int UPDATE_PROGRESS_DELAY = 1000;
+	private static final int UPDATE_PROGRESS_DELAY = 250;
 	private static final int VOLUME_BAR_SHOW_TIME = 1000 * 10;
 
 	private MediaPlayerControl mPlayer;

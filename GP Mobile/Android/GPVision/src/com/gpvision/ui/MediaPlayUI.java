@@ -1,8 +1,11 @@
 package com.gpvision.ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.gpvision.datamodel.Location;
 import com.gpvision.ui.MediaController.MediaPlayerControl;
 
 public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
@@ -26,6 +30,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private int mCurrentPosition = 0;
 	private FullScreenModelListener fullScreenModel;
 	private FaceBox mFaceBox;
+	private HashMap<Integer, ArrayList<Location>> indexMap;
+	private int width, heigth;
+	private float scaleWidth, scaleHeigth;
 
 	public enum Model {
 		Normal, FullScreen
@@ -42,6 +49,10 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	public void setOnFullScreenModelListener(
 			FullScreenModelListener fullScreenModel) {
 		this.fullScreenModel = fullScreenModel;
+	}
+
+	public void setIndexMap(HashMap<Integer, ArrayList<Location>> indexMap) {
+		this.indexMap = indexMap;
 	}
 
 	public void setVideo(final Uri uri, final Model model, final int position) {
@@ -67,8 +78,14 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 					int width, int height) {
 				if (model == Model.Normal) {
 					View view = (View) mSurfaceView.getParent();
+					int newHeigth = (int) (width * 9 / (16f));
 					view.setLayoutParams(new LinearLayout.LayoutParams(width,
-							width * 9 / 16));
+							newHeigth));
+					MediaPlayUI.this.width = width;
+					MediaPlayUI.this.heigth = newHeigth;
+				} else {
+					MediaPlayUI.this.width = width;
+					MediaPlayUI.this.heigth = height;
 				}
 			}
 		});
@@ -114,6 +131,11 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				public void onPrepared(MediaPlayer mp) {
 					mp.start();
 					mController.updatePausePlay();
+					int videoHeigth = mPlayer.getVideoHeight();
+					int videoWidth = mPlayer.getVideoWidth();
+					scaleWidth = width / (videoWidth * 1.0f);
+					scaleHeigth = MediaPlayUI.this.heigth
+							/ (videoHeigth * 1.0f);
 					seekTo(position);
 				}
 			});
@@ -121,7 +143,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 				@Override
 				public void onCompletion(MediaPlayer mp) {
-					// mPlayer.stop();
+					mPlayer.pause();
+					mController.updatePausePlay();
 				}
 			});
 		} catch (IllegalArgumentException e) {
@@ -132,6 +155,29 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void updateFaceBox(int position) {
+		if (indexMap == null)
+			return;
+		int index = (int) Math.floor(position / (250 * 1.0f));
+		if (indexMap.containsKey(index)) {
+			ArrayList<Location> locations = indexMap.get(index);
+			ArrayList<Rect> rects = new ArrayList<Rect>();
+
+			for (Location location : locations) {
+				Rect rect = new Rect();
+				rect.set(
+						(int) (location.getLeft() * scaleWidth),
+						(int) (location.getTop() * scaleHeigth),
+						(int) ((location.getLeft() + location.getWidth()) * scaleWidth),
+						(int) ((location.getTop() + location.getHeight()) * scaleHeigth));
+				rects.add(rect);
+			}
+			mFaceBox.setAreas(rects);
+		} else {
+			mFaceBox.setAreas(null);
 		}
 	}
 
@@ -153,6 +199,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		if (mPlayer != null) {
 			try {
 				mCurrentPosition = mPlayer.getCurrentPosition();
+				updateFaceBox(mCurrentPosition);
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}

@@ -36,25 +36,15 @@ public class FaceBox extends ImageView {
 		mPaint.setStrokeWidth(5);
 	}
 
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right,
-			int bottom) {
-
-		int w = right - left;
-		int h = bottom - top;
-
-		addArea(getWidth() / 4, h / 4, 3 * w / 4, 3 * h / 4);
-
-		super.onLayout(changed, left, top, right, bottom);
-	}
-
-	public void addArea(int l, int t, int r, int b) {
-		mRects.add(new Rect(l, t, r, b));
+	public void setAreas(ArrayList<Rect> rects) {
+		mRects = rects;
+		invalidate();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-
+		if (mRects == null)
+			return;
 		for (Rect rect : mRects) {
 			canvas.drawRect(rect.left, rect.top, rect.right + 1, rect.top + 2,
 					mPaint);

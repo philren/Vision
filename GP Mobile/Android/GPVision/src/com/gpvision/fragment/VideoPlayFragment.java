@@ -4,11 +4,16 @@ import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
 import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.ImageAdapter;
+import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.GetIndexRequest;
+import com.gpvision.api.response.GetIndexResponse;
+import com.gpvision.datamodel.Location;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
 import com.gpvision.utils.Environment;
+import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
@@ -25,6 +30,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Gallery;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class VideoPlayFragment extends BaseFragment {
 
 	public static final String ARGS_VIDEO_KEY = "video";
@@ -33,6 +41,7 @@ public class VideoPlayFragment extends BaseFragment {
 	private Video video;
 	private MediaPlayUI mediaPlayer;
 	private int currentPosition = 0;
+	private HashMap<Integer, ArrayList<Location>> indexMap;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,8 @@ public class VideoPlayFragment extends BaseFragment {
 		if (args == null)
 			args = savedInstanceState;
 		video = args.getParcelable(ARGS_VIDEO_KEY);
+
+		getIndex();
 	}
 
 	@Override
@@ -65,6 +76,8 @@ public class VideoPlayFragment extends BaseFragment {
 				Bundle extras = new Bundle();
 				extras.putParcelable(FullScreenPlayActivity.ARGS_VIDEO_URI_KEY,
 						getVideoUri(video.getStoreName()));
+				extras.putSerializable(FullScreenPlayActivity.ARGS_INDEX_KEY,
+						indexMap);
 				currentPosition = mediaPlayer.getCurrentPosition();
 				extras.putInt(FullScreenPlayActivity.ARGS_POSITION_KEY,
 						currentPosition);
@@ -98,15 +111,36 @@ public class VideoPlayFragment extends BaseFragment {
 
 	private Uri getVideoUri(String storeName) {
 		Uri.Builder builder = new Uri.Builder();
+		Environment environment = LocalDataBuffer.getInstance()
+				.getEnvironment();
 		builder.encodedPath(String.format("%s://%s", "http",
-				Environment.E9.getHost()));
-		if (Environment.E9.getBasePath() != null) {
-			builder.appendEncodedPath(Environment.E9.getBasePath());
+				environment.getHost()));
+		if (environment.getBasePath() != null) {
+			builder.appendEncodedPath(environment.getBasePath());
 		}
 		builder.appendEncodedPath("api");
 		builder.appendEncodedPath("getvideo");
 		builder.appendEncodedPath(storeName);
 		return builder.build();
+	}
+
+	private void getIndex() {
+		new GetIndexRequest(getActivity())
+				.start(new APIResponseHandler<GetIndexResponse>() {
+
+					@Override
+					public void handleResponse(GetIndexResponse response) {
+						indexMap = response.getIndexMap();
+						if (mediaPlayer != null) {
+							mediaPlayer.setIndexMap(indexMap);
+						}
+					}
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+
+					}
+				});
 	}
 
 	private OnItemClickListener listener = new OnItemClickListener() {
