@@ -18,8 +18,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class VideoButtons extends LinearLayout {
+	private int position;
 	private Video video;
 	private VideoStatusChangedListener listener;
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
 
 	public VideoButtons(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -65,6 +74,7 @@ public class VideoButtons extends LinearLayout {
 		pauseButton.setBackgroundResource(R.drawable.icon_button_pause);
 		pauseButton.setOnClickListener(pauseListener);
 		abortButton.setOnClickListener(abortListener);
+		listener.upLoading(position, video);
 		addView(abortButton);
 		addView(pauseButton);
 	}
@@ -119,7 +129,7 @@ public class VideoButtons extends LinearLayout {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							listener.remove(video);
+							listener.remove(position);
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -142,7 +152,7 @@ public class VideoButtons extends LinearLayout {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							video.setStatus(Status.failed);
-							listener.statusChanged();
+							listener.abort(position, video);
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -156,7 +166,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.paused);
-			listener.statusChanged();
+			listener.pause(position, video);
 		}
 	};
 	private OnClickListener resumeListener = new OnClickListener() {
@@ -164,7 +174,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.uploading);
-			listener.statusChanged();
+			listener.upLoading(position, video);
 		}
 	};
 
@@ -184,8 +194,12 @@ public class VideoButtons extends LinearLayout {
 	};
 
 	public interface VideoStatusChangedListener {
-		public void statusChanged();
+		public void upLoading(int position, Video video);
 
-		public void remove(Video video);
+		public void abort(int position, Video video);
+
+		public void pause(int position, Video video);
+
+		public void remove(int position);
 	}
 }

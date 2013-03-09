@@ -23,6 +23,11 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 	private String mUrl;
 	private ArrayList<String[]> mFiles;
+	private UploadedProgressCallback callback;
+
+	public void setCallback(UploadedProgressCallback callback) {
+		this.callback = callback;
+	}
 
 	public UploadFileRequest(String url) {
 		mUrl = url;
@@ -50,6 +55,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		try {
 			URL uri = new URL(mUrl);
 			HttpURLConnection conn = (HttpURLConnection) uri.openConnection();
+			conn.setChunkedStreamingMode(1024 * 1024 * 1);
 
 			conn.setReadTimeout(5 * 1000);
 			conn.setDoInput(true);
@@ -88,11 +94,17 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 					sb1.append(LINEND);
 					outStream.write(sb1.toString().getBytes());
 
-					InputStream is = new FileInputStream(new File(filePath));
+					File file = new File(filePath);
+					InputStream is = new FileInputStream(file);
 					byte[] buffer = new byte[1024];
 					int len = 0;
+					int uploadedSize = 0;
 					while ((len = is.read(buffer)) != -1) {
 						outStream.write(buffer, 0, len);
+						uploadedSize += len;
+						if (callback != null) {
+							callback.uploadedProgress(uploadedSize);
+						}
 					}
 
 					is.close();
@@ -141,5 +153,9 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		} else {
 			responseHandler.handleError(APIError.NETWORK_ERROR, "");
 		}
+	}
+
+	public interface UploadedProgressCallback {
+		public void uploadedProgress(long uploadedBytes);
 	}
 }
