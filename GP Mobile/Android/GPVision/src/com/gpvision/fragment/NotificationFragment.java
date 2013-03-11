@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +19,6 @@ import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.UploadFileRequest;
 import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Notification;
-import com.gpvision.utils.AppUtils;
-import com.gpvision.utils.Environment;
 
 public class NotificationFragment extends BaseFragment {
 
@@ -112,16 +109,7 @@ public class NotificationFragment extends BaseFragment {
 	 */
 	private void upload() {
 
-		Uri.Builder builder = new Uri.Builder();
-		builder.encodedPath(String.format("http://%s", Environment.E9.getHost()));
-		if (!AppUtils.isEmpty(Environment.E9.getBasePath())) {
-			builder.appendPath(Environment.E9.getBasePath());
-		}
-		builder.appendEncodedPath("api");
-		builder.appendEncodedPath("upload");
-
-		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>(
-				builder.toString());
+		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>();
 
 		request.addFile("video.ogv", "video/mp4", "/sdcard/video.ogv");
 		request.start(new APIResponseHandler<UploadFileResponse>() {
