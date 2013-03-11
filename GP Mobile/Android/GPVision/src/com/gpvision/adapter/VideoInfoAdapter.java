@@ -1,6 +1,5 @@
 package com.gpvision.adapter;
 
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -19,20 +18,20 @@ import com.gpvision.datamodel.Video.Status;
 import com.gpvision.ui.VideoButtons;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.utils.AppUtils;
-import com.gpvision.utils.Environment;
-import com.gpvision.utils.LocalDataBuffer;
+
 import java.util.ArrayList;
 
 public class VideoInfoAdapter extends BaseAdapter {
 	private static final int MESSAGE_UPDATE_PROGRESS = 1810;
+	private static final int MESSAGE_CANCEL_UPDATE_PROGRESS = 1811;
 
 	private ArrayList<Video> videos;
 	private LayoutInflater inflater;
-	private ArrayList<TextView> status;
+	private ArrayList<UploadFileRequest<UploadFileResponse>> tasks;
 
 	public VideoInfoAdapter(ArrayList<Video> videos) {
 		this.videos = videos;
-		status = new ArrayList<TextView>();
+		tasks = new ArrayList<UploadFileRequest<UploadFileResponse>>();
 	}
 
 	public ArrayList<Video> getVideos() {
@@ -52,7 +51,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Video getItem(int position) {
 		return videos.get(position);
 	}
 
@@ -85,11 +84,13 @@ public class VideoInfoAdapter extends BaseAdapter {
 		Video video = videos.get(position);
 		holder.videoName.setText(video.getOriginalName());
 		if (video.getStatus() != null) {
-			holder.videoStatus.setText(video.getStatus().name());
 			if (video.getStatus() == Status.uploading) {
-				status.add(position, holder.videoStatus);
+				float x = (float) (video.getUploadedLength() * 1.0 / video
+						.getContentLength());
+				holder.videoStatus.setText(video.getStatus().name()
+						+ AppUtils.precentFormat(x));
 			} else {
-				status.add(position, null);
+				holder.videoStatus.setText(video.getStatus().name());
 			}
 		}
 		holder.videoButtons.setVideo(video, listener);
@@ -106,34 +107,18 @@ public class VideoInfoAdapter extends BaseAdapter {
 
 		@Override
 		public void upLoading(final int position, Video video) {
-			notifyDataSetChanged();
-			final long length = video.getContentLength();
-			Environment environment = LocalDataBuffer.getInstance()
-					.getEnvironment();
-			Uri.Builder builder = new Uri.Builder();
-			builder.encodedPath(String.format("http://%s",
-					environment.getHost()));
-			if (!AppUtils.isEmpty(environment.getBasePath())) {
-				builder.appendPath(environment.getBasePath());
-			}
-			builder.appendEncodedPath("api");
-			builder.appendEncodedPath("upload");
-
-			UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>(
-					builder.toString());
-
+			handler.removeMessages(MESSAGE_UPDATE_PROGRESS);
+			handler.sendEmptyMessage(MESSAGE_UPDATE_PROGRESS);
+			UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>();
+			tasks.add(position, request);
 			request.addFile(video.getOriginalName(), "video/mp4",
 					video.getOriginalPath());
 			request.setCallback(new UploadedProgressCallback() {
 
 				@Override
 				public void uploadedProgress(long uploadedBytes) {
-					Message msg = new Message();
-					msg.what = MESSAGE_UPDATE_PROGRESS;
-					msg.arg1 = position;
-					msg.obj = uploadedBytes * 100f / length;
-					handler.sendMessage(msg);
-
+					Video video = getItem(position);
+					video.setUploadedLength(uploadedBytes);
 				}
 			});
 			request.start(new APIResponseHandler<UploadFileResponse>() {
@@ -158,6 +143,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 		@Override
 		public void pause(int position, Video video) {
 			notifyDataSetChanged();
+			tasks.get(position).cancel(true);
 		}
 	};
 
@@ -168,15 +154,13 @@ public class VideoInfoAdapter extends BaseAdapter {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case MESSAGE_UPDATE_PROGRESS:
-				int position = msg.arg1;
-				float precent = (Float) msg.obj;
-				TextView progressText = status.get(position);
-				if (progressText != null) {
-					progressText.setText(String.format("Uploading %.02f",
-							precent));
-				}
+				notifyDataSetChanged();
+				handler.sendEmptyMessageDelayed(MESSAGE_UPDATE_PROGRESS, 1000);
 				break;
-
+			case MESSAGE_CANCEL_UPDATE_PROGRESS:
+				removeMessages(MESSAGE_UPDATE_PROGRESS);
+				removeMessages(MESSAGE_CANCEL_UPDATE_PROGRESS);
+				break;
 			default:
 				break;
 			}

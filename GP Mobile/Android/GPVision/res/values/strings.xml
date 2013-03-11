@@ -32,6 +32,7 @@
     <string name="choose_file_fragment_max_file">1GB max per file</string>
     <string name="choose_file_fragment_upload_button_text">Upload</string>
     <string name="choose_file_fragment_cancel_button_text">Cancel</string>
+    <string name="choose_file_fragment_file_big">The file is too big.</string>
 
     <!-- video play fragment -->
     <string name="video_play_fragment_slash">/</string>

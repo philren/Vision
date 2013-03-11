@@ -3,6 +3,7 @@ package com.gpvision.fragment;
 import java.io.File;
 
 import com.gpvision.R;
+import com.gpvision.utils.AppUtils;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 public class ChooseFileFragment extends BaseFragment {
 
 	private static final int REQUEST_CODE_CHOOSE_FILE = 2030;
+	private static final int MAX_FILE_SIZE = 1024 * 1024 * 6;
 	private File file;
 	private OnChoseListener listener;
 	private TextView fileInfo;
@@ -60,6 +62,9 @@ public class ChooseFileFragment extends BaseFragment {
 			file = new File(choseFilePath);
 			// TODO add check
 			fileInfo.setText(file.getName() + "\n size:" + file.length());
+			if (file.length() > MAX_FILE_SIZE) {
+				fileInfo.append(getString(R.string.choose_file_fragment_file_big));
+			}
 		}
 	}
 
@@ -73,6 +78,11 @@ public class ChooseFileFragment extends BaseFragment {
 			break;
 		case R.id.choose_file_fragment_upload_btn:
 			if (listener != null && file.exists()) {
+				if (file.length() > MAX_FILE_SIZE) {
+					AppUtils.toastLong(getActivity(),
+							R.string.choose_file_fragment_file_big);
+					break;
+				}
 				listener.onChose(file);
 			}
 			getFragmentManager().popBackStack();

@@ -3,7 +3,6 @@ package com.gpvision.fragment;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +22,6 @@ import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.ui.LoadingDialog;
-import com.gpvision.utils.AppUtils;
-import com.gpvision.utils.Environment;
-import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
@@ -68,8 +64,8 @@ public class VideoInfoFragment extends BaseFragment {
 						videos = response.getVideos();
 						if (videos.get(0) != null)
 							videos.get(0).setStatus(Status.indexed);// test only
-						// videos.get(1).setStatus(Status.Uploading);
-						// videos.get(2).setStatus(Status.Failed);
+							// videos.get(1).setStatus(Status.indexed);
+							// videos.get(2).setStatus(Status.Failed);
 						adapter.setVideos(videos);
 						adapter.notifyDataSetChanged();
 						dialog.dismiss();
@@ -117,18 +113,8 @@ public class VideoInfoFragment extends BaseFragment {
 	}
 
 	private void upload(File file) {
-		Environment environment = LocalDataBuffer.getInstance()
-				.getEnvironment();
-		Uri.Builder builder = new Uri.Builder();
-		builder.encodedPath(String.format("http://%s", environment.getHost()));
-		if (!AppUtils.isEmpty(environment.getBasePath())) {
-			builder.appendPath(environment.getBasePath());
-		}
-		builder.appendEncodedPath("api");
-		builder.appendEncodedPath("upload");
 
-		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>(
-				builder.toString());
+		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>();
 
 		request.addFile(file.getName(), "video/mp4", file.getAbsolutePath());
 		request.setCallback(new UploadedProgressCallback() {

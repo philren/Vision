@@ -23,4 +23,8 @@ public class AppUtils {
 	public static void toastShort(Context context, int id) {
 		Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
 	}
+
+	public static String precentFormat(float x) {
+		return String.format("%.02f", x) + "%";
+	}
 }
