@@ -109,7 +109,7 @@ public class Video implements Parcelable {
 	}
 
 	public enum Status {
-		uploading, paused, indexing, indexed, failed, deleted, uploaded
+		uploading, paused, indexing, indexed, failed, deleted, uploaded, unknow
 	}
 
 	@Override

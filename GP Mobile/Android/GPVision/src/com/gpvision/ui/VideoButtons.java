@@ -2,6 +2,10 @@ package com.gpvision.ui;
 
 import com.gpvision.R;
 import com.gpvision.activity.MainActivity;
+import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.UploadFileRequest;
+import com.gpvision.api.request.UploadFileRequest.UploadedProgressCallback;
+import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.fragment.VideoPlayFragment;
@@ -21,13 +25,15 @@ public class VideoButtons extends LinearLayout {
 	private int position;
 	private Video video;
 	private VideoStatusChangedListener listener;
-
-	public int getPosition() {
-		return position;
-	}
+	private UploadFileRequest<UploadFileResponse> request;
+	private Status lastStatus = Status.unknow;
 
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public void setListener(VideoStatusChangedListener listener) {
+		this.listener = listener;
 	}
 
 	public VideoButtons(Context context, AttributeSet attrs) {
@@ -38,28 +44,41 @@ public class VideoButtons extends LinearLayout {
 		super(context);
 	}
 
-	public void setVideo(Video video, VideoStatusChangedListener listener) {
+	public void setVideo(Video video) {
 		if (video.getStatus() == null) {
 			return;
 		}
 		this.video = video;
-		this.listener = listener;
-		removeAllViews();
 		switch (video.getStatus()) {
 		case uploading:
-			getUploadingButtons();
+			if (lastStatus != Status.uploaded) {
+				getUploadingButtons();
+				lastStatus = Status.uploaded;
+			}
 			break;
 		case paused:
-			getPausedButtons();
+			if (lastStatus != Status.paused) {
+				getPausedButtons();
+				lastStatus = Status.paused;
+			}
 			break;
 		case indexed:
-			getIndexedButtons();
+			if (lastStatus != Status.indexed) {
+				getIndexedButtons();
+				lastStatus = Status.indexed;
+			}
 			break;
 		case deleted:
-			getDeletedButtons();
+			if (lastStatus != Status.deleted) {
+				getDeletedButtons();
+				lastStatus = Status.deleted;
+			}
 			break;
 		case failed:
-			getFailedButtons();
+			if (lastStatus != Status.failed) {
+				getFailedButtons();
+				lastStatus = Status.failed;
+			}
 			break;
 		default:
 			break;
@@ -68,18 +87,41 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	private void getUploadingButtons() {
+		removeAllViews();
 		Button abortButton = new Button(getContext());
 		abortButton.setBackgroundResource(R.drawable.icon_button_abort);
 		Button pauseButton = new Button(getContext());
 		pauseButton.setBackgroundResource(R.drawable.icon_button_pause);
 		pauseButton.setOnClickListener(pauseListener);
 		abortButton.setOnClickListener(abortListener);
-		listener.upLoading(position, video);
 		addView(abortButton);
 		addView(pauseButton);
+		// start uploading task
+		request.addFile(video.getOriginalName(), "video/mp4",
+				video.getOriginalPath());
+		request.setCallback(new UploadedProgressCallback() {
+
+			@Override
+			public void uploadedProgress(long uploadedBytes) {
+				video.setUploadedLength(uploadedBytes);
+			}
+		});
+		request.start(new APIResponseHandler<UploadFileResponse>() {
+
+			@Override
+			public void handleResponse(UploadFileResponse response) {
+
+			}
+
+			@Override
+			public void handleError(Long errorCode, String errorMessage) {
+
+			}
+		});
 	}
 
 	private void getPausedButtons() {
+		removeAllViews();
 		Button abortButton = new Button(getContext());
 		abortButton.setBackgroundResource(R.drawable.icon_button_abort);
 		Button resumeButton = new Button(getContext());
@@ -88,9 +130,15 @@ public class VideoButtons extends LinearLayout {
 		abortButton.setOnClickListener(abortListener);
 		addView(abortButton);
 		addView(resumeButton);
+		// stop uploading task
+		if (request != null) {
+			request.cancel(true);
+			request = null;
+		}
 	}
 
 	private void getIndexedButtons() {
+		removeAllViews();
 		Button playButton = new Button(getContext());
 		playButton.setBackgroundResource(R.drawable.icon_button_play);
 		Button deletedButton = new Button(getContext());
@@ -102,6 +150,7 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	private void getDeletedButtons() {
+		removeAllViews();
 		Button deletedButton = new Button(getContext());
 		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
 		deletedButton.setOnClickListener(deletedListener);
@@ -109,6 +158,7 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	private void getFailedButtons() {
+		removeAllViews();
 		Button deletedButton = new Button(getContext());
 		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
 		deletedButton.setOnClickListener(deletedListener);
@@ -152,7 +202,7 @@ public class VideoButtons extends LinearLayout {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							video.setStatus(Status.failed);
-							listener.abort(position, video);
+							listener.onChanged();
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -166,7 +216,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.paused);
-			listener.pause(position, video);
+			listener.onChanged();
 		}
 	};
 	private OnClickListener resumeListener = new OnClickListener() {
@@ -174,7 +224,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.uploading);
-			listener.upLoading(position, video);
+			listener.onChanged();
 		}
 	};
 
@@ -194,11 +244,8 @@ public class VideoButtons extends LinearLayout {
 	};
 
 	public interface VideoStatusChangedListener {
-		public void upLoading(int position, Video video);
 
-		public void abort(int position, Video video);
-
-		public void pause(int position, Video video);
+		public void onChanged();
 
 		public void remove(int position);
 	}
