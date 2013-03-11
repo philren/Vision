@@ -1,55 +1,40 @@
 package com.gpvision.api.request;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.HashMap;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-import com.gpvision.utils.LogUtil;
-import org.apache.http.util.EncodingUtils;
 import org.json.JSONException;
-
-import android.content.Context;
 
 import com.gpvision.api.CallAPI;
 import com.gpvision.api.response.GetIndexResponse;
-import com.gpvision.http.HttpResponse;
+import com.gpvision.utils.LocalDataBuffer;
 
 public class GetIndexRequest extends CallAPI<GetIndexResponse> {
 
-	private Context mContext;
+	private String fileName;
 
-	public GetIndexRequest(Context mContext) {
+	public GetIndexRequest(String fileName) {
 		super();
-		this.mContext = mContext;
+		this.fileName = fileName;
 	}
 
 	@Override
 	protected String serviceComponent() {
-		return null;
+		return "/api/video_index";
 	}
 
 	@Override
-	protected HttpResponse doInBackground(Void... params) {
-		InputStream inputStream;
-		String res = null;
-		try {
-			inputStream = mContext.getAssets().open("mockdata/index.json");
-			int length = inputStream.available();
-			byte[] buffer = new byte[length];
-
-			inputStream.read(buffer);
-			res = EncodingUtils.getString(buffer, "utf-8");
-			inputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new HttpResponse(res, 200);
+	protected HashMap<String, String> getParameters() {
+		HashMap<String, String> parameters = super.getParameters();
+		parameters.put("filename", fileName);
+		return parameters;
 	}
 
 	@Override
-	protected void onPostExecute(HttpResponse result) {
-		super.onPostExecute(result);
+	protected HashMap<String, String> getHeaders() {
+		HashMap<String, String> headers = super.getHeaders();
+		headers.put("endUserToken", LocalDataBuffer.getInstance().getAccount()
+				.getUserToken());
+		return headers;
 	}
 
 	@Override

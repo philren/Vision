@@ -125,7 +125,7 @@ public class VideoPlayFragment extends BaseFragment {
 	}
 
 	private void getIndex() {
-		new GetIndexRequest(getActivity())
+		new GetIndexRequest("demo.json")
 				.start(new APIResponseHandler<GetIndexResponse>() {
 
 					@Override

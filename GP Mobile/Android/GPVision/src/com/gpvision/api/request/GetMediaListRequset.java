@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.json.JSONException;
 
-import android.net.Uri.Builder;
-
 import com.gpvision.api.CallAPI;
 import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.utils.LocalDataBuffer;

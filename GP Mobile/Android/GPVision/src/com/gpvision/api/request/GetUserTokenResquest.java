@@ -3,8 +3,6 @@ package com.gpvision.api.request;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.net.Uri.Builder;
-
 import com.gpvision.api.CallAPI;
 import com.gpvision.api.response.GetUserTokenResponse;
 import com.gpvision.utils.LocalDataBuffer;
