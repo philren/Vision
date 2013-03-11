@@ -54,6 +54,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		ViewHolder holder;
+		Video video = videos.get(position);
 		if (view == null) {
 			if (inflater == null)
 				inflater = LayoutInflater.from(parent.getContext());
@@ -66,13 +67,10 @@ public class VideoInfoAdapter extends BaseAdapter {
 					.findViewById(R.id.video_info_list_video_status);
 			holder.videoButtons = (VideoButtons) view
 					.findViewById(R.id.video_info_list_videoButtons);
-			holder.videoButtons.setPosition(position);
-			holder.videoButtons.setListener(listener);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
-		Video video = videos.get(position);
 		holder.videoName.setText(video.getOriginalName());
 		if (video.getStatus() != null) {
 			if (video.getStatus() == Status.uploading) {
@@ -84,6 +82,8 @@ public class VideoInfoAdapter extends BaseAdapter {
 				holder.videoStatus.setText(video.getStatus().name());
 			}
 		}
+		holder.videoButtons.setListener(listener);
+		holder.videoButtons.setPosition(position);
 		holder.videoButtons.setVideo(video);
 		return view;
 	}

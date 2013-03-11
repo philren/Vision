@@ -81,6 +81,7 @@ public class VideoButtons extends LinearLayout {
 			}
 			break;
 		default:
+			removeAllViews();
 			break;
 		}
 
@@ -97,6 +98,7 @@ public class VideoButtons extends LinearLayout {
 		addView(abortButton);
 		addView(pauseButton);
 		// start uploading task
+		request = new UploadFileRequest<UploadFileResponse>();
 		request.addFile(video.getOriginalName(), "video/mp4",
 				video.getOriginalPath());
 		request.setCallback(new UploadedProgressCallback() {
