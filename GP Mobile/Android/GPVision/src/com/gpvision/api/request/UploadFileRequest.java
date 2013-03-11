@@ -24,9 +24,30 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	private String mUrl;
 	private ArrayList<String[]> mFiles;
 
-	public UploadFileRequest(String url) {
-		mUrl = url;
+	public UploadFileRequest() {
+
+		StringBuilder requestString = new StringBuilder();
+
+		requestString.append("http://");
+		requestString.append(getServiceHost());
+
+		String path = getServiceHostPath();
+		if (path != null) {
+			requestString.append(path);
+		}
+
+		requestString.append("/api/upload");
+
+		mUrl = requestString.toString();
 		mFiles = new ArrayList<String[]>();
+	}
+
+	private String getServiceHost() {
+		return LocalDataBuffer.getInstance().getEnvironment().getHost();
+	}
+
+	private String getServiceHostPath() {
+		return LocalDataBuffer.getInstance().getEnvironment().getBasePath();
 	}
 
 	public void addFile(String name, String type, String path) {
@@ -105,14 +126,6 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 			res = conn.getResponseCode();
 			InputStream in = conn.getInputStream();
-			// InputStreamReader isReader = new InputStreamReader(in);
-			//
-			// BufferedReader bufReader = new BufferedReader(isReader);
-			//
-			// String line = null;
-			// String data = "OK";
-			// while ((line = bufReader.readLine()) == null)
-			// data += line;
 
 			if (res == 200) {
 				int ch;
