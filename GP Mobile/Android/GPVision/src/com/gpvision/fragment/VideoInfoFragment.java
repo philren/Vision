@@ -14,14 +14,12 @@ import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.VideoInfoAdapter;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.GetMediaListRequset;
-import com.gpvision.api.request.UploadFileRequest;
-import com.gpvision.api.request.UploadFileRequest.UploadedProgressCallback;
 import com.gpvision.api.response.GetMediaListResponse;
-import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.ui.LoadingDialog;
+import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
@@ -44,7 +42,7 @@ public class VideoInfoFragment extends BaseFragment {
 		ListView videoInfoList = (ListView) view
 				.findViewById(R.id.video_info_fragment_list);
 
-		adapter = new VideoInfoAdapter(videos);
+		adapter = new VideoInfoAdapter(videos, listener);
 		videoInfoList.setAdapter(adapter);
 
 		Button uploadButton = (Button) view
@@ -62,10 +60,12 @@ public class VideoInfoFragment extends BaseFragment {
 					@Override
 					public void handleResponse(GetMediaListResponse response) {
 						videos = response.getVideos();
-						if (videos.get(0) != null)
-							videos.get(0).setStatus(Status.indexed);// test only
-							// videos.get(1).setStatus(Status.indexed);
-							// videos.get(2).setStatus(Status.Failed);
+						// clean status deleted
+						for (Video video : videos) {
+							if (video.getStatus() == Status.deleted) {
+								videos.remove(video);
+							}
+						}
 						adapter.setVideos(videos);
 						adapter.notifyDataSetChanged();
 						dialog.dismiss();
@@ -98,7 +98,6 @@ public class VideoInfoFragment extends BaseFragment {
 					}
 					videos.add(0, video);
 					adapter.notifyDataSetChanged();
-					// upload(file);
 				}
 			});
 			MessageCenter.getInstance()
@@ -112,29 +111,18 @@ public class VideoInfoFragment extends BaseFragment {
 		}
 	}
 
-	private void upload(File file) {
+	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
 
-		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>();
+		@Override
+		public void remove(int position) {
+			videos.remove(position);
+			adapter.notifyDataSetChanged();
+		}
 
-		request.addFile(file.getName(), "video/mp4", file.getAbsolutePath());
-		request.setCallback(new UploadedProgressCallback() {
+		@Override
+		public void onChanged() {
+			adapter.notifyDataSetChanged();
+		}
 
-			@Override
-			public void uploadedProgress(long uploadedBytes) {
-				LogUtil.logI("uploadsize:" + uploadedBytes);
-			}
-		});
-		request.start(new APIResponseHandler<UploadFileResponse>() {
-
-			@Override
-			public void handleResponse(UploadFileResponse response) {
-
-			}
-
-			@Override
-			public void handleError(Long errorCode, String errorMessage) {
-
-			}
-		});
-	}
+	};
 }

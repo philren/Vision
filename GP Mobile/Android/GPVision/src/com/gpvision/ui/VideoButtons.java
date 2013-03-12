@@ -26,7 +26,7 @@ public class VideoButtons extends LinearLayout {
 	private Video video;
 	private VideoStatusChangedListener listener;
 	private UploadFileRequest<UploadFileResponse> request;
-	private Status lastStatus = Status.unknow;
+	private static Status lastStatus = Status.unknow;
 
 	public void setPosition(int position) {
 		this.position = position;
@@ -51,9 +51,9 @@ public class VideoButtons extends LinearLayout {
 		this.video = video;
 		switch (video.getStatus()) {
 		case uploading:
-			if (lastStatus != Status.uploaded) {
+			if (lastStatus != Status.uploading) {
 				getUploadingButtons();
-				lastStatus = Status.uploaded;
+				lastStatus = Status.uploading;
 			}
 			break;
 		case paused:

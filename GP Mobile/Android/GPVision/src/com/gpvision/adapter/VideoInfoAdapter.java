@@ -19,9 +19,12 @@ public class VideoInfoAdapter extends BaseAdapter {
 
 	private ArrayList<Video> videos;
 	private LayoutInflater inflater;
+	private VideoStatusChangedListener listener;
 
-	public VideoInfoAdapter(ArrayList<Video> videos) {
+	public VideoInfoAdapter(ArrayList<Video> videos,
+			VideoStatusChangedListener listener) {
 		this.videos = videos;
+		this.listener = listener;
 	}
 
 	public ArrayList<Video> getVideos() {
@@ -87,21 +90,6 @@ public class VideoInfoAdapter extends BaseAdapter {
 		holder.videoButtons.setVideo(video);
 		return view;
 	}
-
-	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
-
-		@Override
-		public void remove(int position) {
-			videos.remove(position);
-			notifyDataSetChanged();
-		}
-
-		@Override
-		public void onChanged() {
-			notifyDataSetChanged();
-		}
-
-	};
 
 	private static class ViewHolder {
 		TextView videoName;
