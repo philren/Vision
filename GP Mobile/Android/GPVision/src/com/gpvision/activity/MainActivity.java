@@ -8,12 +8,15 @@ import android.widget.TextView;
 
 import com.gpvision.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.gpvision.fragment.NotificationFragment;
 import com.gpvision.fragment.SettingFragment;
 import com.gpvision.fragment.VideoInfoFragment;
+import com.gpvision.service.NotificationService;
 import com.gpvision.utils.LocalDataBuffer;
+import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 import com.gpvision.utils.MessageCenter.MessageListener;
@@ -41,6 +44,16 @@ public class MainActivity extends BaseActivity {
 		VideoInfoFragment fragment = new VideoInfoFragment();
 		transaction.replace(R.id.main_activity_fragment_content, fragment);
 		transaction.commit();
+
+		Intent intent = new Intent();
+		intent.setClass(getApplicationContext(), NotificationService.class);
+		startService(intent);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		LogUtil.logE("new Intent");
 	}
 
 	@Override
@@ -55,6 +68,16 @@ public class MainActivity extends BaseActivity {
 		super.onResume();
 		MessageCenter.getInstance().addMessageListener(MESSAGE_UPDATE_FRAGMENT,
 				updateContent);
+		Intent intent = getIntent();
+		if (intent.hasExtra(NotificationFragment.ARGS_NOTIFICATION_KEY)) {
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+			NotificationFragment fragment = new NotificationFragment();
+			Bundle args = intent.getExtras();
+			fragment.setArguments(args);
+			transaction.replace(R.id.main_activity_fragment_content, fragment);
+			transaction.commit();
+		}
 	}
 
 	private MessageListener updateContent = new MessageListener() {

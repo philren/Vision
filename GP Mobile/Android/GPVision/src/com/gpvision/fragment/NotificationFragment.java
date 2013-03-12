@@ -15,29 +15,24 @@ import android.widget.ListView;
 
 import com.gpvision.R;
 import com.gpvision.adapter.NotificationAdapter;
-import com.gpvision.api.APIResponseHandler;
-import com.gpvision.api.request.UploadFileRequest;
-import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Notification;
 
 public class NotificationFragment extends BaseFragment {
 
+	public static final String ARGS_NOTIFICATION_KEY = "notification";
 	private ArrayList<Notification> notifications;
 	private NotificationAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// test only
-		notifications = new ArrayList<Notification>();
-		Notification notification = new Notification();
-		notification.setTitle("test1");
-		notification.setMessage("message1");
-		Notification notification2 = new Notification();
-		notification2.setTitle("test2");
-		notification2.setMessage("message2");
-		notifications.add(notification);
-		notifications.add(notification2);
+		Bundle args = getArguments();
+		if (args == null)
+			args = savedInstanceState;
+		if (args != null && args.containsKey(ARGS_NOTIFICATION_KEY)) {
+			notifications = (ArrayList<Notification>) args
+					.getSerializable(ARGS_NOTIFICATION_KEY);
+		}
 	}
 
 	@Override
@@ -80,7 +75,6 @@ public class NotificationFragment extends BaseFragment {
 			}
 			break;
 		case R.id.notification_fragment_clean_btn:
-			upload();
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(
 					R.string.notification_fragment_alert_dialog_title_Clean)
@@ -104,25 +98,4 @@ public class NotificationFragment extends BaseFragment {
 		}
 	}
 
-	/**
-	 * function for test
-	 */
-	private void upload() {
-
-		UploadFileRequest<UploadFileResponse> request = new UploadFileRequest<UploadFileResponse>();
-
-		request.addFile("video.ogv", "video/mp4", "/sdcard/video.ogv");
-		request.start(new APIResponseHandler<UploadFileResponse>() {
-
-			@Override
-			public void handleResponse(UploadFileResponse response) {
-
-			}
-
-			@Override
-			public void handleError(Long errorCode, String errorMessage) {
-
-			}
-		});
-	}
 }

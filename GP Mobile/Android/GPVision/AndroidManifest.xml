@@ -30,6 +30,9 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
+
+        <service android:name=".service.NotificationService" >
+        </service>
     </application>
 
 </manifest>
