@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Location;
 import com.gpvision.ui.MediaController.MediaPlayerControl;
 
@@ -30,9 +31,10 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private int mCurrentPosition = 0;
 	private FullScreenModelListener fullScreenModel;
 	private FaceBox mFaceBox;
-	private HashMap<Integer, ArrayList<Location>> indexMap;
+	private HashMap<Integer, Index> indexMap;
 	private int width, heigth;
 	private float scaleWidth, scaleHeigth;
+	private Uri uri;
 
 	public enum Model {
 		Normal, FullScreen
@@ -51,12 +53,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		this.fullScreenModel = fullScreenModel;
 	}
 
-	public void setIndexMap(HashMap<Integer, ArrayList<Location>> indexMap) {
+	public void setIndexMap(HashMap<Integer, Index> indexMap) {
 		this.indexMap = indexMap;
 	}
 
-	public void setVideo(final Uri uri, final Model model, final int position) {
-
+	public void setVideo(Uri uri, final Model model, final int position) {
+		this.uri = uri;
 		mSurfaceView = new SurfaceView(getContext());
 		SurfaceHolder holder = mSurfaceView.getHolder();
 		holder.addCallback(new Callback() {
@@ -70,7 +72,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
-				startPlay(uri, holder, position);
+//				startPlay(position);
 			}
 
 			@Override
@@ -119,11 +121,13 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		}
 	}
 
-	private void startPlay(Uri uri, SurfaceHolder holder, final int position) {
+	public void startPlay(final int position) {
+		if (mPlayer != null)
+			return;
 		try {
 			mPlayer = new MediaPlayer();
 			mPlayer.setDataSource(getContext(), uri);
-			mPlayer.setDisplay(holder);
+			mPlayer.setDisplay(mSurfaceView.getHolder());
 			mPlayer.prepareAsync();
 			mPlayer.setOnPreparedListener(new OnPreparedListener() {
 
@@ -163,7 +167,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			return;
 		int index = (int) Math.floor(position / (250 * 1.0f));
 		if (indexMap.containsKey(index)) {
-			ArrayList<Location> locations = indexMap.get(index);
+			ArrayList<Location> locations = indexMap.get(index).getLocations();
 			ArrayList<Rect> rects = new ArrayList<Rect>();
 
 			for (Location location : locations) {
@@ -201,7 +205,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				mCurrentPosition = mPlayer.getCurrentPosition();
 				updateFaceBox(mCurrentPosition);
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 		return mCurrentPosition;
@@ -213,7 +217,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			try {
 				return mPlayer.getDuration();
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 		return 0;
@@ -225,7 +229,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			try {
 				return mPlayer.isPlaying();
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 		return false;
@@ -240,7 +244,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 					mCurrentPosition = mPlayer.getCurrentPosition();
 				}
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			} finally {
 				mController.updatePausePlay();
 			}
@@ -254,7 +258,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				mPlayer.seekTo(pos);
 				mCurrentPosition = mPlayer.getCurrentPosition();
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}

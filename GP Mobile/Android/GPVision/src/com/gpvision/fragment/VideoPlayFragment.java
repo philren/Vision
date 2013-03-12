@@ -5,9 +5,11 @@ import com.gpvision.activity.FullScreenPlayActivity;
 import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.DownLoadImageRequest;
 import com.gpvision.api.request.GetIndexRequest;
+import com.gpvision.api.response.DownLoadImageResponse;
 import com.gpvision.api.response.GetIndexResponse;
-import com.gpvision.datamodel.Location;
+import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
@@ -41,7 +43,7 @@ public class VideoPlayFragment extends BaseFragment {
 	private Video video;
 	private MediaPlayUI mediaPlayer;
 	private int currentPosition = 0;
-	private HashMap<Integer, ArrayList<Location>> indexMap;
+	private HashMap<Integer, Index> indexMap;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,14 +120,16 @@ public class VideoPlayFragment extends BaseFragment {
 		if (environment.getBasePath() != null) {
 			builder.appendEncodedPath(environment.getBasePath());
 		}
-		builder.appendEncodedPath("api");
+		builder.appendEncodedPath("public");
 		builder.appendEncodedPath("getvideo");
 		builder.appendEncodedPath(storeName);
 		return builder.build();
 	}
 
 	private void getIndex() {
-		new GetIndexRequest("demo.json")
+		String fileName = video.getStoreName();
+		fileName = fileName.substring(0, fileName.lastIndexOf('.')) + ".json";
+		new GetIndexRequest(fileName)
 				.start(new APIResponseHandler<GetIndexResponse>() {
 
 					@Override
@@ -138,6 +142,22 @@ public class VideoPlayFragment extends BaseFragment {
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
+
+					}
+				});
+	}
+
+	private void downLoadImages(ArrayList<String> imageUrls) {
+		new DownLoadImageRequest<DownLoadImageResponse>(imageUrls)
+				.start(new APIResponseHandler<DownLoadImageResponse>() {
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+
+					}
+
+					@Override
+					public void handleResponse(DownLoadImageResponse response) {
 
 					}
 				});

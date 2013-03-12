@@ -3,6 +3,7 @@ package com.gpvision.api.response;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Location;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,11 +14,11 @@ import com.gpvision.utils.LogUtil;
 
 public class GetIndexResponse extends APIResponse {
 
-	private HashMap<Integer,ArrayList<Location>> indexMap;
+	private HashMap<Integer, Index> indexMap;
 
 	public GetIndexResponse(String response) throws JSONException {
 		LogUtil.logI(response);
-        indexMap = new HashMap<Integer, ArrayList<Location>>();
+		indexMap = new HashMap<Integer, Index>();
 		JSONObject jsonObject = new JSONObject(response);
 		int size = jsonObject.length();
 		LogUtil.logI("size:" + size);
@@ -26,21 +27,27 @@ public class GetIndexResponse extends APIResponse {
 			String temp = String.valueOf(position);
 			if (jsonObject.has(temp)) {
 				LogUtil.logI("n:" + n + "key:" + position + "text:"
-                        + jsonObject.getJSONArray(temp));
-                JSONArray jsonArray = jsonObject.getJSONArray(temp);
-                int locationSize = jsonArray.length();
-                ArrayList<Location> locations = new ArrayList<Location>();
-                for(int i=0;i<locationSize;i++){
-                    Location location = new Location();
-                    JSONObject object = jsonArray.getJSONObject(i);
-                    object = object.getJSONObject("location");
-                    location.setHeight(object.getInt("Height"));
-                    location.setTop(object.getInt("Top"));
-                    location.setLeft(object.getInt("left"));
-                    location.setWidth(object.getInt("Width"));
-                    locations.add(location);
-                }
-                indexMap.put(position,locations);
+						+ jsonObject.getJSONArray(temp));
+				JSONArray locationArray = jsonObject.getJSONArray(temp);
+				int locationSize = locationArray.length();
+				Index index = new Index();
+				ArrayList<Location> locations = new ArrayList<Location>();
+				ArrayList<String> imageUris = new ArrayList<String>();
+				for (int i = 0; i < locationSize; i++) {
+					Location location = new Location();
+					JSONObject object = locationArray.getJSONObject(i);
+					JSONObject locationObject = object
+							.getJSONObject("location");
+					location.setHeight(locationObject.getInt("Height"));
+					location.setTop(locationObject.getInt("Top"));
+					location.setLeft(locationObject.getInt("left"));
+					location.setWidth(locationObject.getInt("Width"));
+					locations.add(location);
+					imageUris.add(object.getString("name"));
+				}
+				index.setLocations(locations);
+				index.setImageUrls(imageUris);
+				indexMap.put(position, index);
 				position++;
 				n++;
 			} else {
@@ -50,7 +57,7 @@ public class GetIndexResponse extends APIResponse {
 
 	}
 
-	public HashMap<Integer,ArrayList<Location>> getIndexMap() {
+	public HashMap<Integer, Index> getIndexMap() {
 		return indexMap;
 	}
 }
