@@ -29,7 +29,7 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 	}
 
 	protected boolean isSecuredConnection() {
-		return false;
+		return true;
 	}
 
 	protected String getServiceHost() {

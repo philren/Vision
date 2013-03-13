@@ -48,7 +48,7 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 		Environment environment = LocalDataBuffer.getInstance()
 				.getEnvironment();
 		StringBuilder builder = new StringBuilder();
-		builder.append("http://");
+		builder.append("https://");
 		builder.append(environment.getHost());
 		if (!AppUtils.isEmpty(environment.getBasePath())) {
 			builder.append(environment.getBasePath());

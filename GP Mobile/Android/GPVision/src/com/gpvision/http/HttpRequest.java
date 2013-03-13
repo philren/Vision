@@ -4,17 +4,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.net.ssl.HostnameVerifier;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
@@ -26,7 +26,6 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
@@ -36,7 +35,9 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
@@ -115,30 +116,38 @@ public class HttpRequest {
 
 	private void createHttpClient() {
 		BasicHttpParams httpParameters = new BasicHttpParams();
+		HttpProtocolParams.setVersion(httpParameters, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(httpParameters, HTTP.UTF_8);
 
 		// set connection timeout
 		HttpConnectionParams.setConnectionTimeout(httpParameters,
 				mTimeoutConnection);
-		SchemeRegistry sr = new SchemeRegistry();
-		HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-		final SSLSocketFactory socketFactory = SSLSocketFactory
-				.getSocketFactory();
-		socketFactory
-				.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
 
-		sr.register(new Scheme("http", PlainSocketFactory.getSocketFactory(),
-				80));
-		sr.register(new Scheme("https", socketFactory, 80));
-		sr.register(new Scheme("https", socketFactory, 443));
+		try {
+			KeyStore trustStore = KeyStore.getInstance(KeyStore
+					.getDefaultType());
+			trustStore.load(null, null);
 
-		ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(
-				httpParameters, sr);
-		client = new DefaultHttpClient(cm, httpParameters);
+			final SSLSocketFactory socketFactory = new MySSLSocketFactory(
+					trustStore);
+			socketFactory
+					.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
-		// retry 3 times
-		DefaultHttpRequestRetryHandler retryHandler = new DefaultHttpRequestRetryHandler(
-				3, true);
-		client.setHttpRequestRetryHandler(retryHandler);
+			SchemeRegistry sr = new SchemeRegistry();
+			sr.register(new Scheme("http", PlainSocketFactory
+					.getSocketFactory(), 80));
+			sr.register(new Scheme("https", socketFactory, 443));
+
+			ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(
+					httpParameters, sr);
+			client = new DefaultHttpClient(cm, httpParameters);
+
+			// retry 3 times
+			DefaultHttpRequestRetryHandler retryHandler = new DefaultHttpRequestRetryHandler(
+					3, true);
+			client.setHttpRequestRetryHandler(retryHandler);
+		} catch (Exception e) {
+		}
 	}
 
 	public void setPostBody(List<BasicNameValuePair> body) {

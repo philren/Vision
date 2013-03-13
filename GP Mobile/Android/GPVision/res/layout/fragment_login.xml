@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_large" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_large"
+        android:text="@string/login_fragment_have_account_text"
+        android:textColor="@color/text_color_gray" />
+
+    <EditText
+        android:id="@+id/login_fragment_user_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/login_fragment_user_name_hint_text"
+        android:inputType="textEmailAddress" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/login_fragment_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/login_fragment_password_hint_text"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/login_fragment_forgot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginBottom="@dimen/padding_large"
+        android:background="@drawable/bg_button_black"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/login_fragment_forgot_button_text"
+        android:textColor="@color/text_color_white" />
+
+    <Button
+        android:id="@+id/login_fragment_log_in"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_blue"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/login_fragment_log_in_button_text"
+        android:textColor="@color/text_color_white" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_large"
+        android:text="@string/login_fragment_not_have_account"
+        android:textColor="@color/text_color_gray" />
+
+    <Button
+        android:id="@+id/login_fragment_sign_up"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_green"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/login_fragment_sign_up_button_text"
+        android:textColor="@color/text_color_white" />
+
+</LinearLayout>

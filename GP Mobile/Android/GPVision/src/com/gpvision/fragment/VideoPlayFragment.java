@@ -128,7 +128,7 @@ public class VideoPlayFragment extends BaseFragment {
 		Uri.Builder builder = new Uri.Builder();
 		Environment environment = LocalDataBuffer.getInstance()
 				.getEnvironment();
-		builder.encodedPath(String.format("%s://%s", "http",
+		builder.encodedPath(String.format("%s://%s", "https",
 				environment.getHost()));
 		if (environment.getBasePath() != null) {
 			builder.appendEncodedPath(environment.getBasePath());
