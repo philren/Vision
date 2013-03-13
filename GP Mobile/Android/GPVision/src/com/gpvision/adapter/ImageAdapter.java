@@ -1,25 +1,39 @@
 package com.gpvision.adapter;
 
+import java.util.ArrayList;
+
 import com.gpvision.R;
+import com.gpvision.ui.GalleryImage;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 public class ImageAdapter extends BaseAdapter {
 
 	private LayoutInflater inflater;
+	private ArrayList<String> fileNames;
 
-	@Override
-	public int getCount() {
-		return 10;
+	public ArrayList<String> getFileNames() {
+		return fileNames;
+	}
+
+	public void setFileNames(ArrayList<String> fileNames) {
+		this.fileNames = fileNames;
 	}
 
 	@Override
-	public Object getItem(int position) {
-		return null;
+	public int getCount() {
+		if (fileNames != null) {
+			return fileNames.size();
+		}
+		return 0;
+	}
+
+	@Override
+	public String getItem(int position) {
+		return fileNames.get(position);
 	}
 
 	@Override
@@ -31,6 +45,7 @@ public class ImageAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		ViewHolder holder;
+		String fileName = fileNames.get(position);
 		if (view == null) {
 			if (inflater == null) {
 				inflater = LayoutInflater.from(parent.getContext());
@@ -39,17 +54,17 @@ public class ImageAdapter extends BaseAdapter {
 					R.layout.layout_video_play_image_gallery_item, parent,
 					false);
 			holder = new ViewHolder();
-			holder.imageView = (ImageView) view
+			holder.image = (GalleryImage) view
 					.findViewById(R.id.video_play_image_gallery_image_view);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
-		holder.imageView.setImageResource(R.drawable.ic_launcher);
+		holder.image.setFileName(fileName);
 		return view;
 	}
 
 	private class ViewHolder {
-		ImageView imageView;
+		GalleryImage image;
 	}
 }

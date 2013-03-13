@@ -60,6 +60,10 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 			if (indexMap.containsKey(index)) {
 				ArrayList<String> urlList = indexMap.get(index).getImageUrls();
 				for (String url : urlList) {
+					if (ImageCacheUtil.isFileExists(ImageCacheUtil
+							.getFileNameFromUrl(url))) {
+						continue;
+					}
 					HttpRequest request = new HttpRequest(baseUrl + url);
 					LogUtil.logI(baseUrl + url);
 					request.addHeader("endUserToken", userToken);

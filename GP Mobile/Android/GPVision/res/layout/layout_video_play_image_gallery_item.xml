@@ -4,9 +4,10 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <ImageView
+    <com.gpvision.ui.GalleryImage
         android:id="@+id/video_play_image_gallery_image_view"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:scaleType="fitXY" />
 
 </LinearLayout>

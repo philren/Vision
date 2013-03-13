@@ -52,6 +52,9 @@
     <!-- save and share fragment -->
     <string name="save_and_share_fragment_save_button_text">Save</string>
     <string name="save_and_share_fragment_share_button_text">Share</string>
+    <string name="save_and_share_fragment_save_dialog_title">Save to SD card</string>
+    <string name="save_and_share_fragment_save_success">Save Success</string>
+    <string name="save_and_share_fragment_save_failed">Save Failed</string>
 
     <!-- notification fragment -->
     <string name="notification_fragment_remove_button_text">Remove</string>

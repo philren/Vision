@@ -16,6 +16,7 @@ import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
 import com.gpvision.utils.Environment;
+import com.gpvision.utils.ImageCacheUtil;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
@@ -24,6 +25,7 @@ import com.gpvision.utils.MessageCenter;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,18 +35,21 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Gallery;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class VideoPlayFragment extends BaseFragment {
 
-	private static final int TASK_SCAN_TIME = 1000 * 10;
+	private static final int MESSAGE_UPDATE_GALLERY = 1736;
+	private static final int TASK_SCAN_TIME = 1000 * 5;
 	public static final String ARGS_VIDEO_KEY = "video";
 	public static final int REQUEST_CODE_FULL_SCREEN = 101;
 
 	private Video video;
 	private MediaPlayUI mediaPlayer;
+	private ImageAdapter adapter;
 	private int currentPosition = 0;
 	private HashMap<Integer, Index> indexMap;
 	private int index;
@@ -96,7 +101,8 @@ public class VideoPlayFragment extends BaseFragment {
 
 		Gallery gallery = (Gallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
-		gallery.setAdapter(new ImageAdapter());
+		adapter = new ImageAdapter();
+		gallery.setAdapter(adapter);
 		gallery.setOnItemClickListener(listener);
 		return view;
 	}
@@ -151,7 +157,7 @@ public class VideoPlayFragment extends BaseFragment {
 						if (mediaPlayer != null) {
 							mediaPlayer.setIndexMap(indexMap);
 							downLoadImages(indexMap);
-							mediaPlayer.startPlay(currentPosition);
+							// mediaPlayer.startPlay(currentPosition);
 						}
 					}
 
@@ -187,16 +193,35 @@ public class VideoPlayFragment extends BaseFragment {
 		});
 	}
 
+	private ArrayList<String> getImageNames(int position) {
+		if (indexMap == null)
+			return null;
+		ArrayList<String> list = new ArrayList<String>();
+		int index = position / 250;
+		int from = index - TASK_SCAN_TIME / 250;
+		int to = index + TASK_SCAN_TIME / 250;
+		for (int i = from; i < to; i++) {
+			if (indexMap.containsKey(i)) {
+				ArrayList<String> imageUrls = indexMap.get(i).getImageUrls();
+				for (String url : imageUrls) {
+					list.add(ImageCacheUtil.getFileNameFromUrl(url));
+				}
+			}
+		}
+		return list;
+	}
+
 	private void startScanTask() {
 		task = new TimerTask() {
 
 			@Override
 			public void run() {
-				int index = (mediaPlayer.getCurrentPosition() + TASK_SCAN_TIME) / 250;
-				if (index > VideoPlayFragment.this.index) {
-					mediaPlayer.start();
+				int n = (mediaPlayer.getCurrentPosition() + TASK_SCAN_TIME) / 250;
+				if (n < VideoPlayFragment.this.index) {
+					// mediaPlayer.start();
+					handler.sendEmptyMessage(MESSAGE_UPDATE_GALLERY);
 				} else {
-					mediaPlayer.pause();
+					// mediaPlayer.pause();
 				}
 			}
 		};
@@ -218,12 +243,35 @@ public class VideoPlayFragment extends BaseFragment {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			LogUtil.logI("click:" + position);
+			String fileName = adapter.getItem(position);
 			SaveAndShareFragment fragment = new SaveAndShareFragment();
+			Bundle args = new Bundle();
+			args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK, fileName);
+			fragment.setArguments(args);
 			MessageCenter.getInstance()
 					.sendMessage(
 							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
 									fragment));
 		}
+	};
+
+	private Handler handler = new Handler() {
+		int n = 10000;
+
+		@Override
+		public void handleMessage(android.os.Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case MESSAGE_UPDATE_GALLERY:
+				adapter.setFileNames(getImageNames(n));
+				adapter.notifyDataSetChanged();
+				n += 10000;
+				break;
+
+			default:
+				break;
+			}
+		}
+
 	};
 }

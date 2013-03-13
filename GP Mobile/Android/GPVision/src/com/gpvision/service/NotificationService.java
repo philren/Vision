@@ -23,7 +23,7 @@ import android.os.IBinder;
 
 public class NotificationService extends Service {
 
-	private static final int PERIOD = 1000 * 60;
+	private static final int PERIOD = 1000 * 60 * 5;
 	private static final int NOTIFICATION_ID = 2115;
 	private TimerTask task;
 	private Timer timer;
