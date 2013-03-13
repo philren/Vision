@@ -62,7 +62,7 @@ public class NotificationService extends Service {
 							if (old == null || old.size() < i) {
 								Notification notification = new Notification();
 								notification.setTitle(newVideo
-										.getOriginalPath());
+										.getOriginalName());
 								notification.setMessage(newVideo.getStatus()
 										.name());
 								notifications.add(notification);
@@ -72,7 +72,7 @@ public class NotificationService extends Service {
 										.getStatus()) {
 									Notification notification = new Notification();
 									notification.setTitle(newVideo
-											.getOriginalPath());
+											.getOriginalName());
 									notification.setMessage(String
 											.format(getString(R.string.notification_fragment_notification_message),
 													oldVideo.getStatus().name(),

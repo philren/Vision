@@ -6,6 +6,7 @@ import com.gpvision.activity.MainActivity;
 import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DownLoadImageRequest;
+import com.gpvision.api.request.DownLoadImageRequest.DownLoadStatusCallBack;
 import com.gpvision.api.request.GetIndexRequest;
 import com.gpvision.api.response.DownLoadImageResponse;
 import com.gpvision.api.response.GetIndexResponse;
@@ -32,11 +33,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Gallery;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VideoPlayFragment extends BaseFragment {
 
+	private static final int TASK_SCAN_TIME = 1000 * 10;
 	public static final String ARGS_VIDEO_KEY = "video";
 	public static final int REQUEST_CODE_FULL_SCREEN = 101;
 
@@ -44,6 +47,9 @@ public class VideoPlayFragment extends BaseFragment {
 	private MediaPlayUI mediaPlayer;
 	private int currentPosition = 0;
 	private HashMap<Integer, Index> indexMap;
+	private int index;
+	private TimerTask task;
+	private Timer timer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -106,9 +112,16 @@ public class VideoPlayFragment extends BaseFragment {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		startScanTask();
+	}
+
+	@Override
 	public void onPause() {
 		super.onPause();
 		mediaPlayer.pause();
+		stopScanTask();
 	}
 
 	private Uri getVideoUri(String storeName) {
@@ -137,6 +150,8 @@ public class VideoPlayFragment extends BaseFragment {
 						indexMap = response.getIndexMap();
 						if (mediaPlayer != null) {
 							mediaPlayer.setIndexMap(indexMap);
+							downLoadImages(indexMap);
+							mediaPlayer.startPlay(currentPosition);
 						}
 					}
 
@@ -147,20 +162,55 @@ public class VideoPlayFragment extends BaseFragment {
 				});
 	}
 
-	private void downLoadImages(ArrayList<String> imageUrls) {
-		new DownLoadImageRequest<DownLoadImageResponse>(imageUrls)
-				.start(new APIResponseHandler<DownLoadImageResponse>() {
+	private void downLoadImages(HashMap<Integer, Index> indexMap) {
+		DownLoadImageRequest<DownLoadImageResponse> request = new DownLoadImageRequest<DownLoadImageResponse>(
+				indexMap);
+		request.setCallBack(new DownLoadStatusCallBack() {
 
-					@Override
-					public void handleError(Long errorCode, String errorMessage) {
+			@Override
+			public void downLoadStatus(int index) {
+				LogUtil.logI("downindex:" + index);
+				VideoPlayFragment.this.index = index;
+			}
+		});
+		request.start(new APIResponseHandler<DownLoadImageResponse>() {
 
-					}
+			@Override
+			public void handleError(Long errorCode, String errorMessage) {
 
-					@Override
-					public void handleResponse(DownLoadImageResponse response) {
+			}
 
-					}
-				});
+			@Override
+			public void handleResponse(DownLoadImageResponse response) {
+
+			}
+		});
+	}
+
+	private void startScanTask() {
+		task = new TimerTask() {
+
+			@Override
+			public void run() {
+				int index = (mediaPlayer.getCurrentPosition() + TASK_SCAN_TIME) / 250;
+				if (index > VideoPlayFragment.this.index) {
+					mediaPlayer.start();
+				} else {
+					mediaPlayer.pause();
+				}
+			}
+		};
+		timer = new Timer();
+		timer.schedule(task, 0, TASK_SCAN_TIME);
+	}
+
+	private void stopScanTask() {
+		if (task != null) {
+			task.cancel();
+		}
+		if (timer != null) {
+			timer.cancel();
+		}
 	}
 
 	private OnItemClickListener listener = new OnItemClickListener() {

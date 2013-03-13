@@ -26,8 +26,6 @@ public class GetIndexResponse extends APIResponse {
 		while (n < size) {
 			String temp = String.valueOf(position);
 			if (jsonObject.has(temp)) {
-				LogUtil.logI("n:" + n + "key:" + position + "text:"
-						+ jsonObject.getJSONArray(temp));
 				JSONArray locationArray = jsonObject.getJSONArray(temp);
 				int locationSize = locationArray.length();
 				Index index = new Index();

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -32,29 +31,35 @@ public class ImageCacheUtil {
 	public static void write2SDCard(String fileName, InputStream inputStream) {
 		File file = new File(CACHE_DIR + File.separator + fileName);
 		if (!file.getParentFile().exists()) {
-			file.getParentFile().mkdir();
+			file.getParentFile().mkdirs();
 		}
 		Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-		if (bitmap == null)
-			return;
-
-		FileOutputStream outputStream = null;
-		try {
-			outputStream = new FileOutputStream(file);
-			bitmap.compress(CompressFormat.JPEG, 100, outputStream);
-			outputStream.flush();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (outputStream != null)
-				try {
-					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
+//		FileOutputStream outputStream = null;
+//		try {
+//			outputStream = new FileOutputStream(file);
+//			byte[] b = new byte[4096];
+//			int len;
+//			while ((len = inputStream.read(b)) != -1) {
+//				outputStream.write(b, 0, len);
+//			}
+//			outputStream.flush();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				inputStream.close();
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
+//			if (outputStream != null)
+//				try {
+//					outputStream.close();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//		}
 	}
 
 	public static Bitmap getBitmapFromFile(String fileName, int maxWidth,

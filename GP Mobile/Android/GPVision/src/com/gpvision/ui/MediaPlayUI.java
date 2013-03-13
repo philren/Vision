@@ -65,9 +65,11 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 			@Override
 			public void surfaceDestroyed(SurfaceHolder holder) {
-				mPlayer.stop();
-				mPlayer.reset();
-				mPlayer.release();
+				if(mPlayer!=null){
+					mPlayer.stop();
+					mPlayer.reset();
+					mPlayer.release();
+				}
 			}
 
 			@Override

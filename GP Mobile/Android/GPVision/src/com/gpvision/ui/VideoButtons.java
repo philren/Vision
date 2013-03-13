@@ -63,22 +63,13 @@ public class VideoButtons extends LinearLayout {
 			}
 			break;
 		case indexed:
-			if (lastStatus != Status.indexed) {
-				getIndexedButtons();
-				lastStatus = Status.indexed;
-			}
-			break;
 		case deleted:
-			if (lastStatus != Status.deleted) {
-				getDeletedButtons();
-				lastStatus = Status.deleted;
-			}
-			break;
 		case failed:
-			if (lastStatus != Status.failed) {
-				getFailedButtons();
-				lastStatus = Status.failed;
-			}
+		case analysing:
+			getDeletedButtons();
+			break;
+		case analysed:
+			getAnalysedButtons();
 			break;
 		default:
 			removeAllViews();
@@ -139,7 +130,7 @@ public class VideoButtons extends LinearLayout {
 		}
 	}
 
-	private void getIndexedButtons() {
+	private void getAnalysedButtons() {
 		removeAllViews();
 		Button playButton = new Button(getContext());
 		playButton.setBackgroundResource(R.drawable.icon_button_play);
@@ -159,13 +150,13 @@ public class VideoButtons extends LinearLayout {
 		addView(deletedButton);
 	}
 
-	private void getFailedButtons() {
-		removeAllViews();
-		Button deletedButton = new Button(getContext());
-		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
-		deletedButton.setOnClickListener(deletedListener);
-		addView(deletedButton);
-	}
+	// private void getFailedButtons() {
+	// removeAllViews();
+	// Button deletedButton = new Button(getContext());
+	// deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
+	// deletedButton.setOnClickListener(deletedListener);
+	// addView(deletedButton);
+	// }
 
 	private OnClickListener deletedListener = new OnClickListener() {
 
