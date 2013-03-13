@@ -19,7 +19,7 @@ public class DeleteVideoRequest extends CallAPI<DeleteVideoResponse> {
 
 	@Override
 	protected String serviceComponent() {
-		return "api/deletevideo/" + videoId;
+		return "/api/deletevideo/" + videoId;
 	}
 
 	@Override
@@ -32,7 +32,11 @@ public class DeleteVideoRequest extends CallAPI<DeleteVideoResponse> {
 
 	@Override
 	protected void onResponseReceived(String respString) throws JSONException {
-
+		if (respString.equals("true")) {
+			responseHandler.handleResponse(null);
+		} else {
+			new JSONException(respString);
+		}
 	}
 
 }

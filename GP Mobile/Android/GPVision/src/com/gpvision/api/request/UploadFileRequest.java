@@ -34,7 +34,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 		StringBuilder requestString = new StringBuilder();
 
-		requestString.append("http://");
+		requestString.append("https://");
 		requestString.append(getServiceHost());
 
 		String path = getServiceHostPath();

@@ -114,9 +114,8 @@ public class VideoInfoFragment extends BaseFragment {
 	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
 
 		@Override
-		public void remove(int position) {
-			videos.remove(position);
-			adapter.notifyDataSetChanged();
+		public void delete(int position) {
+			getVideoList();
 		}
 
 		@Override

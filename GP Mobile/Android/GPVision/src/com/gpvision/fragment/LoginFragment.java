@@ -115,6 +115,7 @@ public class LoginFragment extends BaseFragment {
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
+						dialog.dismiss();
 					}
 				});
 	}
@@ -131,8 +132,8 @@ public class LoginFragment extends BaseFragment {
 								.getAccount();
 						account.setAccount(userName);
 						account.setUserToken(response.getUserToken());
-						logined();
 						dialog.dismiss();
+						logined();
 					}
 
 					@Override

@@ -3,12 +3,15 @@ package com.gpvision.ui;
 import com.gpvision.R;
 import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.request.DeleteVideoRequest;
 import com.gpvision.api.request.UploadFileRequest;
 import com.gpvision.api.request.UploadFileRequest.UploadedProgressCallback;
+import com.gpvision.api.response.DeleteVideoResponse;
 import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.fragment.VideoPlayFragment;
+import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 
@@ -63,13 +66,18 @@ public class VideoButtons extends LinearLayout {
 			}
 			break;
 		case indexed:
-		case deleted:
+		case uploaded:
 		case failed:
-		case analysing:
+		case wait_index:
 			getDeletedButtons();
 			break;
 		case analysed:
 			getAnalysedButtons();
+			break;
+		case indexing:
+		case encoding:
+		case analysing:
+			removeAllViews();
 			break;
 		default:
 			removeAllViews();
@@ -158,6 +166,22 @@ public class VideoButtons extends LinearLayout {
 	// addView(deletedButton);
 	// }
 
+	public void deleteVideo() {
+		new DeleteVideoRequest(video.getUuid())
+				.start(new APIResponseHandler<DeleteVideoResponse>() {
+
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
+						LogUtil.logE(errorMessage);
+					}
+
+					@Override
+					public void handleResponse(DeleteVideoResponse response) {
+						listener.delete(position);
+					}
+				});
+	}
+
 	private OnClickListener deletedListener = new OnClickListener() {
 
 		@Override
@@ -172,7 +196,7 @@ public class VideoButtons extends LinearLayout {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							listener.remove(position);
+							deleteVideo();
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -240,6 +264,6 @@ public class VideoButtons extends LinearLayout {
 
 		public void onChanged();
 
-		public void remove(int position);
+		public void delete(int position);
 	}
 }

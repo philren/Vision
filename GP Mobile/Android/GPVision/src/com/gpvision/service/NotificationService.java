@@ -59,7 +59,7 @@ public class NotificationService extends Service {
 						ArrayList<Notification> notifications = new ArrayList<Notification>();
 						for (int i = 0; i < size; i++) {
 							Video newVideo = list.get(i);
-							if (old == null || old.size() < i) {
+							if (old == null || old.size() <= i) {
 								Notification notification = new Notification();
 								notification.setTitle(newVideo
 										.getOriginalName());
