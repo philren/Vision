@@ -155,10 +155,9 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 				onResponseReceived(result.getData());
 			} catch (JSONException e) {
 				e.printStackTrace();
-				handleError(result.getData());
 			}
 		} else {
-			responseHandler.handleError(APIError.NETWORK_ERROR, "");
+			handleError(result.getData());
 		}
 	}
 
@@ -171,7 +170,7 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 			responseHandler.handleError(errorCode, errorMessage);
 		} catch (JSONException e) {
 			e.printStackTrace();
-			responseHandler.handleError(APIError.UNKOOW_ERROR, "");
+			responseHandler.handleError(APIError.NETWORK_ERROR, "");
 		}
 	}
 

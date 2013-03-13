@@ -1,5 +1,8 @@
 package com.gpvision.fragment;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -11,12 +14,14 @@ import android.widget.EditText;
 
 import com.gpvision.R;
 import com.gpvision.activity.MainActivity;
+import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.GetAppTokenRequest;
 import com.gpvision.api.request.GetUserTokenResquest;
 import com.gpvision.api.response.GetAppTokenResponse;
 import com.gpvision.api.response.GetUserTokenResponse;
 import com.gpvision.datamodel.Account;
+import com.gpvision.ui.ErrorDialog;
 import com.gpvision.ui.LoadingDialog;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
@@ -24,6 +29,7 @@ import com.gpvision.utils.LogUtil;
 
 public class LoginFragment extends BaseFragment {
 
+	public static final String REG_TEXT = "^[A-Za-z0-9]+$";
 	private EditText mUserName;
 	private EditText mPassword;
 
@@ -42,8 +48,8 @@ public class LoginFragment extends BaseFragment {
 		mSignUp.setOnClickListener(this);
 
 		// test only
-		mUserName.setText("mobile001");
-		mPassword.setText("123456");
+		 mUserName.setText("mobile001");
+		 mPassword.setText("123456");
 		return view;
 	}
 
@@ -66,18 +72,36 @@ public class LoginFragment extends BaseFragment {
 	}
 
 	private void doLogIn() {
-		String email = mUserName.getText().toString().trim();
+		String useerName = mUserName.getText().toString().trim();
 		String password = mPassword.getText().toString().trim();
-		// check email
-		if (AppUtils.isEmpty(email)) {
-			AppUtils.toastLong(getActivity(),
-					R.string.login_fragment_user_name_null_toast);
+
+		Pattern pattern = Pattern.compile(REG_TEXT);
+		// check user name
+		if (AppUtils.isEmpty(useerName)) {
+			new ErrorDialog(getActivity(), R.string.base_error_title,
+					R.string.login_fragment_error_message_user_name_empty);
+			return;
+		}
+		Matcher matcher = pattern.matcher(useerName);
+		if (!matcher.matches()) {
+			new ErrorDialog(
+					getActivity(),
+					R.string.base_error_title,
+					R.string.login_fragment_error_message_user_name_sprcial_chars);
 			return;
 		}
 		// check password
 		if (AppUtils.isEmpty(password)) {
-			AppUtils.toastLong(getActivity(),
-					R.string.login_fragment_password_null_toast);
+			new ErrorDialog(getActivity(), R.string.base_error_title,
+					R.string.login_fragment_error_message_password_empty);
+			return;
+		}
+		matcher = pattern.matcher(password);
+		if (!matcher.matches()) {
+			new ErrorDialog(
+					getActivity(),
+					R.string.base_error_title,
+					R.string.login_fragment_error_message_password_sprcial_chars);
 			return;
 		}
 
@@ -138,8 +162,22 @@ public class LoginFragment extends BaseFragment {
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
-						LogUtil.logE(errorMessage);
 						dialog.dismiss();
+						if (errorCode == APIError.LOGIN_ERROR_PASS_NOT_CORRENT) {
+							new ErrorDialog(
+									getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_login_error_pass_not_corrent);
+							return;
+						}
+						if (errorCode == APIError.LOGIN_ERROR_USER_NOT_EXIST) {
+							new ErrorDialog(
+									getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_login_error_user_not_exist);
+							return;
+
+						}
 					}
 				});
 	}

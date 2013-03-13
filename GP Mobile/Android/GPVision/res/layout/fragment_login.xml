@@ -20,7 +20,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/login_fragment_user_name_hint_text"
-        android:inputType="textEmailAddress" >
+        android:inputType="text"
+        android:maxLength="50" >
     </EditText>
 
     <EditText
@@ -29,7 +30,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/login_fragment_password_hint_text"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:maxLength="50" />
 
     <Button
         android:id="@+id/login_fragment_forgot"

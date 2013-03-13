@@ -3,6 +3,7 @@
     <string name="app_name">Video indexing</string>
     <string name="base_ok">OK</string>
     <string name="base_cancel">Cancel</string>
+    <string name="base_error_title">Error!</string>
 
     <!-- login fragment -->
     <string name="login_fragment_have_account_text">Alreadly have an account</string>
@@ -12,8 +13,10 @@
     <string name="login_fragment_log_in_button_text">Log in</string>
     <string name="login_fragment_not_have_account">Don\'t have an account?</string>
     <string name="login_fragment_sign_up_button_text">Sign up</string>
-    <string name="login_fragment_user_name_null_toast">User name can not null!</string>
-    <string name="login_fragment_password_null_toast">Password can not null!</string>
+    <string name="login_fragment_error_message_user_name_empty">User name can not empty!</string>
+    <string name="login_fragment_error_message_password_empty">Password can not empty!</string>
+    <string name="login_fragment_error_message_user_name_sprcial_chars">User name can not input special characters!</string>
+    <string name="login_fragment_error_message_password_sprcial_chars">Password can not input special characters!</string>
 
     <!-- signup fragment -->
     <string name="signup_fragment_user_name_hint">Please input your user name</string>
@@ -21,10 +24,13 @@
     <string name="signup_fragment_pass_hint">Please Input your pass</string>
     <string name="signup_fragment_confirm_hint">Please confirm your pass</string>
     <string name="signup_fragment_signup_button_text">Sign Up</string>
-    <string name="signup_fragment_toast_message_user_name_null">User name can not null!</string>
-    <string name="signup_fragment_toast_message_email_null">Email can not null!</string>
-    <string name="signup_fragment_toast_message_password_null">Password can not null!</string>
-    <string name="signup_fragment_toast_message_pass_not_same">Pass can not different</string>
+    <string name="signup_fragment_error_message_user_name_empty">User name can not empty!</string>
+    <string name="signup_fragment_error_message_email_empty">Email can not empty!</string>
+    <string name="signup_fragment_error_message_password_empty">Password can not empty!</string>
+    <string name="signup_fragment_error_message_pass_not_same">Pass can not different</string>
+    <string name="signup_fragment_error_message_user_name_sprcial_chars">User name can not input special characters!</string>
+    <string name="signup_fragment_error_message_email_format_error">Email format error!</string>
+    <string name="signup_fragment_error_message_password_sprcial_chars">Password can not input special characters!</string>
 
     <!-- main activity -->
     <string name="main_activity_videos">Videos</string>
@@ -64,15 +70,23 @@
     <string name="notification_fragment_notification_message">From %1$s To %2$s</string>
 
     <!-- setting fragment -->
-    <string name="setting_fragment_old_password">Old password</string>
-    <string name="setting_fragment_new_password">New password</string>
-    <string name="setting_fragment_confirm_password">Confirm password</string>
-    <string name="setting_fragment_toast_message_old_pass_null">Old pass can not null</string>
-    <string name="setting_fragment_toast_message_new_pass_null">New pass can not null</string>
-    <string name="setting_fragment_toast_message_pass_not_same">New pass can not different</string>
-    <string name="setting_fragment_toast_message_success">Success</string>
+    <string name="setting_fragment_old_password_hint">Old password</string>
+    <string name="setting_fragment_new_password_hint">New password</string>
+    <string name="setting_fragment_confirm_password_hint">Confirm password</string>
+    <string name="setting_fragment_error_message_old_pass_empty">Old pass can not empty</string>
+    <string name="setting_fragment_error_message_new_pass_empty">New pass can not empty</string>
+    <string name="setting_fragment_error_message_pass_not_same">New pass can not different</string>
+    <string name="setting_fragment_error_message_pass_can_not_input_special_chars">New pass can not input special characters!</string>
+    <string name="setting_fragment_error_message_success">Success</string>
 
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>
+
+    <!-- api error message -->
+    <string name="api_error_network_error">Network Error!</string>
+    <string name="api_error_login_error_pass_not_corrent">pass not corrent</string>
+    <string name="api_error_login_error_user_not_exist">user not exist</string>
+    <string name="api_error_sign_up_error_user_existed">user already existed</string>
+    <string name="api_error_setting_error_pass_not_corrent">pass not corrent</string>
 
 </resources>

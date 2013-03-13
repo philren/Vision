@@ -11,9 +11,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="@string/signup_fragment_user_name_hint" >
-
-        <requestFocus />
+        android:hint="@string/signup_fragment_user_name_hint"
+        android:maxLength="50" >
     </EditText>
 
     <EditText
@@ -22,7 +21,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/signup_fragment_email_hint"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:maxLength="50" />
 
     <EditText
         android:id="@+id/signup_fragment_pass"
@@ -30,7 +30,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/signup_fragment_pass_hint"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:maxLength="50" />
 
     <EditText
         android:id="@+id/signup_fragment_confirm_pass"
@@ -38,11 +39,13 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/signup_fragment_confirm_hint"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:maxLength="50" />
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_large"
         android:gravity="center" >
 
         <Button

@@ -4,69 +4,33 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TableLayout
+    <EditText
+        android:id="@+id/setting_fragment_old_password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:shrinkColumns="1"
-        android:stretchColumns="1" >
+        android:ems="10"
+        android:hint="@string/setting_fragment_old_password_hint"
+        android:inputType="textPassword"
+        android:maxLength="50" >
+    </EditText>
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+    <EditText
+        android:id="@+id/setting_fragment_new_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/setting_fragment_new_password_hint"
+        android:inputType="textPassword"
+        android:maxLength="50" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_fragment_old_password"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <EditText
-                android:id="@+id/setting_fragment_old_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPassword" >
-
-                <requestFocus />
-            </EditText>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_fragment_new_password"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <EditText
-                android:id="@+id/setting_fragment_new_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPassword" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_fragment_confirm_password"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <EditText
-                android:id="@+id/setting_fragment_confirm_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPassword" />
-        </TableRow>
-    </TableLayout>
+    <EditText
+        android:id="@+id/setting_fragment_confirm_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/setting_fragment_confirm_password_hint"
+        android:inputType="textPassword"
+        android:maxLength="50" />
 
     <LinearLayout
         android:layout_width="fill_parent"
