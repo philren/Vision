@@ -110,7 +110,8 @@ public class NotificationService extends Service {
 				notifications);
 		intent.putExtras(bundle);
 		PendingIntent pendingIntent = PendingIntent.getActivity(
-				getApplicationContext(), 0, intent, 0);
+				getApplicationContext(), 0, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		android.app.Notification notification = new android.app.Notification(
 				R.drawable.ic_launcher, "Status changed",
