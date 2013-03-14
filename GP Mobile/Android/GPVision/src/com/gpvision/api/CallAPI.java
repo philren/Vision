@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import com.gpvision.http.HttpRequest;
 import com.gpvision.http.HttpResponse;
+import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 
@@ -162,6 +163,10 @@ public abstract class CallAPI<RESPONSE extends APIResponse> extends
 	}
 
 	private void handleError(String response) {
+		if (AppUtils.isEmpty(response)) {
+			responseHandler.handleError(APIError.NETWORK_ERROR, "");
+			return;
+		}
 		JSONObject json;
 		try {
 			json = new JSONObject(response);

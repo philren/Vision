@@ -48,8 +48,8 @@ public class LoginFragment extends BaseFragment {
 		mSignUp.setOnClickListener(this);
 
 		// test only
-		 mUserName.setText("mobile001");
-		 mPassword.setText("123456");
+		mUserName.setText("mobile001");
+		mPassword.setText("123456");
 		return view;
 	}
 
@@ -140,6 +140,12 @@ public class LoginFragment extends BaseFragment {
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
 						dialog.dismiss();
+						if (errorCode == APIError.NETWORK_ERROR) {
+							new ErrorDialog(getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_network_error);
+							return;
+						}
 					}
 				});
 	}
@@ -176,7 +182,12 @@ public class LoginFragment extends BaseFragment {
 									R.string.base_error_title,
 									R.string.api_error_login_error_user_not_exist);
 							return;
-
+						}
+						if (errorCode == APIError.NETWORK_ERROR) {
+							new ErrorDialog(getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_network_error);
+							return;
 						}
 					}
 				});

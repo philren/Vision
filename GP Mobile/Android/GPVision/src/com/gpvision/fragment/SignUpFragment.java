@@ -134,11 +134,17 @@ public class SignUpFragment extends BaseFragment {
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
-						if(errorCode == APIError.SIGN_UP_ERROR_USER_EXISTED){
+						if (errorCode == APIError.SIGN_UP_ERROR_USER_EXISTED) {
 							new ErrorDialog(
 									getActivity(),
 									R.string.base_error_title,
 									R.string.api_error_sign_up_error_user_existed);
+							return;
+						}
+						if (errorCode == APIError.NETWORK_ERROR) {
+							new ErrorDialog(getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_network_error);
 							return;
 						}
 					}

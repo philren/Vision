@@ -116,6 +116,12 @@ public class SettingFragment extends BaseFragment {
 									R.string.api_error_setting_error_pass_not_corrent);
 							return;
 						}
+						if (errorCode == APIError.NETWORK_ERROR) {
+							new ErrorDialog(getActivity(),
+									R.string.base_error_title,
+									R.string.api_error_network_error);
+							return;
+						}
 					}
 				});
 	}
