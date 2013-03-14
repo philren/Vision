@@ -12,15 +12,12 @@ import com.gpvision.api.response.DownLoadImageResponse;
 import com.gpvision.api.response.GetIndexResponse;
 import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Video;
+import com.gpvision.ui.LoadingDialog;
+import com.gpvision.ui.MediaController.Callback;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
-import com.gpvision.utils.Environment;
-import com.gpvision.utils.ImageCacheUtil;
-import com.gpvision.utils.LocalDataBuffer;
-import com.gpvision.utils.LogUtil;
-import com.gpvision.utils.Message;
-import com.gpvision.utils.MessageCenter;
+import com.gpvision.utils.*;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -33,17 +30,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Gallery;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class VideoPlayFragment extends BaseFragment {
 
 	private static final int MESSAGE_UPDATE_GALLERY = 1736;
-	private static final int TASK_SCAN_TIME = 1000 * 5;
+	private static final int TASK_SCAN_TIME = 1000;
 	public static final String ARGS_VIDEO_KEY = "video";
 	public static final int REQUEST_CODE_FULL_SCREEN = 101;
 
@@ -53,12 +49,14 @@ public class VideoPlayFragment extends BaseFragment {
 	private int currentPosition = 0;
 	private HashMap<Integer, Index> indexMap;
 	private int index;
-	private TimerTask task;
-	private Timer timer;
+	private static boolean isManual = false;
+	private LoadingDialog dialog;
+	private Gallery gallery;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		dialog = new LoadingDialog(getActivity());
 		Bundle args = getArguments();
 		if (args == null)
 			args = savedInstanceState;
@@ -78,6 +76,7 @@ public class VideoPlayFragment extends BaseFragment {
 
 		mediaPlayer = (MediaPlayUI) view
 				.findViewById(R.id.video_play_fragment_media_play);
+		mediaPlayer.setCallback(callback);
 		mediaPlayer.setVideo(getVideoUri(video.getStoreName()), Model.Normal,
 				currentPosition);
 		mediaPlayer.setOnFullScreenModelListener(new FullScreenModelListener() {
@@ -89,8 +88,8 @@ public class VideoPlayFragment extends BaseFragment {
 				Bundle extras = new Bundle();
 				extras.putParcelable(FullScreenPlayActivity.ARGS_VIDEO_URI_KEY,
 						getVideoUri(video.getStoreName()));
-				extras.putSerializable(FullScreenPlayActivity.ARGS_INDEX_KEY,
-						indexMap);
+//				 extras.putSerializable(FullScreenPlayActivity.ARGS_INDEX_KEY,
+//				 indexMap);
 				currentPosition = mediaPlayer.getCurrentPosition();
 				extras.putInt(FullScreenPlayActivity.ARGS_POSITION_KEY,
 						currentPosition);
@@ -99,7 +98,7 @@ public class VideoPlayFragment extends BaseFragment {
 			}
 		});
 
-		Gallery gallery = (Gallery) view
+		gallery = (Gallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
 		adapter = new ImageAdapter();
 		gallery.setAdapter(adapter);
@@ -120,29 +119,30 @@ public class VideoPlayFragment extends BaseFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		startScanTask();
+		handler.sendEmptyMessage(MESSAGE_UPDATE_GALLERY);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		mediaPlayer.pause();
-		stopScanTask();
+		handler.removeMessages(MESSAGE_UPDATE_GALLERY);
 	}
 
 	private Uri getVideoUri(String storeName) {
-		Uri.Builder builder = new Uri.Builder();
-		Environment environment = LocalDataBuffer.getInstance()
-				.getVideoEnvironment();
-		builder.encodedPath(String.format("%s://%s", "http",
-				environment.getHost()));
-		if (environment.getBasePath() != null) {
-			builder.appendEncodedPath(environment.getBasePath());
-		}
-		builder.appendEncodedPath("public");
-		builder.appendEncodedPath("getvideo");
-		builder.appendEncodedPath(storeName);
-		return builder.build();
+		// Uri.Builder builder = new Uri.Builder();
+		// Environment environment = LocalDataBuffer.getInstance()
+		// .getVideoEnvironment();
+		// builder.encodedPath(String.format("%s://%s", "http",
+		// environment.getHost()));
+		// if (environment.getBasePath() != null) {
+		// builder.appendEncodedPath(environment.getBasePath());
+		// }
+		// builder.appendEncodedPath("public");
+		// builder.appendEncodedPath("getvideo");
+		// builder.appendEncodedPath(storeName);
+		// return builder.build();
+		return Uri.parse("http://192.168.1.100:8080/video/test2.mp4");
 	}
 
 	private void getIndex() {
@@ -157,7 +157,6 @@ public class VideoPlayFragment extends BaseFragment {
 						if (mediaPlayer != null) {
 							mediaPlayer.setIndexMap(indexMap);
 							downLoadImages(indexMap);
-							 mediaPlayer.startPlay(currentPosition);
 						}
 					}
 
@@ -175,7 +174,6 @@ public class VideoPlayFragment extends BaseFragment {
 
 			@Override
 			public void downLoadStatus(int index) {
-				LogUtil.logI("downindex:" + index);
 				VideoPlayFragment.this.index = index;
 			}
 		});
@@ -211,33 +209,6 @@ public class VideoPlayFragment extends BaseFragment {
 		return list;
 	}
 
-	private void startScanTask() {
-		task = new TimerTask() {
-
-			@Override
-			public void run() {
-				int n = (mediaPlayer.getPosition() + TASK_SCAN_TIME) / 250;
-				if (n < VideoPlayFragment.this.index) {
-					// mediaPlayer.start();
-					handler.sendEmptyMessage(MESSAGE_UPDATE_GALLERY);
-				} else {
-					// mediaPlayer.pause();
-				}
-			}
-		};
-		timer = new Timer();
-		timer.schedule(task, 0, TASK_SCAN_TIME);
-	}
-
-	private void stopScanTask() {
-		if (task != null) {
-			task.cancel();
-		}
-		if (timer != null) {
-			timer.cancel();
-		}
-	}
-
 	private OnItemClickListener listener = new OnItemClickListener() {
 
 		@Override
@@ -256,16 +227,25 @@ public class VideoPlayFragment extends BaseFragment {
 	};
 
 	private Handler handler = new Handler() {
-		int n = 10000;
 
 		@Override
 		public void handleMessage(android.os.Message msg) {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case MESSAGE_UPDATE_GALLERY:
-				adapter.setFileNames(getImageNames(n));
-				adapter.notifyDataSetChanged();
-				n += 10000;
+				if (!isManual) {
+					int position = mediaPlayer.getCurrentPosition();
+					if (index > position / 250) {
+						mediaPlayer.start();
+						adapter.setFileNames(getImageNames(position));
+						adapter.notifyDataSetChanged();
+						dialog.dismiss();
+					} else {
+						mediaPlayer.pause();
+						dialog.show();
+					}
+				}
+				sendEmptyMessageDelayed(MESSAGE_UPDATE_GALLERY, TASK_SCAN_TIME);
 				break;
 
 			default:
@@ -273,5 +253,15 @@ public class VideoPlayFragment extends BaseFragment {
 			}
 		}
 
+	};
+
+	private Callback callback = new Callback() {
+
+		@Override
+		public void onManualModel(boolean isManual) {
+			VideoPlayFragment.isManual = isManual;
+			if (isManual) {
+			}
+		}
 	};
 }

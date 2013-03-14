@@ -39,6 +39,7 @@ public class MediaController extends FrameLayout {
 
 	private StringBuilder mFormatBuilder;
 	private Formatter mFormatter;
+	private Callback callback;
 
 	public MediaController(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -53,6 +54,10 @@ public class MediaController extends FrameLayout {
 	public MediaController(Context context) {
 		super(context);
 		init();
+	}
+
+	public void setCallback(Callback callback) {
+		this.callback = callback;
 	}
 
 	private void init() {
@@ -140,8 +145,14 @@ public class MediaController extends FrameLayout {
 	private void doPauseResume() {
 		if (mPlayer.isPlaying()) {
 			mPlayer.pause();
+			if (callback != null) {
+				callback.onManualModel(true);
+			}
 		} else {
 			mPlayer.start();
+			if (callback != null) {
+				callback.onManualModel(false);
+			}
 		}
 	}
 
@@ -290,8 +301,9 @@ public class MediaController extends FrameLayout {
 		int getBufferPercentage();
 
 		void fullScreenModel();
-		// boolean canPause();
-		// boolean canSeekBackward();
-		// boolean canSeekForward();
+	}
+
+	public interface Callback {
+		void onManualModel(boolean isManual);
 	}
 }

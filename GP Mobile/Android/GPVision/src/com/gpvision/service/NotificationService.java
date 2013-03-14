@@ -1,9 +1,6 @@
 package com.gpvision.service;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.gpvision.R;
 import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIResponseHandler;
@@ -19,14 +16,15 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 
 public class NotificationService extends Service {
 
-	private static final int PERIOD = 1000 * 60 * 5;
+	private static final int DELAY = 1000 * 60 * 5;
+	private static final int MESSAGE_WHAT = 1544;
 	private static final int NOTIFICATION_ID = 2115;
-	private TimerTask task;
-	private Timer timer;
 	private ArrayList<Video> old;
 
 	@Override
@@ -37,16 +35,26 @@ public class NotificationService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		task = new TimerTask() {
-
-			@Override
-			public void run() {
-				checkChanges();
-			}
-		};
-		timer = new Timer();
-		timer.schedule(task, 0, PERIOD);
+		handler.sendEmptyMessage(MESSAGE_WHAT);
 	}
+
+	private Handler handler = new Handler() {
+
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case MESSAGE_WHAT:
+				checkChanges();
+				sendEmptyMessageDelayed(MESSAGE_WHAT, DELAY);
+				break;
+
+			default:
+				break;
+			}
+		}
+
+	};
 
 	private void checkChanges() {
 		new GetMediaListRequset()

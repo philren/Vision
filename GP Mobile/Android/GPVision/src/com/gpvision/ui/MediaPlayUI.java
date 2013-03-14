@@ -35,6 +35,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private int width, heigth;
 	private float scaleWidth, scaleHeigth;
 	private Uri uri;
+	private com.gpvision.ui.MediaController.Callback callback;
 
 	public enum Model {
 		Normal, FullScreen
@@ -57,6 +58,10 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		this.indexMap = indexMap;
 	}
 
+	public void setCallback(com.gpvision.ui.MediaController.Callback callback) {
+		this.callback = callback;
+	}
+
 	public void setVideo(Uri uri, final Model model, final int position) {
 		this.uri = uri;
 		mSurfaceView = new SurfaceView(getContext());
@@ -74,7 +79,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
-				// startPlay(position);
+				preparePlayer();
 			}
 
 			@Override
@@ -98,6 +103,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		mController = new MediaController(getContext());
 		mController.setMediaPlayer(this);
 		mController.setEnabled(true);
+		mController.setCallback(callback);
 
 		mFaceBox = new FaceBox(getContext());
 
@@ -123,11 +129,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		}
 	}
 
-	public void startPlay(final int position) {
-		if (mPlayer != null)
-			return;
+	public void preparePlayer() {
 		try {
-			mPlayer = new MediaPlayer();
+			if (mPlayer == null) {
+				mPlayer = new MediaPlayer();
+			}
+			mPlayer.reset();
 			mPlayer.setDataSource(getContext(), uri);
 			mPlayer.setDisplay(mSurfaceView.getHolder());
 			mPlayer.prepareAsync();
@@ -135,14 +142,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 				@Override
 				public void onPrepared(MediaPlayer mp) {
-					mp.start();
 					mController.updatePausePlay();
 					int videoHeigth = mPlayer.getVideoHeight();
 					int videoWidth = mPlayer.getVideoWidth();
 					scaleWidth = width / (videoWidth * 1.0f);
 					scaleHeigth = MediaPlayUI.this.heigth
 							/ (videoHeigth * 1.0f);
-					seekTo(position);
 				}
 			});
 			mPlayer.setOnCompletionListener(new OnCompletionListener() {
