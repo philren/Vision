@@ -114,6 +114,7 @@ public class MediaController extends FrameLayout {
 		} else {
 			mPauseButton
 					.setImageResource(R.drawable.icon_media_controller_button_play);
+			handler.removeMessages(UPDATE_PROGRESS);
 			handler.sendEmptyMessage(CANCEL_UPDATE);
 		}
 	}

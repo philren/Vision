@@ -9,13 +9,15 @@
     <LinearLayout
         android:id="@+id/media_controller_play_layout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <ImageButton
             android:id="@+id/media_controller_play_pause_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/icon_media_controller_button_play" />
+            android:layout_width="@dimen/video_player_button_size"
+            android:layout_height="@dimen/video_player_button_size"
+            android:background="@drawable/icon_media_controller_button_play"
+            android:padding="@dimen/padding_small" />
 
         <SeekBar
             android:id="@+id/media_controller_play_seek_bar"
@@ -47,16 +49,18 @@
 
         <ImageButton
             android:id="@+id/media_controller_volume_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/video_player_button_size"
+            android:layout_height="@dimen/video_player_button_size"
             android:layout_marginRight="@dimen/padding_small"
-            android:background="@drawable/icon_media_controller_button_volume" />
+            android:background="@drawable/icon_media_controller_button_volume"
+            android:padding="@dimen/padding_small" />
 
         <ImageButton
             android:id="@+id/media_controller_full_screen_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/icon_media_controller_button_full_screen" />
+            android:layout_width="@dimen/video_player_button_size"
+            android:layout_height="@dimen/video_player_button_size"
+            android:background="@drawable/icon_media_controller_button_full_screen"
+            android:padding="@dimen/padding_small" />
     </LinearLayout>
 
     <LinearLayout
@@ -64,11 +68,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_small"
+        android:gravity="center_vertical"
         android:visibility="gone" >
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/video_player_button_size"
+            android:layout_height="@dimen/video_player_button_size"
             android:src="@drawable/icon_media_controller_volume_low" />
 
         <SeekBar
@@ -81,8 +86,8 @@
             android:layout_weight="1" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/video_player_button_size"
+            android:layout_height="@dimen/video_player_button_size"
             android:src="@drawable/icon_media_controller_volume_high" />
     </LinearLayout>
 

@@ -21,7 +21,10 @@ import android.widget.LinearLayout;
 
 import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Location;
+import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaController.MediaPlayerControl;
+import com.gpvision.utils.Environment;
+import com.gpvision.utils.LocalDataBuffer;
 
 public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
@@ -34,8 +37,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private HashMap<Integer, Index> indexMap;
 	private int width, heigth;
 	private float scaleWidth, scaleHeigth;
-	private Uri uri;
+	private Video video;
 	private com.gpvision.ui.MediaController.Callback callback;
+	private boolean prepared = false;
 
 	public enum Model {
 		Normal, FullScreen
@@ -62,8 +66,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		this.callback = callback;
 	}
 
-	public void setVideo(Uri uri, final Model model, final int position) {
-		this.uri = uri;
+	public boolean isPrepared() {
+		return prepared;
+	}
+
+	public void setVideo(Video video, final Model model, final int position) {
+		this.video = video;
 		mSurfaceView = new SurfaceView(getContext());
 		SurfaceHolder holder = mSurfaceView.getHolder();
 		holder.addCallback(new Callback() {
@@ -74,6 +82,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 					mPlayer.stop();
 					mPlayer.reset();
 					mPlayer.release();
+					mPlayer = null;
+					prepared = false;
 				}
 			}
 
@@ -87,7 +97,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 					int width, int height) {
 				if (model == Model.Normal) {
 					View view = (View) mSurfaceView.getParent();
-					int newHeigth = (int) (width * 9 / (16f));
+					int newHeigth = (int) (1.0f * width
+							* MediaPlayUI.this.video.getHeight() / MediaPlayUI.this.video
+							.getWidth());
 					view.setLayoutParams(new LinearLayout.LayoutParams(width,
 							newHeigth));
 					MediaPlayUI.this.width = width;
@@ -131,20 +143,21 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	public void preparePlayer() {
 		try {
-			if (mPlayer == null) {
-				mPlayer = new MediaPlayer();
-			}
+			prepared = false;
+			mPlayer = new MediaPlayer();
 			mPlayer.reset();
-			mPlayer.setDataSource(getContext(), uri);
+			mPlayer.setDataSource(getContext(),
+					getVideoUri(video.getStoreName()));
 			mPlayer.setDisplay(mSurfaceView.getHolder());
 			mPlayer.prepareAsync();
 			mPlayer.setOnPreparedListener(new OnPreparedListener() {
 
 				@Override
 				public void onPrepared(MediaPlayer mp) {
+					prepared = true;
 					mController.updatePausePlay();
-					int videoHeigth = mPlayer.getVideoHeight();
-					int videoWidth = mPlayer.getVideoWidth();
+					int videoHeigth = video.getHeight();
+					int videoWidth = video.getWidth();
 					scaleWidth = width / (videoWidth * 1.0f);
 					scaleHeigth = MediaPlayUI.this.heigth
 							/ (videoHeigth * 1.0f);
@@ -192,6 +205,22 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		}
 	}
 
+	private Uri getVideoUri(String storeName) {
+		Uri.Builder builder = new Uri.Builder();
+		Environment environment = LocalDataBuffer.getInstance()
+				.getVideoEnvironment();
+		builder.encodedPath(String.format("%s://%s", "http",
+				environment.getHost()));
+		if (environment.getBasePath() != null) {
+			builder.appendEncodedPath(environment.getBasePath());
+		}
+		builder.appendEncodedPath("public");
+		builder.appendEncodedPath("getvideo");
+		builder.appendEncodedPath(storeName);
+		return builder.build();
+		// return Uri.parse("http://192.168.1.100:8080/video/test2.mp4");
+	}
+
 	@Override
 	public int getBufferPercentage() {
 		if (mPlayer != null) {
@@ -216,7 +245,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				mCurrentPosition = mPlayer.getCurrentPosition();
 				updateFaceBox(mCurrentPosition);
 			} catch (IllegalStateException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		return mCurrentPosition;
@@ -228,7 +257,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			try {
 				return mPlayer.getDuration();
 			} catch (IllegalStateException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		return 0;
@@ -240,7 +269,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			try {
 				return mPlayer.isPlaying();
 			} catch (IllegalStateException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		return false;
@@ -255,7 +284,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 					mCurrentPosition = mPlayer.getCurrentPosition();
 				}
 			} catch (IllegalStateException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			} finally {
 				mController.updatePausePlay();
 			}
@@ -269,7 +298,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				mPlayer.seekTo(pos);
 				mCurrentPosition = mPlayer.getCurrentPosition();
 			} catch (IllegalStateException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}

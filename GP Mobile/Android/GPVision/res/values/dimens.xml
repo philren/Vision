@@ -9,4 +9,7 @@
     <!-- video info list -->
     <dimen name="video_info_video_name_text_size">25sp</dimen>
 
+    <!-- video player controller button -->
+    <dimen name="video_player_button_size">25dip</dimen>
+
 </resources>

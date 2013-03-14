@@ -20,17 +20,17 @@ import com.gpvision.ui.MediaPlayUI.Model;
 import com.gpvision.utils.*;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Gallery;
-import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ public class VideoPlayFragment extends BaseFragment {
 		mediaPlayer = (MediaPlayUI) view
 				.findViewById(R.id.video_play_fragment_media_play);
 		mediaPlayer.setCallback(callback);
-		mediaPlayer.setVideo(getVideoUri(video.getStoreName()), Model.Normal,
-				currentPosition);
+		mediaPlayer.setVideo(video, Model.Normal, currentPosition);
+		mediaPlayer.setIndexMap(indexMap);
 		mediaPlayer.setOnFullScreenModelListener(new FullScreenModelListener() {
 
 			@Override
@@ -86,10 +86,10 @@ public class VideoPlayFragment extends BaseFragment {
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), FullScreenPlayActivity.class);
 				Bundle extras = new Bundle();
-				extras.putParcelable(FullScreenPlayActivity.ARGS_VIDEO_URI_KEY,
-						getVideoUri(video.getStoreName()));
-//				 extras.putSerializable(FullScreenPlayActivity.ARGS_INDEX_KEY,
-//				 indexMap);
+				extras.putParcelable(
+						FullScreenPlayActivity.ARGS_VIDEO_VIDEO_KEY, video);
+				// extras.putSerializable(FullScreenPlayActivity.ARGS_INDEX_KEY,
+				// indexMap);
 				currentPosition = mediaPlayer.getCurrentPosition();
 				extras.putInt(FullScreenPlayActivity.ARGS_POSITION_KEY,
 						currentPosition);
@@ -97,9 +97,16 @@ public class VideoPlayFragment extends BaseFragment {
 				startActivityForResult(intent, REQUEST_CODE_FULL_SCREEN);
 			}
 		});
+		DisplayMetrics metrics = new DisplayMetrics();
+		getActivity().getWindowManager().getDefaultDisplay()
+				.getMetrics(metrics);
 
 		gallery = (Gallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
+
+		MarginLayoutParams mlp = (MarginLayoutParams) gallery.getLayoutParams();
+		mlp.setMargins(-(metrics.widthPixels / 2), mlp.topMargin,
+				mlp.rightMargin, mlp.bottomMargin);
 		adapter = new ImageAdapter();
 		gallery.setAdapter(adapter);
 		gallery.setOnItemClickListener(listener);
@@ -109,10 +116,11 @@ public class VideoPlayFragment extends BaseFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == REQUEST_CODE_FULL_SCREEN
-				&& resultCode == FragmentActivity.RESULT_OK) {
-			currentPosition = data.getIntExtra(
-					FullScreenPlayActivity.ARGS_POSITION_KEY, 0);
+		if (requestCode == REQUEST_CODE_FULL_SCREEN) {
+			// currentPosition = data.getIntExtra(
+			// FullScreenPlayActivity.ARGS_POSITION_KEY, 0);
+			mediaPlayer.setVideo(video, Model.Normal, currentPosition);
+			mediaPlayer.preparePlayer();
 		}
 	}
 
@@ -125,24 +133,7 @@ public class VideoPlayFragment extends BaseFragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		mediaPlayer.pause();
 		handler.removeMessages(MESSAGE_UPDATE_GALLERY);
-	}
-
-	private Uri getVideoUri(String storeName) {
-		// Uri.Builder builder = new Uri.Builder();
-		// Environment environment = LocalDataBuffer.getInstance()
-		// .getVideoEnvironment();
-		// builder.encodedPath(String.format("%s://%s", "http",
-		// environment.getHost()));
-		// if (environment.getBasePath() != null) {
-		// builder.appendEncodedPath(environment.getBasePath());
-		// }
-		// builder.appendEncodedPath("public");
-		// builder.appendEncodedPath("getvideo");
-		// builder.appendEncodedPath(storeName);
-		// return builder.build();
-		return Uri.parse("http://192.168.1.100:8080/video/test2.mp4");
 	}
 
 	private void getIndex() {
@@ -214,15 +205,17 @@ public class VideoPlayFragment extends BaseFragment {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			String fileName = adapter.getItem(position);
-			SaveAndShareFragment fragment = new SaveAndShareFragment();
-			Bundle args = new Bundle();
-			args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK, fileName);
-			fragment.setArguments(args);
-			MessageCenter.getInstance()
-					.sendMessage(
-							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-									fragment));
+			if (isManual) {
+				String fileName = adapter.getItem(position);
+				SaveAndShareFragment fragment = new SaveAndShareFragment();
+				Bundle args = new Bundle();
+				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
+						fileName);
+				fragment.setArguments(args);
+				MessageCenter.getInstance().sendMessage(
+						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+								fragment));
+			}
 		}
 	};
 
@@ -236,12 +229,16 @@ public class VideoPlayFragment extends BaseFragment {
 				if (!isManual) {
 					int position = mediaPlayer.getCurrentPosition();
 					if (index > position / 250) {
-						mediaPlayer.start();
-						adapter.setFileNames(getImageNames(position));
-						adapter.notifyDataSetChanged();
-						dialog.dismiss();
+						if (mediaPlayer.isPrepared()) {
+							mediaPlayer.start();
+							adapter.setFileNames(getImageNames(position));
+							adapter.notifyDataSetChanged();
+							dialog.dismiss();
+						}
 					} else {
-						mediaPlayer.pause();
+						if (mediaPlayer.isPrepared()) {
+							mediaPlayer.pause();
+						}
 						dialog.show();
 					}
 				}
@@ -260,8 +257,6 @@ public class VideoPlayFragment extends BaseFragment {
 		@Override
 		public void onManualModel(boolean isManual) {
 			VideoPlayFragment.isManual = isManual;
-			if (isManual) {
-			}
 		}
 	};
 }
