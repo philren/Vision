@@ -33,7 +33,8 @@ public class SignUpRequest extends CallAPI<SignUpResponse> {
 
 	@Override
 	protected void onResponseReceived(String respString) throws JSONException {
-
+		SignUpResponse response = new SignUpResponse(respString);
+		responseHandler.handleResponse(response);
 	}
 
 }

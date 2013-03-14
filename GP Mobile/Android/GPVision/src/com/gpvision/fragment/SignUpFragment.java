@@ -11,6 +11,7 @@ import com.gpvision.api.request.SignUpRequest;
 import com.gpvision.api.response.SignUpResponse;
 import com.gpvision.datamodel.Account;
 import com.gpvision.ui.ErrorDialog;
+import com.gpvision.ui.LoadingDialog;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
@@ -65,6 +66,8 @@ public class SignUpFragment extends BaseFragment {
 	}
 
 	private void doSignUp() {
+		final LoadingDialog dialog = new LoadingDialog(getActivity());
+		dialog.show();
 		final String userName = mUserName.getText().toString().trim();
 		String email = mEmail.getText().toString().trim();
 		String pass = mPass.getText().toString().trim();
@@ -124,6 +127,7 @@ public class SignUpFragment extends BaseFragment {
 
 					@Override
 					public void handleResponse(SignUpResponse response) {
+						dialog.dismiss();
 						Account account = new Account();
 						account.setAccount(userName);
 						account.setUserToken(response.getUserToken());
@@ -134,6 +138,7 @@ public class SignUpFragment extends BaseFragment {
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
+						dialog.dismiss();
 						if (errorCode == APIError.SIGN_UP_ERROR_USER_EXISTED) {
 							new ErrorDialog(
 									getActivity(),
