@@ -5,9 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import android.os.AsyncTask;
 
@@ -15,6 +16,7 @@ import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.utils.LocalDataBuffer;
+import com.gpvision.utils.LogUtil;
 
 public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		AsyncTask<Void, Void, Integer> {
@@ -76,7 +78,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 		try {
 			URL uri = new URL(mUrl);
-			HttpURLConnection conn = (HttpURLConnection) uri.openConnection();
+			HttpsURLConnection conn = (HttpsURLConnection) uri.openConnection();
 
 			conn.setReadTimeout(5 * 1000);
 			conn.setDoInput(true);
@@ -145,12 +147,14 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				while ((ch = in.read()) != -1) {
 					sb2.append((char) ch);
 				}
+				LogUtil.logI(sb2.toString());
 			}
 
 			outStream.close();
 			conn.disconnect();
 
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return res;

@@ -7,13 +7,14 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
@@ -25,21 +26,19 @@ public class MySSLSocketFactory extends SSLSocketFactory {
 			KeyStoreException, UnrecoverableKeyException {
 		super(truststore);
 
-		TrustManager tm = new X509TrustManager() {
-			public void checkClientTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {
-			}
+		TrustManager tm = new MyTrustManager();
 
-			public void checkServerTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {
-			}
+		sslContext.init(null, new TrustManager[] { tm }, new SecureRandom());
 
-			public X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-		};
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 
-		sslContext.init(null, new TrustManager[] { tm }, null);
+			@Override
+			public boolean verify(String arg0, SSLSession arg1) {
+				return true;
+			}
+		});
+		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext
+				.getSocketFactory());
 	}
 
 	@Override
