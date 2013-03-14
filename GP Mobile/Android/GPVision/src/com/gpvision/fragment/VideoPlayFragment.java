@@ -22,7 +22,6 @@ import com.gpvision.utils.*;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,13 +119,15 @@ public class VideoPlayFragment extends BaseFragment {
 			// currentPosition = data.getIntExtra(
 			// FullScreenPlayActivity.ARGS_POSITION_KEY, 0);
 			mediaPlayer.setVideo(video, Model.Normal, currentPosition);
-			mediaPlayer.preparePlayer();
+			mediaPlayer.setIndexMap(indexMap);
 		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		// mediaPlayer.setVideo(video, Model.Normal, currentPosition);
+		// mediaPlayer.setIndexMap(indexMap);
 		handler.sendEmptyMessage(MESSAGE_UPDATE_GALLERY);
 	}
 

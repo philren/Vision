@@ -150,9 +150,11 @@ public class MediaController extends FrameLayout {
 				callback.onManualModel(true);
 			}
 		} else {
-			mPlayer.start();
-			if (callback != null) {
-				callback.onManualModel(false);
+			if (mPlayer.prepared()) {
+				mPlayer.start();
+				if (callback != null) {
+					callback.onManualModel(false);
+				}
 			}
 		}
 	}
@@ -302,6 +304,8 @@ public class MediaController extends FrameLayout {
 		int getBufferPercentage();
 
 		void fullScreenModel();
+
+		boolean prepared();
 	}
 
 	public interface Callback {

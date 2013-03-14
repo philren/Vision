@@ -39,7 +39,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private float scaleWidth, scaleHeigth;
 	private Video video;
 	private com.gpvision.ui.MediaController.Callback callback;
-	private boolean prepared = false;
+	private static boolean prepared = false;
 
 	public enum Model {
 		Normal, FullScreen
@@ -79,11 +79,11 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 			@Override
 			public void surfaceDestroyed(SurfaceHolder holder) {
 				if (mPlayer != null) {
+					prepared = false;
 					mPlayer.stop();
 					mPlayer.reset();
 					mPlayer.release();
 					mPlayer = null;
-					prepared = false;
 				}
 			}
 
@@ -223,7 +223,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public int getBufferPercentage() {
-		if (mPlayer != null) {
+		if (mPlayer != null && prepared) {
 			try {
 				return (mPlayer.getCurrentPosition() * 100)
 						/ mPlayer.getDuration();
@@ -253,7 +253,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public int getDuration() {
-		if (mPlayer != null) {
+		if (mPlayer != null && prepared) {
 			try {
 				return mPlayer.getDuration();
 			} catch (IllegalStateException e) {
@@ -292,15 +292,16 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	}
 
 	@Override
+	@Deprecated
 	public void seekTo(int pos) {
-		if (mPlayer != null) {
-			try {
-				mPlayer.seekTo(pos);
-				mCurrentPosition = mPlayer.getCurrentPosition();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
-		}
+		// if (mPlayer != null) {
+		// try {
+		// mPlayer.seekTo(pos);
+		// mCurrentPosition = mPlayer.getCurrentPosition();
+		// } catch (IllegalStateException e) {
+		// e.printStackTrace();
+		// }
+		// }
 	}
 
 	@Override
@@ -320,8 +321,12 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public void fullScreenModel() {
-		pause();
 		fullScreenModel.onFullScreenModel();
+	}
+
+	@Override
+	public boolean prepared() {
+		return isPrepared();
 	}
 
 	public interface FullScreenModelListener {

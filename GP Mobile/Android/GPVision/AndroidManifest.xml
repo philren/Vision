@@ -28,7 +28,6 @@
         </activity>
         <activity
             android:name=".activity.FullScreenPlayActivity"
-            android:process=":FullScreenPlay"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
