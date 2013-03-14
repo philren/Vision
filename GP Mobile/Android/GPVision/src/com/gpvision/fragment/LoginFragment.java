@@ -48,8 +48,8 @@ public class LoginFragment extends BaseFragment {
 		mSignUp.setOnClickListener(this);
 
 		// test only
-		mUserName.setText("mobile001");
-		mPassword.setText("123456");
+		// mUserName.setText("mobile001");
+		// mPassword.setText("123456");
 		return view;
 	}
 
