@@ -4,6 +4,8 @@ public class Environment {
 
 	public static final Environment E9 = new Environment("172.20.230.9:3011",
 			null);
+	public static final Environment E9S = new Environment("172.20.230.9:3111",
+			null);
 	private final String host;
 	private final String basePath;
 

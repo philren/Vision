@@ -6,7 +6,8 @@ public class LocalDataBuffer {
 	private static LocalDataBuffer instance = new LocalDataBuffer();
 
 	private LocalDataBuffer() {
-		environment = Environment.E9;
+		environment = Environment.E9S;
+		videoEnvironment = Environment.E9;
 	}
 
 	public static LocalDataBuffer getInstance() {
@@ -15,6 +16,7 @@ public class LocalDataBuffer {
 
 	private Account account;
 	private Environment environment;
+	private Environment videoEnvironment;
 
 	public Account getAccount() {
 		return account;
@@ -30,6 +32,10 @@ public class LocalDataBuffer {
 
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
+	}
+
+	public Environment getVideoEnvironment() {
+		return videoEnvironment;
 	}
 
 }

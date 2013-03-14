@@ -133,8 +133,8 @@ public class VideoPlayFragment extends BaseFragment {
 	private Uri getVideoUri(String storeName) {
 		Uri.Builder builder = new Uri.Builder();
 		Environment environment = LocalDataBuffer.getInstance()
-				.getEnvironment();
-		builder.encodedPath(String.format("%s://%s", "https",
+				.getVideoEnvironment();
+		builder.encodedPath(String.format("%s://%s", "http",
 				environment.getHost()));
 		if (environment.getBasePath() != null) {
 			builder.appendEncodedPath(environment.getBasePath());
@@ -157,7 +157,7 @@ public class VideoPlayFragment extends BaseFragment {
 						if (mediaPlayer != null) {
 							mediaPlayer.setIndexMap(indexMap);
 							downLoadImages(indexMap);
-							// mediaPlayer.startPlay(currentPosition);
+							 mediaPlayer.startPlay(currentPosition);
 						}
 					}
 
@@ -216,7 +216,7 @@ public class VideoPlayFragment extends BaseFragment {
 
 			@Override
 			public void run() {
-				int n = (mediaPlayer.getCurrentPosition() + TASK_SCAN_TIME) / 250;
+				int n = (mediaPlayer.getPosition() + TASK_SCAN_TIME) / 250;
 				if (n < VideoPlayFragment.this.index) {
 					// mediaPlayer.start();
 					handler.sendEmptyMessage(MESSAGE_UPDATE_GALLERY);

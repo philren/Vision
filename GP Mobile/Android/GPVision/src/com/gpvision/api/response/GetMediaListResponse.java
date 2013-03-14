@@ -23,6 +23,8 @@ public class GetMediaListResponse extends APIResponse {
 			video.setUuid(jsonObject.getString("videoUUID"));
 			video.setStoreName(jsonObject.getString("videoStoreName"));
 			video.setOriginalName(jsonObject.getString("videoOriginalName"));
+			video.setWidth(jsonObject.getInt("width"));
+			video.setHeight(jsonObject.getInt("height"));
 			video.setStatus(Status.valueOf(jsonObject.getString("status")));
 			videos.add(video);
 		}
