@@ -37,6 +37,7 @@ import java.util.HashMap;
 
 public class VideoPlayFragment extends BaseFragment {
 
+	public static final String TAG = VideoPlayFragment.class.getName();
 	private static final int MESSAGE_UPDATE_GALLERY = 1736;
 	private static final int TASK_SCAN_TIME = 1000;
 	public static final String ARGS_VIDEO_KEY = "video";

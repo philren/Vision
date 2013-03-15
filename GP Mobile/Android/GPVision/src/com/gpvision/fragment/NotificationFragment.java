@@ -19,6 +19,7 @@ import com.gpvision.datamodel.Notification;
 
 public class NotificationFragment extends BaseFragment {
 
+	public static final String TAG = Notification.class.getName();
 	public static final String ARGS_NOTIFICATION_KEY = "notification";
 	private ArrayList<Notification> notifications;
 	private NotificationAdapter adapter;

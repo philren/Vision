@@ -29,6 +29,7 @@ import com.gpvision.utils.LogUtil;
 
 public class LoginFragment extends BaseFragment {
 
+	public static final String TAG = LoginFragment.class.getName();
 	public static final String REG_TEXT = "^[A-Za-z0-9]+$";
 	private EditText mUserName;
 	private EditText mPassword;

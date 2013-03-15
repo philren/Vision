@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 public class SaveAndShareFragment extends BaseFragment {
 
+	public static final String TAG = SaveAndShareFragment.class.getName();
 	public static final String ARGS_FILE_NAME_KEK = "file";
 	private String fileName;
 

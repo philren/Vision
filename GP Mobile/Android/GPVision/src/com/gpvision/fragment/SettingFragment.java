@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 public class SettingFragment extends BaseFragment {
 
+	public static final String TAG = SettingFragment.class.getName();
 	public static final String REG_TEXT = "^[A-Za-z0-9]+$";
 	private TextView mOldPass, mNewPass, mConfirmPass;
 

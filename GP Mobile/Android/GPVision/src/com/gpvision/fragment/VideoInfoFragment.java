@@ -25,6 +25,7 @@ import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 
 public class VideoInfoFragment extends BaseFragment {
+	public static final String TAG = VideoInfoFragment.class.getName();
 	private VideoInfoAdapter adapter;
 	private ArrayList<Video> videos;
 

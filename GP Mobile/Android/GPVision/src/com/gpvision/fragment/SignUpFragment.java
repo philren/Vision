@@ -21,6 +21,7 @@ import android.widget.EditText;
 
 public class SignUpFragment extends BaseFragment {
 
+	public static final String TAG = SignUpFragment.class.getName();
 	public static final String REG_TEXT = "^[A-Za-z0-9]+$";
 	public static final String REG_EMAIL = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	private EditText mUserName, mEmail, mPass, mConfirmPass;
