@@ -16,7 +16,6 @@ import com.gpvision.fragment.SettingFragment;
 import com.gpvision.fragment.VideoInfoFragment;
 import com.gpvision.service.NotificationService;
 import com.gpvision.utils.LocalDataBuffer;
-import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
 import com.gpvision.utils.MessageCenter.MessageListener;
@@ -48,12 +47,6 @@ public class MainActivity extends BaseActivity {
 		Intent intent = new Intent();
 		intent.setClass(getApplicationContext(), NotificationService.class);
 		startService(intent);
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		LogUtil.logE("new Intent");
 	}
 
 	@Override

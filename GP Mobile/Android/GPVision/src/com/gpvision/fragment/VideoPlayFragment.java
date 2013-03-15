@@ -12,11 +12,11 @@ import com.gpvision.api.response.DownLoadImageResponse;
 import com.gpvision.api.response.GetIndexResponse;
 import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Video;
-import com.gpvision.ui.LoadingDialog;
 import com.gpvision.ui.MediaController.Callback;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
+import com.gpvision.ui.dialog.LoadingDialog;
 import com.gpvision.utils.*;
 
 import android.content.Intent;

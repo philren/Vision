@@ -4,19 +4,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gpvision.R;
-import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.SignUpRequest;
 import com.gpvision.api.response.SignUpResponse;
-import com.gpvision.datamodel.Account;
-import com.gpvision.ui.ErrorDialog;
-import com.gpvision.ui.LoadingDialog;
+import com.gpvision.ui.dialog.ErrorDialog;
+import com.gpvision.ui.dialog.SignUpDialog;
 import com.gpvision.utils.AppUtils;
-import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,8 +62,7 @@ public class SignUpFragment extends BaseFragment {
 	}
 
 	private void doSignUp() {
-		final LoadingDialog dialog = new LoadingDialog(getActivity());
-		dialog.show();
+
 		final String userName = mUserName.getText().toString().trim();
 		String email = mEmail.getText().toString().trim();
 		String pass = mPass.getText().toString().trim();
@@ -121,6 +116,8 @@ public class SignUpFragment extends BaseFragment {
 			return;
 		}
 
+		final SignUpDialog dialog = new SignUpDialog(getActivity());
+		dialog.show();
 		// call api
 		new SignUpRequest(userName, email, pass)
 				.start(new APIResponseHandler<SignUpResponse>() {
@@ -128,11 +125,9 @@ public class SignUpFragment extends BaseFragment {
 					@Override
 					public void handleResponse(SignUpResponse response) {
 						dialog.dismiss();
-						Account account = new Account();
-						account.setAccount(userName);
-						account.setUserToken(response.getUserToken());
-						LocalDataBuffer.getInstance().setAccount(account);
-						logined();
+						AppUtils.toastLong(getActivity(),
+								R.string.signup_fragment_success);
+						getFragmentManager().popBackStack();
 					}
 
 					@Override
@@ -156,9 +151,4 @@ public class SignUpFragment extends BaseFragment {
 				});
 	}
 
-	private void logined() {
-		Intent intent = new Intent();
-		intent.setClass(getActivity(), MainActivity.class);
-		startActivity(intent);
-	}
 }

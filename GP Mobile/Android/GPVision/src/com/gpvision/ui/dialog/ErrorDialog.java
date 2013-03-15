@@ -1,4 +1,4 @@
-package com.gpvision.ui;
+package com.gpvision.ui.dialog;
 
 import com.gpvision.R;
 

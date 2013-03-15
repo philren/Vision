@@ -3,7 +3,7 @@ package com.gpvision.fragment;
 import java.io.File;
 
 import com.gpvision.R;
-import com.gpvision.ui.SaveDialog;
+import com.gpvision.ui.dialog.SaveDialog;
 import com.gpvision.utils.ImageCacheUtil;
 
 import android.content.Intent;

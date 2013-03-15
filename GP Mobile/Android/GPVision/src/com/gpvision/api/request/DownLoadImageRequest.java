@@ -88,6 +88,7 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 			}
 			callBack.downLoadStatus(index);
 		}
+		callBack.downLoadStatus(Integer.MAX_VALUE);
 		return null;
 	}
 

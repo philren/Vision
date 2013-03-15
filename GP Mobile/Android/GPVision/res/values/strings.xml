@@ -31,6 +31,7 @@
     <string name="signup_fragment_error_message_user_name_sprcial_chars">User name can not input special characters!</string>
     <string name="signup_fragment_error_message_email_format_error">Email format error!</string>
     <string name="signup_fragment_error_message_password_sprcial_chars">Password can not input special characters!</string>
+    <string name="signup_fragment_success">Sign Up Success</string>
 
     <!-- main activity -->
     <string name="main_activity_videos">Videos</string>
@@ -81,6 +82,8 @@
 
     <!-- dialog strings -->
     <string name="dialog_message_loading">Loading...</string>
+    <string name="dialog_message_login">Logining...</string>
+    <string name="dialog_message_sign_up">Sign up...</string>
 
     <!-- api error message -->
     <string name="api_error_network_error">Network Error!</string>

@@ -21,8 +21,8 @@ import com.gpvision.api.request.GetUserTokenResquest;
 import com.gpvision.api.response.GetAppTokenResponse;
 import com.gpvision.api.response.GetUserTokenResponse;
 import com.gpvision.datamodel.Account;
-import com.gpvision.ui.ErrorDialog;
-import com.gpvision.ui.LoadingDialog;
+import com.gpvision.ui.dialog.ErrorDialog;
+import com.gpvision.ui.dialog.LoginDialog;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
@@ -34,7 +34,7 @@ public class LoginFragment extends BaseFragment {
 	private EditText mPassword;
 
 	private Button mLogIn, mSignUp;
-	private LoadingDialog dialog;
+	private LoginDialog dialog;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,8 +48,8 @@ public class LoginFragment extends BaseFragment {
 		mSignUp.setOnClickListener(this);
 
 		// test only
-		// mUserName.setText("mobile001");
-		// mPassword.setText("123456");
+		mUserName.setText("mobile001");
+		mPassword.setText("123456");
 		return view;
 	}
 
@@ -105,23 +105,14 @@ public class LoginFragment extends BaseFragment {
 			return;
 		}
 
-		dialog = new LoadingDialog(getActivity());
+		dialog = new LoginDialog(getActivity());
 		dialog.show();
 		Account account = LocalDataBuffer.getInstance().getAccount();
 		if (account == null) {
 			account = new Account();
 			LocalDataBuffer.getInstance().setAccount(account);
 		}
-		if (account.getAppToken() == null) {
-			getAppToken();
-		} else {
-			if (account.getUserToken() == null) {
-				getUserToken();
-			} else {
-				logined();
-			}
-		}
-
+		getAppToken();
 	}
 
 	private void getAppToken() {
