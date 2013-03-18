@@ -155,7 +155,7 @@ public class VideoPlayFragment extends BaseFragment {
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
-
+						LogUtil.logE(errorMessage);
 					}
 				});
 	}

@@ -67,8 +67,10 @@ public class VideoInfoFragment extends BaseFragment {
 								videos.remove(video);
 							}
 						}
-						adapter.setVideos(videos);
-						adapter.notifyDataSetChanged();
+						if (adapter != null) {
+							adapter.setVideos(videos);
+							adapter.notifyDataSetChanged();
+						}
 						dialog.dismiss();
 					}
 
@@ -121,7 +123,8 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onChanged() {
-			adapter.notifyDataSetChanged();
+			if (adapter != null)
+				adapter.notifyDataSetChanged();
 		}
 
 	};
