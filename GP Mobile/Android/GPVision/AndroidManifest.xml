@@ -15,6 +15,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activity.LoginActivity"
+            android:configChanges="orientation"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,10 +25,12 @@
         </activity>
         <activity
             android:name=".activity.MainActivity"
+            android:configChanges="orientation"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name=".activity.FullScreenPlayActivity"
+            android:configChanges="orientation"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
