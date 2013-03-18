@@ -27,8 +27,10 @@ public class GetUserTokenResquest extends CallAPI<GetUserTokenResponse> {
 		JSONObject json = new JSONObject();
 		json.put("userName", account);
 		json.put("password", password);
-		json.put("appToken", LocalDataBuffer.getInstance().getAccount()
-				.getAppToken());
+		if (LocalDataBuffer.getInstance().getAccount().getAppToken() != null) {
+			json.put("appToken", LocalDataBuffer.getInstance().getAccount()
+					.getAppToken());
+		}
 		return json.toString();
 	}
 

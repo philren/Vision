@@ -94,9 +94,10 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			conn.setRequestProperty("accept",
 					"application/json, text/javascript, */*; q=0.01");
 
-			conn.setRequestProperty("endUserToken", LocalDataBuffer
-					.getInstance().getAccount().getUserToken());
-
+			if (LocalDataBuffer.getInstance().getAccount() != null) {
+				conn.setRequestProperty("endUserToken", LocalDataBuffer
+						.getInstance().getAccount().getUserToken());
+			}
 			DataOutputStream outStream = new DataOutputStream(
 					conn.getOutputStream());
 

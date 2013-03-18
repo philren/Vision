@@ -61,8 +61,7 @@ public class SettingFragment extends BaseFragment {
 	}
 
 	private void doChangePass() {
-		final LoadingDialog dialog = new LoadingDialog(getActivity());
-		dialog.show();
+
 		String oldPass = mOldPass.getText().toString().trim();
 		String newPass = mNewPass.getText().toString().trim();
 		String confirmPass = mConfirmPass.getText().toString().trim();
@@ -94,8 +93,12 @@ public class SettingFragment extends BaseFragment {
 			return;
 		}
 
-		String userName = LocalDataBuffer.getInstance().getAccount()
-				.getAccount();
+		final LoadingDialog dialog = new LoadingDialog(getActivity());
+		dialog.show();
+		String userName = null;
+		if (LocalDataBuffer.getInstance().getAccount() != null) {
+			userName = LocalDataBuffer.getInstance().getAccount().getAccount();
+		}
 		new ChangePassRequest(userName, oldPass, newPass)
 				.start(new APIResponseHandler<ChangePassResponse>() {
 

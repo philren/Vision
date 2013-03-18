@@ -32,8 +32,10 @@ public class GetIndexRequest extends CallAPI<GetIndexResponse> {
 	@Override
 	protected HashMap<String, String> getHeaders() {
 		HashMap<String, String> headers = super.getHeaders();
-		headers.put("endUserToken", LocalDataBuffer.getInstance().getAccount()
-				.getUserToken());
+		if (LocalDataBuffer.getInstance().getAccount() != null) {
+			headers.put("endUserToken", LocalDataBuffer.getInstance()
+					.getAccount().getUserToken());
+		}
 		return headers;
 	}
 

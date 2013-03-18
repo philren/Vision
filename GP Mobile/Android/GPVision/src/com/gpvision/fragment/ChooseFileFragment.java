@@ -20,7 +20,7 @@ public class ChooseFileFragment extends BaseFragment {
 
 	public static final String TAG = ChooseFileFragment.class.getName();
 	private static final int REQUEST_CODE_CHOOSE_FILE = 2030;
-	private static final int MAX_FILE_SIZE = 1024 * 1024 * 6;
+	private static final int MAX_FILE_SIZE = 1024 * 1024 * 1;
 	private File file;
 	private OnChoseListener listener;
 	private TextView fileInfo;

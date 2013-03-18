@@ -43,8 +43,11 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 
 	@Override
 	protected Void doInBackground(Void... params) {
-		String userToken = LocalDataBuffer.getInstance().getAccount()
-				.getUserToken();
+		String userToken = null;
+		if (LocalDataBuffer.getInstance().getAccount() != null) {
+			userToken = LocalDataBuffer.getInstance().getAccount()
+					.getUserToken();
+		}
 		Environment environment = LocalDataBuffer.getInstance()
 				.getEnvironment();
 		StringBuilder builder = new StringBuilder();
