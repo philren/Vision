@@ -30,7 +30,9 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 
 		TextView account = (TextView) findViewById(R.id.main_activity_logined_user_name);
-		account.setText(LocalDataBuffer.getInstance().getAccount().getAccount());
+		if (LocalDataBuffer.getInstance().getAccount() != null)
+			account.setText(LocalDataBuffer.getInstance().getAccount()
+					.getAccount());
 
 		Button video = (Button) findViewById(R.id.main_activity_videos_btn);
 		video.setOnClickListener(this);

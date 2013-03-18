@@ -37,7 +37,7 @@ public class DeleteVideoRequest extends CallAPI<DeleteVideoResponse> {
 		if (respString.equals("true")) {
 			responseHandler.handleResponse(null);
 		} else {
-			new JSONException(respString);
+			throw new JSONException(respString);
 		}
 	}
 
