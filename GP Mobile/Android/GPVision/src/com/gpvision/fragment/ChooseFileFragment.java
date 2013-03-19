@@ -78,15 +78,15 @@ public class ChooseFileFragment extends BaseFragment {
 			startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
 			break;
 		case R.id.choose_file_fragment_upload_btn:
-			if (listener != null && file.exists()) {
+			if (listener != null && file != null && file.exists()) {
 				if (file.length() > MAX_FILE_SIZE) {
 					AppUtils.toastLong(getActivity(),
 							R.string.choose_file_fragment_file_big);
 					break;
 				}
 				listener.onChose(file);
+				getFragmentManager().popBackStack();
 			}
-			getFragmentManager().popBackStack();
 			break;
 		case R.id.choose_file_fragment_cancel_btn:
 			getFragmentManager().popBackStack();
