@@ -2,8 +2,6 @@ package com.gpvision.fragment;
 
 import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
-import com.gpvision.activity.MainActivity;
-import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DownLoadImageRequest;
 import com.gpvision.api.request.DownLoadImageRequest.DownLoadStatusCallBack;
@@ -14,6 +12,7 @@ import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaController.Callback;
 import com.gpvision.ui.MediaPlayUI;
+import com.gpvision.ui.MyGallery;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
 import com.gpvision.ui.dialog.LoadingDialog;
@@ -26,10 +25,6 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Gallery;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,13 +40,12 @@ public class VideoPlayFragment extends BaseFragment {
 
 	private Video video;
 	private MediaPlayUI mediaPlayer;
-	private ImageAdapter adapter;
 	private int currentPosition = 0;
 	private HashMap<Integer, Index> indexMap;
 	private int index;
 	private static boolean isManual = false;
 	private LoadingDialog dialog;
-	private Gallery gallery;
+	private MyGallery gallery;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -101,15 +95,9 @@ public class VideoPlayFragment extends BaseFragment {
 		getActivity().getWindowManager().getDefaultDisplay()
 				.getMetrics(metrics);
 
-		gallery = (Gallery) view
+		gallery = (MyGallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
 
-		MarginLayoutParams mlp = (MarginLayoutParams) gallery.getLayoutParams();
-		mlp.setMargins(-(metrics.widthPixels / 2), mlp.topMargin,
-				mlp.rightMargin, mlp.bottomMargin);
-		adapter = new ImageAdapter();
-		gallery.setAdapter(adapter);
-		gallery.setOnItemClickListener(listener);
 		return view;
 	}
 
@@ -202,25 +190,6 @@ public class VideoPlayFragment extends BaseFragment {
 		return list;
 	}
 
-	private OnItemClickListener listener = new OnItemClickListener() {
-
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			if (isManual) {
-				String fileName = adapter.getItem(position);
-				SaveAndShareFragment fragment = new SaveAndShareFragment();
-				Bundle args = new Bundle();
-				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
-						fileName);
-				fragment.setArguments(args);
-				MessageCenter.getInstance().sendMessage(
-						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-								fragment));
-			}
-		}
-	};
-
 	private Handler handler = new Handler() {
 
 		@Override
@@ -233,8 +202,6 @@ public class VideoPlayFragment extends BaseFragment {
 					if (index > position / 250) {
 						if (mediaPlayer.isPrepared()) {
 							mediaPlayer.start();
-							adapter.setFileNames(getImageNames(position));
-							adapter.notifyDataSetChanged();
 							dialog.dismiss();
 						}
 					} else {
