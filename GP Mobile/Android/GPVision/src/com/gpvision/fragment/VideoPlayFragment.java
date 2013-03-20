@@ -210,6 +210,7 @@ public class VideoPlayFragment extends BaseFragment {
 						}
 						dialog.show();
 					}
+                    gallery.setImageFileNames(getImageNames(position));
 				}
 				sendEmptyMessageDelayed(MESSAGE_UPDATE_GALLERY, TASK_SCAN_TIME);
 				break;

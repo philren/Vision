@@ -43,9 +43,11 @@ public class MyGallery extends HorizontalScrollView {
     }
 
     public void setImageFileNames(ArrayList<String> fileNames) {
+        if(fileNames==null)
+            return;
         int size = fileNames.size();
         for (int i = 0; i < size; i++) {
-            if (images.size() <= 0) {
+            if (images.size() < size) {
                 GalleryImage image = new GalleryImage(getContext());
                 image.setOnClickListener(listener);
                 images.add(i, image);
@@ -58,47 +60,15 @@ public class MyGallery extends HorizontalScrollView {
 
         @Override
         public void onClick(View v) {
-
+            GalleryImage image = (GalleryImage)v;
+            String fileName = image.getFileName();
+            onItemClickListener.onItemClickListener(fileName);
         }
     };
 
     public interface OnItemClickListener {
-        public void onItemCilckListener(int position);
+        public void onItemClickListener(String fileName);
     }
 
-    public class GalleryAdapterView extends AdapterView<ImageAdapter> {
-        private ImageAdapter mAdapter;
-        public GalleryAdapterView(Context context) {
-            super(context);
-        }
 
-        public GalleryAdapterView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public GalleryAdapterView(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-        }
-
-        @Override
-        public ImageAdapter getAdapter() {
-            return mAdapter;
-        }
-
-        @Override
-        public void setAdapter(ImageAdapter adapter) {
-            mAdapter = adapter;
-        }
-
-        @Override
-        public View getSelectedView() {
-            return null;
-        }
-
-        @Override
-        public void setSelection(int position) {
-
-        }
-
-    }
 }
