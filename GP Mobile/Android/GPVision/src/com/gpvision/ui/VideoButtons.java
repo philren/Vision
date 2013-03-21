@@ -54,16 +54,16 @@ public class VideoButtons extends LinearLayout {
 		this.video = video;
 		switch (video.getStatus()) {
 		case uploading:
-			if (lastStatus != Status.uploading) {
-				getUploadingButtons();
-				lastStatus = Status.uploading;
-			}
+			// if (lastStatus != Status.uploading) {
+			getUploadingButtons();
+			// lastStatus = Status.uploading;
+			// }
 			break;
 		case paused:
-			if (lastStatus != Status.paused) {
-				getPausedButtons();
-				lastStatus = Status.paused;
-			}
+			// if (lastStatus != Status.paused) {
+			getPausedButtons();
+			// lastStatus = Status.paused;
+			// }
 			break;
 		case indexed:
 		case uploaded:
