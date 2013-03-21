@@ -64,18 +64,18 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 				ArrayList<String> urlList = indexMap.get(index).getImageUrls();
 				for (String url : urlList) {
 					if (ImageCacheUtil.isFileExists(ImageCacheUtil
-							.getFileNameFromUrl(url))) {
+							.getChildDir(url))) {
 						continue;
 					}
 					HttpRequest request = new HttpRequest(baseUrl + url);
 					LogUtil.logI(baseUrl + url);
 					request.addHeader("endUserToken", userToken);
-					String fileName = ImageCacheUtil.getFileNameFromUrl(url);
+					String childDir = ImageCacheUtil.getChildDir(url);
 					InputStream inputStream;
 					try {
 						inputStream = request.getStream();
 						if (inputStream != null)
-							ImageCacheUtil.write2SDCard(fileName, inputStream);
+							ImageCacheUtil.write2SDCard(childDir, inputStream);
 					} catch (ClientProtocolException e) {
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {

@@ -16,7 +16,7 @@ public class SaveDialog extends AlertDialog.Builder {
 
 	private EditText editText;
 	private Context context;
-	private String fileName;
+	private String childDir;
 
 	private SaveDialog(Context context) {
 		super(context);
@@ -24,9 +24,9 @@ public class SaveDialog extends AlertDialog.Builder {
 		init();
 	}
 
-	public SaveDialog(Context context, String fileName) {
+	public SaveDialog(Context context, String childDir) {
 		this(context);
-		this.fileName = fileName;
+		this.childDir = childDir;
 	}
 
 	private void init() {
@@ -41,8 +41,10 @@ public class SaveDialog extends AlertDialog.Builder {
 				if (root.lastIndexOf("/") - 1 != root.length()) {
 					root = root + File.separator;
 				}
-				ImageCacheUtil.saveTo(fileName, root + fileName);
-				if (new File(root + fileName).exists()) {
+				String toPath = root + File.separator
+						+ ImageCacheUtil.getFileName(childDir);
+				ImageCacheUtil.saveTo(childDir, toPath);
+				if (new File(toPath).exists()) {
 					AppUtils.toastLong(context,
 							R.string.save_and_share_fragment_save_success);
 				} else {

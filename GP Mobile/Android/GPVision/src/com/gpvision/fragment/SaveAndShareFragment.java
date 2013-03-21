@@ -19,7 +19,7 @@ public class SaveAndShareFragment extends BaseFragment {
 
 	public static final String TAG = SaveAndShareFragment.class.getName();
 	public static final String ARGS_FILE_NAME_KEK = "file";
-	private String fileName;
+	private String childDir;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public class SaveAndShareFragment extends BaseFragment {
 		Bundle args = getArguments();
 		if (args == null)
 			args = savedInstanceState;
-		fileName = args.getString(ARGS_FILE_NAME_KEK);
+		childDir = args.getString(ARGS_FILE_NAME_KEK);
 	}
 
 	@Override
@@ -37,10 +37,10 @@ public class SaveAndShareFragment extends BaseFragment {
 				container, false);
 		TextView imageTitle = (TextView) view
 				.findViewById(R.id.save_and_share_fragment_image_name_title);
-		imageTitle.setText(fileName);
+		imageTitle.setText(ImageCacheUtil.getFileName(childDir));
 		ImageView imageView = (ImageView) view
 				.findViewById(R.id.save_and_share_fragment_image_view);
-		imageView.setImageBitmap(ImageCacheUtil.getBitmapFromFile(fileName,
+		imageView.setImageBitmap(ImageCacheUtil.getBitmapFromFile(childDir,
 				400, 400));
 
 		view.findViewById(R.id.save_and_share_fragment_save_btn)
@@ -54,12 +54,11 @@ public class SaveAndShareFragment extends BaseFragment {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.save_and_share_fragment_save_btn:
-			new SaveDialog(getActivity(), fileName);
+			new SaveDialog(getActivity(), childDir);
 			break;
 		case R.id.save_and_share_fragment_share_btn:
 			Intent shareIntent = new Intent(Intent.ACTION_SEND);
-			File file = new File(ImageCacheUtil.CACHE_DIR + File.separator
-					+ fileName);
+			File file = new File(ImageCacheUtil.CACHE_DIR + childDir);
 			shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
 			shareIntent.setType("image/jpeg");
 			startActivity(Intent
@@ -72,4 +71,5 @@ public class SaveAndShareFragment extends BaseFragment {
 			break;
 		}
 	}
+
 }

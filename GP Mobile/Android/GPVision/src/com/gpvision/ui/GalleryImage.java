@@ -6,34 +6,44 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+import android.widget.LinearLayout.LayoutParams;
 
 public class GalleryImage extends ImageView {
 
-	private String fileName;
+	private static final LayoutParams PARAMS = new LayoutParams(
+			LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT);
+	private String childDir;
 
-	public String getFileName() {
-		return fileName;
+	public String getChildDir() {
+		return childDir;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setChildDir(String childDir) {
+		this.childDir = childDir;
 		setImage();
 	}
 
 	public GalleryImage(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
 	}
 
 	public GalleryImage(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public GalleryImage(Context context) {
 		super(context);
+		init();
+	}
+
+	private void init() {
+		setLayoutParams(PARAMS);
 	}
 
 	private void setImage() {
-		Bitmap bitmap = ImageCacheUtil.getBitmapFromFile(fileName, 50, 50);
+		Bitmap bitmap = ImageCacheUtil.getBitmapFromFile(childDir, 50, 50);
 		if (bitmap != null)
 			setImageBitmap(bitmap);
 	}
@@ -42,5 +52,5 @@ public class GalleryImage extends ImageView {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(heightMeasureSpec, heightMeasureSpec);
 	}
-	
+
 }

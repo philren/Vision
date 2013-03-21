@@ -2,6 +2,7 @@ package com.gpvision.fragment;
 
 import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
+import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DownLoadImageRequest;
 import com.gpvision.api.request.DownLoadImageRequest.DownLoadStatusCallBack;
@@ -15,13 +16,13 @@ import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MyGallery;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
+import com.gpvision.ui.MyGallery.OnItemClickListener;
 import com.gpvision.ui.dialog.LoadingDialog;
 import com.gpvision.utils.*;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,13 +92,10 @@ public class VideoPlayFragment extends BaseFragment {
 				startActivityForResult(intent, REQUEST_CODE_FULL_SCREEN);
 			}
 		});
-		DisplayMetrics metrics = new DisplayMetrics();
-		getActivity().getWindowManager().getDefaultDisplay()
-				.getMetrics(metrics);
 
 		gallery = (MyGallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
-
+		gallery.setOnItemClickListener(listener);
 		return view;
 	}
 
@@ -172,7 +170,7 @@ public class VideoPlayFragment extends BaseFragment {
 		});
 	}
 
-	private ArrayList<String> getImageNames(int position) {
+	private ArrayList<String> getImageDirs(int position) {
 		if (indexMap == null)
 			return null;
 		ArrayList<String> list = new ArrayList<String>();
@@ -183,7 +181,9 @@ public class VideoPlayFragment extends BaseFragment {
 			if (indexMap.containsKey(i)) {
 				ArrayList<String> imageUrls = indexMap.get(i).getImageUrls();
 				for (String url : imageUrls) {
-					list.add(ImageCacheUtil.getFileNameFromUrl(url));
+					String t = ImageCacheUtil.getChildDir(url);
+					if (!list.contains(t))
+						list.add(ImageCacheUtil.getChildDir(url));
 				}
 			}
 		}
@@ -210,7 +210,7 @@ public class VideoPlayFragment extends BaseFragment {
 						}
 						dialog.show();
 					}
-                    gallery.setImageFileNames(getImageNames(position));
+					gallery.setImageChildDirs(getImageDirs(position));
 				}
 				sendEmptyMessageDelayed(MESSAGE_UPDATE_GALLERY, TASK_SCAN_TIME);
 				break;
@@ -222,11 +222,30 @@ public class VideoPlayFragment extends BaseFragment {
 
 	};
 
+	private OnItemClickListener listener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClickListener(String childDir) {
+			if (isManual) {
+				SaveAndShareFragment fragment = new SaveAndShareFragment();
+				Bundle args = new Bundle();
+				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
+						childDir);
+				fragment.setArguments(args);
+				MessageCenter.getInstance().sendMessage(
+						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+								fragment));
+			}
+		}
+
+	};
+
 	private Callback callback = new Callback() {
 
 		@Override
 		public void onManualModel(boolean isManual) {
 			VideoPlayFragment.isManual = isManual;
+			gallery.setTouchable(isManual);
 		}
 	};
 }
