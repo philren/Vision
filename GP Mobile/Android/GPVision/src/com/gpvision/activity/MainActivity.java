@@ -43,7 +43,8 @@ public class MainActivity extends BaseActivity {
 		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction();
 		VideoInfoFragment fragment = new VideoInfoFragment();
-		transaction.replace(R.id.main_activity_fragment_content, fragment);
+		transaction.replace(R.id.main_activity_fragment_content, fragment,
+				VideoInfoFragment.TAG);
 		transaction.commit();
 
 		Intent intent = new Intent();
@@ -84,7 +85,7 @@ public class MainActivity extends BaseActivity {
 				FragmentTransaction transaction = getSupportFragmentManager()
 						.beginTransaction();
 				transaction.replace(R.id.main_activity_fragment_content,
-						fragment);
+						fragment, message.getTag());
 				transaction.addToBackStack(null).commit();
 			}
 		}
@@ -97,30 +98,41 @@ public class MainActivity extends BaseActivity {
 			Fragment fragment = getSupportFragmentManager().findFragmentById(
 					R.id.main_activity_fragment_content);
 			if (!(fragment instanceof NotificationFragment)) {
-				NotificationFragment notificationFragment = new NotificationFragment();
-				MessageCenter.getInstance().sendMessage(
-						new Message(MESSAGE_UPDATE_FRAGMENT,
-								notificationFragment));
+				NotificationFragment notificationFragment = (NotificationFragment) getSupportFragmentManager()
+						.findFragmentByTag(NotificationFragment.TAG);
+				if (notificationFragment == null)
+					notificationFragment = new NotificationFragment();
+				MessageCenter.getInstance()
+						.sendMessage(
+								new Message(MESSAGE_UPDATE_FRAGMENT,
+										notificationFragment,
+										NotificationFragment.TAG));
 			}
 			break;
 		case R.id.main_activity_videos_btn:
 			Fragment fragment2 = getSupportFragmentManager().findFragmentById(
 					R.id.main_activity_fragment_content);
 			if (!(fragment2 instanceof VideoInfoFragment)) {
-				VideoInfoFragment videoInfoFragment = new VideoInfoFragment();
-				MessageCenter.getInstance()
-						.sendMessage(
-								new Message(MESSAGE_UPDATE_FRAGMENT,
-										videoInfoFragment));
+				VideoInfoFragment videoInfoFragment = (VideoInfoFragment) getSupportFragmentManager()
+						.findFragmentByTag(VideoInfoFragment.TAG);
+				if (videoInfoFragment == null)
+					videoInfoFragment = new VideoInfoFragment();
+				MessageCenter.getInstance().sendMessage(
+						new Message(MESSAGE_UPDATE_FRAGMENT, videoInfoFragment,
+								VideoInfoFragment.TAG));
 			}
 			break;
 		case R.id.main_activity_settings_btn:
 			Fragment fragment3 = getSupportFragmentManager().findFragmentById(
 					R.id.main_activity_fragment_content);
 			if (!(fragment3 instanceof SettingFragment)) {
-				SettingFragment settingFragment = new SettingFragment();
+				SettingFragment settingFragment = (SettingFragment) getSupportFragmentManager()
+						.findFragmentByTag(SettingFragment.TAG);
+				if (settingFragment == null)
+					settingFragment = new SettingFragment();
 				MessageCenter.getInstance().sendMessage(
-						new Message(MESSAGE_UPDATE_FRAGMENT, settingFragment));
+						new Message(MESSAGE_UPDATE_FRAGMENT, settingFragment,
+								SettingFragment.TAG));
 			}
 			break;
 		default:
