@@ -79,6 +79,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		try {
 			URL uri = new URL(mUrl);
 			HttpsURLConnection conn = (HttpsURLConnection) uri.openConnection();
+			conn.setChunkedStreamingMode(0);
 
 			conn.setReadTimeout(5 * 1000);
 			conn.setDoInput(true);
@@ -87,6 +88,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("connection", "keep-alive");
 			conn.setRequestProperty("Charsert", "UTF-8");
+			// conn.setRequestProperty("Transfer-Encoding", "chunked");
 
 			conn.setRequestProperty("Content-Type", MULTIPART_FROM_DATA
 					+ ";boundary=" + BOUNDARY);
