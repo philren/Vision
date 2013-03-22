@@ -23,6 +23,7 @@ import com.gpvision.utils.*;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,6 @@ public class VideoPlayFragment extends BaseFragment {
 	public static final String TAG = VideoPlayFragment.class.getName();
 	private static final int MESSAGE_UPDATE_GALLERY = 1736;
 	private static final int TASK_SCAN_TIME = 1000;
-	public static final String ARGS_VIDEO_KEY = "video";
 	public static final int REQUEST_CODE_FULL_SCREEN = 101;
 
 	private Video video;
@@ -48,21 +48,16 @@ public class VideoPlayFragment extends BaseFragment {
 	private LoadingDialog dialog;
 	private MyGallery gallery;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		dialog = new LoadingDialog(getActivity());
-		Bundle args = getArguments();
-		if (args == null)
-			args = savedInstanceState;
-		video = args.getParcelable(ARGS_VIDEO_KEY);
-
+	public void setVideo(Video video) {
+		this.video = video;
 		getIndexKey();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if (dialog == null)
+			dialog = new LoadingDialog(getActivity());
 		View view = inflater.inflate(R.layout.fragemnt_video_play, container,
 				false);
 		TextView videoName = (TextView) view
@@ -228,14 +223,15 @@ public class VideoPlayFragment extends BaseFragment {
 		@Override
 		public void onItemClickListener(String childDir) {
 			if (isManual) {
-				SaveAndShareFragment fragment = new SaveAndShareFragment();
-				Bundle args = new Bundle();
-				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
-						childDir);
-				fragment.setArguments(args);
+				FragmentManager manager = getFragmentManager();
+				SaveAndShareFragment fragment = (SaveAndShareFragment) manager
+						.findFragmentByTag(SaveAndShareFragment.TAG);
+				if (fragment == null)
+					fragment = new SaveAndShareFragment();
+				fragment.setChildDir(childDir);
 				MessageCenter.getInstance().sendMessage(
 						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-								fragment));
+								fragment, SaveAndShareFragment.TAG));
 			}
 		}
 

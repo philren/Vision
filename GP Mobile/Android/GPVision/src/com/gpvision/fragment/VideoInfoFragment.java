@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,7 +87,11 @@ public class VideoInfoFragment extends BaseFragment {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.video_info_fragment_upload_more_button:
-			ChooseFileFragment fragment = new ChooseFileFragment();
+			FragmentManager manager = getFragmentManager();
+			ChooseFileFragment fragment = (ChooseFileFragment) manager
+					.findFragmentByTag(ChooseFileFragment.TAG);
+			if (fragment == null)
+				fragment = new ChooseFileFragment();
 			fragment.setOnChoseListener(new OnChoseListener() {
 
 				@Override
@@ -103,10 +108,9 @@ public class VideoInfoFragment extends BaseFragment {
 					adapter.notifyDataSetChanged();
 				}
 			});
-			MessageCenter.getInstance()
-					.sendMessage(
-							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-									fragment));
+			MessageCenter.getInstance().sendMessage(
+					new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT, fragment,
+							ChooseFileFragment.TAG));
 			break;
 
 		default:
@@ -125,6 +129,19 @@ public class VideoInfoFragment extends BaseFragment {
 		public void onChanged() {
 			if (adapter != null)
 				adapter.notifyDataSetChanged();
+		}
+
+		@Override
+		public void onPlay(Video video) {
+			FragmentManager manager = getFragmentManager();
+			VideoPlayFragment fragment = (VideoPlayFragment) manager
+					.findFragmentByTag(VideoPlayFragment.TAG);
+			if (fragment == null)
+				fragment = new VideoPlayFragment();
+			fragment.setVideo(video);
+			MessageCenter.getInstance().sendMessage(
+					new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT, fragment,
+							VideoPlayFragment.TAG));
 		}
 
 	};

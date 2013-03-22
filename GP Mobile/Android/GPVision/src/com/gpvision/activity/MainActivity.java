@@ -1,6 +1,9 @@
 package com.gpvision.activity;
 
+import java.util.ArrayList;
+
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +14,7 @@ import com.gpvision.R;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.gpvision.datamodel.Notification;
 import com.gpvision.fragment.NotificationFragment;
 import com.gpvision.fragment.SettingFragment;
 import com.gpvision.fragment.VideoInfoFragment;
@@ -23,6 +27,7 @@ import com.gpvision.utils.MessageCenter.MessageListener;
 public class MainActivity extends BaseActivity {
 
 	public static final int MESSAGE_UPDATE_FRAGMENT = 1;
+	public static final String ARGS_NOTIFICATION_KEY = "notification";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,14 +70,18 @@ public class MainActivity extends BaseActivity {
 		MessageCenter.getInstance().addMessageListener(MESSAGE_UPDATE_FRAGMENT,
 				updateContent);
 		Intent intent = getIntent();
-		if (intent.hasExtra(NotificationFragment.ARGS_NOTIFICATION_KEY)) {
-			FragmentTransaction transaction = getSupportFragmentManager()
-					.beginTransaction();
-			NotificationFragment fragment = new NotificationFragment();
-			Bundle args = intent.getExtras();
-			fragment.setArguments(args);
-			transaction.replace(R.id.main_activity_fragment_content, fragment);
-			transaction.commit();
+		if (intent.hasExtra(ARGS_NOTIFICATION_KEY)) {
+			FragmentManager manager = getSupportFragmentManager();
+			NotificationFragment fragment = (NotificationFragment) manager
+					.findFragmentByTag(NotificationFragment.TAG);
+			if (fragment == null)
+				fragment = new NotificationFragment();
+			ArrayList<Notification> notifications = (ArrayList<Notification>) intent
+					.getExtras().getSerializable(ARGS_NOTIFICATION_KEY);
+			fragment.setNotifications(notifications);
+			MessageCenter.getInstance().sendMessage(
+					new Message(MESSAGE_UPDATE_FRAGMENT, fragment,
+							NotificationFragment.TAG));
 		}
 	}
 

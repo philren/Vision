@@ -8,8 +8,6 @@ import com.gpvision.api.request.GetMediaListRequset;
 import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.datamodel.Notification;
 import com.gpvision.datamodel.Video;
-import com.gpvision.fragment.NotificationFragment;
-
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -106,7 +104,7 @@ public class NotificationService extends Service {
 		Intent intent = new Intent(Intent.ACTION_MAIN);
 		intent.setClass(getApplicationContext(), MainActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putSerializable(NotificationFragment.ARGS_NOTIFICATION_KEY,
+		bundle.putSerializable(MainActivity.ARGS_NOTIFICATION_KEY,
 				notifications);
 		intent.putExtras(bundle);
 		PendingIntent pendingIntent = PendingIntent.getActivity(
