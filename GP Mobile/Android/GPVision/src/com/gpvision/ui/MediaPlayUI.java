@@ -34,7 +34,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private int mCurrentPosition = 0;
 	private FullScreenModelListener fullScreenModel;
 	private FaceBox mFaceBox;
-	private HashMap<Integer, Index> indexMap;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
 	private int width, heigth;
 	private float scaleWidth, scaleHeigth;
 	private Video video;
@@ -58,7 +58,7 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 		this.fullScreenModel = fullScreenModel;
 	}
 
-	public void setIndexMap(HashMap<Integer, Index> indexMap) {
+	public void setIndexMap(HashMap<Integer, ArrayList<Index>> indexMap) {
 		this.indexMap = indexMap;
 	}
 
@@ -185,13 +185,14 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private void updateFaceBox(int position) {
 		if (indexMap == null)
 			return;
-		int index = (int) Math.floor(position / (250 * 1.0f));
-		if (indexMap.containsKey(index)) {
-			ArrayList<Location> locations = indexMap.get(index).getLocations();
+		int indexKey = (int) Math.floor(position / (250 * 1.0f));
+		if (indexMap.containsKey(indexKey)) {
+			ArrayList<Index> indexs = indexMap.get(indexKey);
 			ArrayList<Rect> rects = new ArrayList<Rect>();
 
-			for (Location location : locations) {
+			for (Index index : indexs) {
 				Rect rect = new Rect();
+				Location location = index.getLocation();
 				rect.set(
 						(int) (location.getLeft() * scaleWidth),
 						(int) (location.getTop() * scaleHeigth),

@@ -1,32 +1,31 @@
 package com.gpvision.datamodel;
 
-import java.util.ArrayList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Index implements Parcelable {
 
-	private ArrayList<Location> locations;
-	private ArrayList<String> imageUrls;
+	private Location location;
+	private String imageUrl;
 
 	public Index() {
 		super();
 	}
 
-	public ArrayList<Location> getLocations() {
-		return locations;
+	public Location getLocation() {
+		return location;
 	}
 
-	public void setLocations(ArrayList<Location> locations) {
-		this.locations = locations;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
-	public ArrayList<String> getImageUrls() {
-		return imageUrls;
+	public String getImageUrl() {
+		return imageUrl;
 	}
 
-	public void setImageUrls(ArrayList<String> imageUrls) {
-		this.imageUrls = imageUrls;
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	@Override
@@ -36,15 +35,13 @@ public class Index implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeList(locations);
-		dest.writeList(imageUrls);
+		dest.writeParcelable(location, flags);
+		dest.writeString(imageUrl);
 	}
 
 	public Index(Parcel source) {
-		locations = new ArrayList<Location>();
-		source.readList(locations, Location.class.getClassLoader());
-		imageUrls = new ArrayList<String>();
-		source.readList(imageUrls, String.class.getClassLoader());
+		location = source.readParcelable(Location.class.getClassLoader());
+		imageUrl = source.readString();
 	}
 
 	public static final Parcelable.Creator<Index> COEATOR = new Parcelable.Creator<Index>() {

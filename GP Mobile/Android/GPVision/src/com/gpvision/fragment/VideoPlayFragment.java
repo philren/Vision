@@ -42,8 +42,8 @@ public class VideoPlayFragment extends BaseFragment {
 	private Video video;
 	private MediaPlayUI mediaPlayer;
 	private int currentPosition = 0;
-	private HashMap<Integer, Index> indexMap;
-	private int index;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
+	private int indexKey;
 	private static boolean isManual = false;
 	private LoadingDialog dialog;
 	private MyGallery gallery;
@@ -57,7 +57,7 @@ public class VideoPlayFragment extends BaseFragment {
 			args = savedInstanceState;
 		video = args.getParcelable(ARGS_VIDEO_KEY);
 
-		getIndex();
+		getIndexKey();
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class VideoPlayFragment extends BaseFragment {
 		handler.removeMessages(MESSAGE_UPDATE_GALLERY);
 	}
 
-	private void getIndex() {
+	private void getIndexKey() {
 		String fileName = video.getStoreName();
 		fileName = fileName.substring(0, fileName.lastIndexOf('.')) + ".json";
 		new GetIndexRequest(fileName)
@@ -146,14 +146,14 @@ public class VideoPlayFragment extends BaseFragment {
 				});
 	}
 
-	private void downLoadImages(HashMap<Integer, Index> indexMap) {
+	private void downLoadImages(HashMap<Integer, ArrayList<Index>> indexMap) {
 		DownLoadImageRequest<DownLoadImageResponse> request = new DownLoadImageRequest<DownLoadImageResponse>(
 				indexMap);
 		request.setCallBack(new DownLoadStatusCallBack() {
 
 			@Override
 			public void downLoadStatus(int index) {
-				VideoPlayFragment.this.index = index;
+				VideoPlayFragment.this.indexKey = index;
 			}
 		});
 		request.start(new APIResponseHandler<DownLoadImageResponse>() {
@@ -174,16 +174,17 @@ public class VideoPlayFragment extends BaseFragment {
 		if (indexMap == null)
 			return null;
 		ArrayList<String> list = new ArrayList<String>();
-		int index = position / 250;
-		int from = index - TASK_SCAN_TIME / 250;
-		int to = index + TASK_SCAN_TIME / 250;
+		int p = position / 250;
+		int from = p - TASK_SCAN_TIME / 250;
+		int to = p + TASK_SCAN_TIME / 250;
 		for (int i = from; i < to; i++) {
 			if (indexMap.containsKey(i)) {
-				ArrayList<String> imageUrls = indexMap.get(i).getImageUrls();
-				for (String url : imageUrls) {
+				ArrayList<Index> indexs = indexMap.get(i);
+				for (Index index : indexs) {
+					String url = index.getImageUrl();
 					String t = ImageCacheUtil.getChildDir(url);
 					if (!list.contains(t))
-						list.add(ImageCacheUtil.getChildDir(url));
+						list.add(t);
 				}
 			}
 		}
@@ -199,7 +200,7 @@ public class VideoPlayFragment extends BaseFragment {
 			case MESSAGE_UPDATE_GALLERY:
 				if (!isManual) {
 					int position = mediaPlayer.getCurrentPosition();
-					if (index > position / 250) {
+					if (indexKey > position / 250) {
 						if (mediaPlayer.isPrepared()) {
 							mediaPlayer.start();
 							dialog.dismiss();
