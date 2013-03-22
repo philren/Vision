@@ -24,10 +24,10 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 
 	private APIResponseHandler<RESPONSE> responseHandler;
 
-	private HashMap<Integer, Index> indexMap;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
 	private DownLoadStatusCallBack callBack;
 
-	public DownLoadImageRequest(HashMap<Integer, Index> indexMap) {
+	public DownLoadImageRequest(HashMap<Integer, ArrayList<Index>> indexMap) {
 		super();
 		this.indexMap = indexMap;
 	}
@@ -57,25 +57,26 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 			builder.append(environment.getBasePath());
 		}
 		String baseUrl = builder.toString();
-		int size = indexMap.size(), index = 0, n = 0;
+		int size = indexMap.size(), indexKey = 0, n = 0;
 
 		while (n < size) {
-			if (indexMap.containsKey(index)) {
-				ArrayList<String> urlList = indexMap.get(index).getImageUrls();
-				for (String url : urlList) {
+			if (indexMap.containsKey(indexKey)) {
+				ArrayList<Index> indexs = indexMap.get(indexKey);
+				for (Index index : indexs) {
+					String url = index.getImageUrl();
 					if (ImageCacheUtil.isFileExists(ImageCacheUtil
-							.getFileNameFromUrl(url))) {
+							.getChildDir(url))) {
 						continue;
 					}
 					HttpRequest request = new HttpRequest(baseUrl + url);
 					LogUtil.logI(baseUrl + url);
 					request.addHeader("endUserToken", userToken);
-					String fileName = ImageCacheUtil.getFileNameFromUrl(url);
+					String childDir = ImageCacheUtil.getChildDir(url);
 					InputStream inputStream;
 					try {
 						inputStream = request.getStream();
 						if (inputStream != null)
-							ImageCacheUtil.write2SDCard(fileName, inputStream);
+							ImageCacheUtil.write2SDCard(childDir, inputStream);
 					} catch (ClientProtocolException e) {
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
@@ -85,11 +86,11 @@ public class DownLoadImageRequest<RESPONSE extends APIResponse> extends
 					}
 				}
 				n++;
-				index++;
+				indexKey++;
 			} else {
-				index++;
+				indexKey++;
 			}
-			callBack.downLoadStatus(index);
+			callBack.downLoadStatus(indexKey);
 		}
 		callBack.downLoadStatus(Integer.MAX_VALUE);
 		return null;

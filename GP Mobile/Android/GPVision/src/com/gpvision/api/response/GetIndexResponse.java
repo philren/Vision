@@ -14,11 +14,11 @@ import com.gpvision.utils.LogUtil;
 
 public class GetIndexResponse extends APIResponse {
 
-	private HashMap<Integer, Index> indexMap;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
 
 	public GetIndexResponse(String response) throws JSONException {
 		LogUtil.logI(response);
-		indexMap = new HashMap<Integer, Index>();
+		indexMap = new HashMap<Integer, ArrayList<Index>>();
 		JSONObject jsonObject = new JSONObject(response);
 		int size = jsonObject.length();
 		LogUtil.logI("size:" + size);
@@ -26,26 +26,24 @@ public class GetIndexResponse extends APIResponse {
 		while (n < size) {
 			String temp = String.valueOf(position);
 			if (jsonObject.has(temp)) {
-				JSONArray locationArray = jsonObject.getJSONArray(temp);
-				int locationSize = locationArray.length();
-				Index index = new Index();
-				ArrayList<Location> locations = new ArrayList<Location>();
-				ArrayList<String> imageUris = new ArrayList<String>();
-				for (int i = 0; i < locationSize; i++) {
+				JSONArray indexArray = jsonObject.getJSONArray(temp);
+				int indexArraySize = indexArray.length();
+				ArrayList<Index> indexs = new ArrayList<Index>();
+				for (int i = 0; i < indexArraySize; i++) {
+					Index index = new Index();
 					Location location = new Location();
-					JSONObject object = locationArray.getJSONObject(i);
+					JSONObject object = indexArray.getJSONObject(i);
 					JSONObject locationObject = object
 							.getJSONObject("location");
 					location.setHeight(locationObject.getInt("Height"));
 					location.setTop(locationObject.getInt("Top"));
 					location.setLeft(locationObject.getInt("left"));
 					location.setWidth(locationObject.getInt("Width"));
-					locations.add(location);
-					imageUris.add(object.getString("name"));
+					index.setLocation(location);
+					index.setImageUrl(object.getString("name"));
+					indexs.add(index);
 				}
-				index.setLocations(locations);
-				index.setImageUrls(imageUris);
-				indexMap.put(position, index);
+				indexMap.put(position, indexs);
 				position++;
 				n++;
 			} else {
@@ -55,7 +53,7 @@ public class GetIndexResponse extends APIResponse {
 
 	}
 
-	public HashMap<Integer, Index> getIndexMap() {
+	public HashMap<Integer, ArrayList<Index>> getIndexMap() {
 		return indexMap;
 	}
 }

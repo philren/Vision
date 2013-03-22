@@ -1,5 +1,6 @@
 package com.gpvision.activity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.gpvision.R;
@@ -28,7 +29,7 @@ public class FullScreenPlayActivity extends BaseActivity {
 	private int position;
 	private MediaPlayUI mediaPlayer;
 	private Video video;
-	private HashMap<Integer, Index> indexMap;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

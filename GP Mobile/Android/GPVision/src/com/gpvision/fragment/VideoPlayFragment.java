@@ -3,7 +3,6 @@ package com.gpvision.fragment;
 import com.gpvision.R;
 import com.gpvision.activity.FullScreenPlayActivity;
 import com.gpvision.activity.MainActivity;
-import com.gpvision.adapter.ImageAdapter;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DownLoadImageRequest;
 import com.gpvision.api.request.DownLoadImageRequest.DownLoadStatusCallBack;
@@ -14,22 +13,19 @@ import com.gpvision.datamodel.Index;
 import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaController.Callback;
 import com.gpvision.ui.MediaPlayUI;
+import com.gpvision.ui.MyGallery;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
+import com.gpvision.ui.MyGallery.OnItemClickListener;
 import com.gpvision.ui.dialog.LoadingDialog;
 import com.gpvision.utils.*;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Gallery;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,13 +41,12 @@ public class VideoPlayFragment extends BaseFragment {
 
 	private Video video;
 	private MediaPlayUI mediaPlayer;
-	private ImageAdapter adapter;
 	private int currentPosition = 0;
-	private HashMap<Integer, Index> indexMap;
-	private int index;
+	private HashMap<Integer, ArrayList<Index>> indexMap;
+	private int indexKey;
 	private static boolean isManual = false;
 	private LoadingDialog dialog;
-	private Gallery gallery;
+	private MyGallery gallery;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +57,7 @@ public class VideoPlayFragment extends BaseFragment {
 			args = savedInstanceState;
 		video = args.getParcelable(ARGS_VIDEO_KEY);
 
-		getIndex();
+		getIndexKey();
 	}
 
 	@Override
@@ -97,18 +92,9 @@ public class VideoPlayFragment extends BaseFragment {
 				startActivityForResult(intent, REQUEST_CODE_FULL_SCREEN);
 			}
 		});
-		DisplayMetrics metrics = new DisplayMetrics();
-		getActivity().getWindowManager().getDefaultDisplay()
-				.getMetrics(metrics);
 
-		gallery = (Gallery) view
+		gallery = (MyGallery) view
 				.findViewById(R.id.video_play_fragment_indexing_images_gallery);
-
-		MarginLayoutParams mlp = (MarginLayoutParams) gallery.getLayoutParams();
-		mlp.setMargins(-(metrics.widthPixels / 2), mlp.topMargin,
-				mlp.rightMargin, mlp.bottomMargin);
-		adapter = new ImageAdapter();
-		gallery.setAdapter(adapter);
 		gallery.setOnItemClickListener(listener);
 		return view;
 	}
@@ -138,7 +124,7 @@ public class VideoPlayFragment extends BaseFragment {
 		handler.removeMessages(MESSAGE_UPDATE_GALLERY);
 	}
 
-	private void getIndex() {
+	private void getIndexKey() {
 		String fileName = video.getStoreName();
 		fileName = fileName.substring(0, fileName.lastIndexOf('.')) + ".json";
 		new GetIndexRequest(fileName)
@@ -160,14 +146,14 @@ public class VideoPlayFragment extends BaseFragment {
 				});
 	}
 
-	private void downLoadImages(HashMap<Integer, Index> indexMap) {
+	private void downLoadImages(HashMap<Integer, ArrayList<Index>> indexMap) {
 		DownLoadImageRequest<DownLoadImageResponse> request = new DownLoadImageRequest<DownLoadImageResponse>(
 				indexMap);
 		request.setCallBack(new DownLoadStatusCallBack() {
 
 			@Override
 			public void downLoadStatus(int index) {
-				VideoPlayFragment.this.index = index;
+				VideoPlayFragment.this.indexKey = index;
 			}
 		});
 		request.start(new APIResponseHandler<DownLoadImageResponse>() {
@@ -184,42 +170,26 @@ public class VideoPlayFragment extends BaseFragment {
 		});
 	}
 
-	private ArrayList<String> getImageNames(int position) {
+	private ArrayList<String> getImageDirs(int position) {
 		if (indexMap == null)
 			return null;
 		ArrayList<String> list = new ArrayList<String>();
-		int index = position / 250;
-		int from = index - TASK_SCAN_TIME / 250;
-		int to = index + TASK_SCAN_TIME / 250;
+		int p = position / 250;
+		int from = p - TASK_SCAN_TIME / 250;
+		int to = p + TASK_SCAN_TIME / 250;
 		for (int i = from; i < to; i++) {
 			if (indexMap.containsKey(i)) {
-				ArrayList<String> imageUrls = indexMap.get(i).getImageUrls();
-				for (String url : imageUrls) {
-					list.add(ImageCacheUtil.getFileNameFromUrl(url));
+				ArrayList<Index> indexs = indexMap.get(i);
+				for (Index index : indexs) {
+					String url = index.getImageUrl();
+					String t = ImageCacheUtil.getChildDir(url);
+					if (!list.contains(t))
+						list.add(t);
 				}
 			}
 		}
 		return list;
 	}
-
-	private OnItemClickListener listener = new OnItemClickListener() {
-
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			if (isManual) {
-				String fileName = adapter.getItem(position);
-				SaveAndShareFragment fragment = new SaveAndShareFragment();
-				Bundle args = new Bundle();
-				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
-						fileName);
-				fragment.setArguments(args);
-				MessageCenter.getInstance().sendMessage(
-						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-								fragment));
-			}
-		}
-	};
 
 	private Handler handler = new Handler() {
 
@@ -230,11 +200,9 @@ public class VideoPlayFragment extends BaseFragment {
 			case MESSAGE_UPDATE_GALLERY:
 				if (!isManual) {
 					int position = mediaPlayer.getCurrentPosition();
-					if (index > position / 250) {
+					if (indexKey > position / 250) {
 						if (mediaPlayer.isPrepared()) {
 							mediaPlayer.start();
-							adapter.setFileNames(getImageNames(position));
-							adapter.notifyDataSetChanged();
 							dialog.dismiss();
 						}
 					} else {
@@ -243,6 +211,7 @@ public class VideoPlayFragment extends BaseFragment {
 						}
 						dialog.show();
 					}
+					gallery.setImageChildDirs(getImageDirs(position));
 				}
 				sendEmptyMessageDelayed(MESSAGE_UPDATE_GALLERY, TASK_SCAN_TIME);
 				break;
@@ -254,11 +223,30 @@ public class VideoPlayFragment extends BaseFragment {
 
 	};
 
+	private OnItemClickListener listener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClickListener(String childDir) {
+			if (isManual) {
+				SaveAndShareFragment fragment = new SaveAndShareFragment();
+				Bundle args = new Bundle();
+				args.putString(SaveAndShareFragment.ARGS_FILE_NAME_KEK,
+						childDir);
+				fragment.setArguments(args);
+				MessageCenter.getInstance().sendMessage(
+						new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
+								fragment));
+			}
+		}
+
+	};
+
 	private Callback callback = new Callback() {
 
 		@Override
 		public void onManualModel(boolean isManual) {
 			VideoPlayFragment.isManual = isManual;
+			gallery.setTouchable(isManual);
 		}
 	};
 }

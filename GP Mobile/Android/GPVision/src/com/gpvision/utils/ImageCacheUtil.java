@@ -30,13 +30,13 @@ public class ImageCacheUtil {
 				Environment.MEDIA_MOUNTED);
 	}
 
-	public static boolean isFileExists(String fileName) {
-		File file = new File(CACHE_DIR + File.separator + fileName);
+	public static boolean isFileExists(String childDir) {
+		File file = new File(CACHE_DIR + childDir);
 		return file.exists();
 	}
 
-	public static void write2SDCard(String fileName, InputStream inputStream) {
-		File file = new File(CACHE_DIR + File.separator + fileName);
+	public static void write2SDCard(String childDir, InputStream inputStream) {
+		File file = new File(CACHE_DIR + childDir);
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
 		}
@@ -68,10 +68,10 @@ public class ImageCacheUtil {
 		}
 	}
 
-	public static Bitmap getBitmapFromFile(String fileName, int maxWidth,
+	public static Bitmap getBitmapFromFile(String childDir, int maxWidth,
 			int maxHeight) {
 		Bitmap bitmap = null;
-		String imageFilePath = CACHE_DIR + File.separator + fileName;
+		String imageFilePath = CACHE_DIR + childDir;
 		int width, height;
 		int simpleSize = 1;
 		Options options = new Options();
@@ -88,12 +88,8 @@ public class ImageCacheUtil {
 		return bitmap;
 	}
 
-	public static String getFileNameFromUrl(String url) {
-		return url.substring(url.lastIndexOf("=") + 1);
-	}
-
-	public static void saveTo(String fileName, String toPath) {
-		File originalFile = new File(CACHE_DIR + File.separator + fileName);
+	public static void saveTo(String childDir, String toPath) {
+		File originalFile = new File(CACHE_DIR + childDir);
 		File toFile = new File(toPath);
 		if (originalFile.exists()) {
 			if (!toFile.getParentFile().exists()) {
@@ -128,8 +124,25 @@ public class ImageCacheUtil {
 					}
 				}
 			}
-
 		}
+	}
+
+	/**
+	 * parse url from
+	 * "/public/getindexpic?dir=abca0380-8d1c-11e2-94d2-5d840e626c7c_test2&filename=1.jpg"
+	 * to "/abca0380-8d1c-11e2-94d2-5d840e626c7c_test2/1.jpg"
+	 * 
+	 * @param url
+	 * @return child dir
+	 */
+	public static String getChildDir(String url) {
+		String dir = url.substring(url.indexOf('=') + 1, url.indexOf('&'));
+		String fileName = url.substring(url.lastIndexOf('=') + 1);
+		return File.separator + dir + File.separator + fileName;
+	}
+
+	public static String getFileName(String childDir) {
+		return childDir.substring(childDir.lastIndexOf('/') + 1);
 	}
 
 	public static class ImageSize {
