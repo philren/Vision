@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,10 +62,15 @@ public class LoginFragment extends BaseFragment {
 			doLogIn();
 			break;
 		case R.id.login_fragment_sign_up:
-			FragmentTransaction transaction = getFragmentManager()
-					.beginTransaction();
-			SignUpFragment fragment = new SignUpFragment();
-			transaction.replace(R.id.login_activity_content, fragment);
+
+			FragmentManager manager = getFragmentManager();
+			SignUpFragment fragment = (SignUpFragment) manager
+					.findFragmentByTag(SignUpFragment.TAG);
+			if (fragment == null)
+				fragment = new SignUpFragment();
+			FragmentTransaction transaction = manager.beginTransaction();
+			transaction.replace(R.id.login_activity_content, fragment,
+					SignUpFragment.TAG);
 			transaction.addToBackStack(null).commit();
 			break;
 		default:

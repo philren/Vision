@@ -1,7 +1,6 @@
 package com.gpvision.ui;
 
 import com.gpvision.R;
-import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DeleteVideoRequest;
 import com.gpvision.api.request.UploadFileRequest;
@@ -10,15 +9,10 @@ import com.gpvision.api.response.DeleteVideoResponse;
 import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
-import com.gpvision.fragment.VideoPlayFragment;
 import com.gpvision.utils.LogUtil;
-import com.gpvision.utils.Message;
-import com.gpvision.utils.MessageCenter;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -29,7 +23,7 @@ public class VideoButtons extends LinearLayout {
 	private Video video;
 	private VideoStatusChangedListener listener;
 	private UploadFileRequest<UploadFileResponse> request;
-	private static Status lastStatus = Status.unknow;
+	private volatile static Status lastStatus = Status.unknow;
 
 	public void setPosition(int position) {
 		this.position = position;
@@ -54,16 +48,16 @@ public class VideoButtons extends LinearLayout {
 		this.video = video;
 		switch (video.getStatus()) {
 		case uploading:
-			// if (lastStatus != Status.uploading) {
-			getUploadingButtons();
-			// lastStatus = Status.uploading;
-			// }
+			if (lastStatus != Status.uploading) {
+				getUploadingButtons();
+				lastStatus = Status.uploading;
+			}
 			break;
 		case paused:
-			// if (lastStatus != Status.paused) {
-			getPausedButtons();
-			// lastStatus = Status.paused;
-			// }
+			if (lastStatus != Status.paused) {
+				getPausedButtons();
+				lastStatus = Status.paused;
+			}
 			break;
 		case indexed:
 		case uploaded:
@@ -249,14 +243,8 @@ public class VideoButtons extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			VideoPlayFragment fragment = new VideoPlayFragment();
-			Bundle args = new Bundle();
-			args.putParcelable(VideoPlayFragment.ARGS_VIDEO_KEY, video);
-			fragment.setArguments(args);
-			MessageCenter.getInstance()
-					.sendMessage(
-							new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT,
-									fragment));
+			if (listener != null)
+				listener.onPlay(video);
 		}
 	};
 
@@ -265,5 +253,7 @@ public class VideoButtons extends LinearLayout {
 		public void onChanged();
 
 		public void delete(int position);
+
+		public void onPlay(Video video);
 	}
 }

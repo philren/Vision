@@ -20,20 +20,11 @@ import com.gpvision.datamodel.Notification;
 public class NotificationFragment extends BaseFragment {
 
 	public static final String TAG = Notification.class.getName();
-	public static final String ARGS_NOTIFICATION_KEY = "notification";
 	private ArrayList<Notification> notifications;
 	private NotificationAdapter adapter;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Bundle args = getArguments();
-		if (args == null)
-			args = savedInstanceState;
-		if (args != null && args.containsKey(ARGS_NOTIFICATION_KEY)) {
-			notifications = (ArrayList<Notification>) args
-					.getSerializable(ARGS_NOTIFICATION_KEY);
-		}
+	public void setNotifications(ArrayList<Notification> notifications) {
+		this.notifications = notifications;
 	}
 
 	@Override

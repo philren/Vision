@@ -18,16 +18,10 @@ import android.widget.TextView;
 public class SaveAndShareFragment extends BaseFragment {
 
 	public static final String TAG = SaveAndShareFragment.class.getName();
-	public static final String ARGS_FILE_NAME_KEK = "file";
 	private String childDir;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Bundle args = getArguments();
-		if (args == null)
-			args = savedInstanceState;
-		childDir = args.getString(ARGS_FILE_NAME_KEK);
+	public void setChildDir(String childDir) {
+		this.childDir = childDir;
 	}
 
 	@Override
