@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -122,6 +121,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			conn.setRequestProperty("content-range", "bytes " + offset + "-"
 					+ to + "/" + file.length());
 			LogUtil.logI("bytes " + offset + "-" + to + "/" + file.length());
+
 			// conn.setRequestProperty("uuid",
 			// AppUtils.getMd5(file, offset, CHUNKED_SIZE));
 			// LogUtil.logE(AppUtils.getMd5(file, offset, CHUNKED_SIZE));
@@ -134,14 +134,14 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 					conn.getOutputStream());
 
 			StringBuilder sb1 = new StringBuilder();
-			// sb1.append(PREFIX);
-			// sb1.append(BOUNDARY);
-			// sb1.append(LINEND);
-			// sb1.append("Content-Disposition: form-data; name=\"uuid\"" +
-			// LINEND);
-			// sb1.append(md5);
-			// sb1.append(LINEND);
-			// sb1.append(LINEND);
+			sb1.append(PREFIX);
+			sb1.append(BOUNDARY);
+			sb1.append(LINEND);
+			sb1.append("Content-Disposition: form-data; name=\"uuid\"" + LINEND);
+			sb1.append(LINEND);
+			sb1.append(md5);
+			sb1.append(LINEND);
+
 			sb1.append(PREFIX);
 			sb1.append(BOUNDARY);
 			sb1.append(LINEND);
@@ -173,6 +173,16 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			is.close();
 			outStream.write(LINEND.getBytes());
 
+			// StringBuilder sb3 = new StringBuilder();
+			// sb3.append(PREFIX);
+			// sb3.append(BOUNDARY);
+			// sb3.append(LINEND);
+			// sb3.append("Content-Disposition: form-data; name=\"uuid\"" +
+			// LINEND);
+			// sb3.append(md5);
+			// sb3.append(LINEND);
+			// sb3.append(LINEND);
+			// outStream.write(sb3.toString().getBytes());
 			byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
 			outStream.write(end_data);
 			outStream.flush();
