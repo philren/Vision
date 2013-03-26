@@ -2,6 +2,7 @@ package com.gpvision.api.request;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -30,6 +31,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	private APIResponseHandler<RESPONSE> responseHandler;
 
 	private String mUrl;
+	private String md5;
 	private ArrayList<String[]> mFiles;
 	private UploadedProgressCallback callback;
 	private volatile boolean running = true;
@@ -75,7 +77,6 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 	@Override
 	protected Integer doInBackground(Void... params) {
-
 		int res = 0;
 
 		if (mFiles != null && mFiles.size() > 0)
@@ -85,6 +86,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				String fileType = param[1];
 				String filePath = param[2];
 				File file = new File(filePath);
+				md5 = AppUtils.getMd5(file);
 				int chunkedSize = (int) (file.length() / CHUNKED_SIZE + 1);
 				for (int n = 0; n < chunkedSize; n++) {
 					long offset = n * CHUNKED_SIZE;
@@ -119,10 +121,10 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				to = (int) file.length();
 			conn.setRequestProperty("content-range", "bytes " + offset + "-"
 					+ to + "/" + file.length());
-			LogUtil.logE("bytes " + offset + "-" + to + "/" + file.length());
-//			conn.setRequestProperty("uuid",
-//					AppUtils.getMd5(file, offset, CHUNKED_SIZE));
-//			LogUtil.logE(AppUtils.getMd5(file, offset, CHUNKED_SIZE));
+			LogUtil.logI("bytes " + offset + "-" + to + "/" + file.length());
+			// conn.setRequestProperty("uuid",
+			// AppUtils.getMd5(file, offset, CHUNKED_SIZE));
+			// LogUtil.logE(AppUtils.getMd5(file, offset, CHUNKED_SIZE));
 
 			if (LocalDataBuffer.getInstance().getAccount() != null) {
 				conn.setRequestProperty("endUserToken", LocalDataBuffer
@@ -132,35 +134,42 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 					conn.getOutputStream());
 
 			StringBuilder sb1 = new StringBuilder();
+			// sb1.append(PREFIX);
+			// sb1.append(BOUNDARY);
+			// sb1.append(LINEND);
+			// sb1.append("Content-Disposition: form-data; name=\"uuid\"" +
+			// LINEND);
+			// sb1.append(md5);
+			// sb1.append(LINEND);
+			// sb1.append(LINEND);
 			sb1.append(PREFIX);
 			sb1.append(BOUNDARY);
 			sb1.append(LINEND);
 			sb1.append("Content-Disposition: form-data; name=\"file[]\"; filename=\""
 					+ fileName + "\"" + LINEND);
 			sb1.append("Content-Type: " + fileType + LINEND);
-			sb1.append("uuid:" + AppUtils.getMd5(file, offset, CHUNKED_SIZE)
-					+ LINEND);
 			sb1.append(LINEND);
 			outStream.write(sb1.toString().getBytes());
+			LogUtil.logE(sb1.toString());
 
-			RandomAccessFile is = new RandomAccessFile(file, "r");
-			is.seek(offset);
+			InputStream is = new FileInputStream(file);
+			// is.seek(offset);
 			byte[] buffer = new byte[1024];
 			int len = 0;
 			int count = 0;
 			while (running && (len = is.read(buffer)) != -1) {
-				count += len;
-				if (count < CHUNKED_SIZE) {
-					outStream.write(buffer, 0, len);
-				} else {
-					outStream.write(buffer, 0, 1024 - (count - CHUNKED_SIZE));
-					break;
-				}
+				// count += len;
+				// if (count < CHUNKED_SIZE) {
+				outStream.write(buffer, 0, len);
+				// } else {
+				// outStream.write(buffer, 0, 1024 - (count - CHUNKED_SIZE));
+				// break;
+				// }
 				if (callback != null) {
 					callback.uploadedProgress(count);
 				}
 			}
-
+			LogUtil.logE("size:" + count);
 			is.close();
 			outStream.write(LINEND.getBytes());
 

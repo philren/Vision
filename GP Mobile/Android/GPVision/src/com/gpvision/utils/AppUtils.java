@@ -1,6 +1,7 @@
 package com.gpvision.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -38,16 +39,16 @@ public class AppUtils {
 		return String.format("%.02f", x) + "%";
 	}
 
-	public static String getMd5(File file, long offset, int length) {
-		RandomAccessFile accessFile = null;
+	public static String getMd5(File file) {
+		FileInputStream accessFile = null;
 		String md5 = null;
 		try {
-			accessFile = new RandomAccessFile(file, "r");
-			accessFile.seek(offset);
+			accessFile = new FileInputStream(file);
 			MessageDigest digest = MessageDigest.getInstance("MD5");
 			byte[] bytes = new byte[1024];
 			int count = 0;
 			int len = 0;
+			int length = 1024 * 20;
 			while ((len = accessFile.read(bytes)) != -1) {
 				count = +len;
 				if (count < length) {
