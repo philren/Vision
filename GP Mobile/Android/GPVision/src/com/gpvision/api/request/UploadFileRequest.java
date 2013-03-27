@@ -7,20 +7,21 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import android.os.AsyncTask;
 
-import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
+import com.gpvision.api.response.GetUploadedSizeResponse;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 
 public class UploadFileRequest<RESPONSE extends APIResponse> extends
-		AsyncTask<Void, Void, Integer> {
+		AsyncTask<Void, Void, Void> {
 
 	private static final int CHUNKED_SIZE = 1024 * 1024;
 	private static final String BOUNDARY = java.util.UUID.randomUUID()
@@ -75,24 +76,47 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	}
 
 	@Override
-	protected Integer doInBackground(Void... params) {
-		int res = 0;
+	protected Void doInBackground(Void... params) {
 
 		if (mFiles != null && mFiles.size() > 0)
 			for (int i = 0, num = mFiles.size(); i < num; i++) {
 				String[] param = mFiles.get(i);
-				String fileName = param[0];
-				String fileType = param[1];
+				final String fileName = param[0];
+				final String fileType = param[1];
 				String filePath = param[2];
-				File file = new File(filePath);
+				final File file = new File(filePath);
 				md5 = AppUtils.getMd5(file);
-				int chunkedSize = (int) (file.length() / CHUNKED_SIZE + 1);
-				for (int n = 0; n < chunkedSize; n++) {
-					long offset = n * CHUNKED_SIZE;
-					res = upload(fileName, fileType, file, offset);
-				}
+				new GetUploadedSizeRequest(fileName, md5, file.length(),
+						Calendar.getInstance().getTimeInMillis())
+						.start(new APIResponseHandler<GetUploadedSizeResponse>() {
+
+							@Override
+							public void handleError(Long errorCode,
+									String errorMessage) {
+
+							}
+
+							@Override
+							public void handleResponse(
+									GetUploadedSizeResponse response) {
+								long uploadedSize = response.getUploadedSize();
+								if (uploadedSize < file.length()) {
+									int chunkedSize = (int) ((file.length() - uploadedSize)
+											/ CHUNKED_SIZE + 1);
+									for (int n = 0; n < chunkedSize; n++) {
+										long offset = n * CHUNKED_SIZE
+												+ uploadedSize;
+										if (running)
+											upload(fileName, fileType, file,
+													offset);
+									}
+
+								}
+							}
+
+						});
 			}
-		return res;
+		return null;
 	}
 
 	private int upload(String fileName, String fileType, File file, long offset) {
@@ -164,11 +188,8 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 					outStream.write(buffer, 0, 1024 - (count - CHUNKED_SIZE));
 					break;
 				}
-				if (callback != null) {
-					callback.uploadedProgress(count);
-				}
+
 			}
-			LogUtil.logE("size:" + count);
 			is.close();
 			outStream.write(LINEND.getBytes());
 
@@ -186,6 +207,10 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 					sb2.append((char) ch);
 				}
 				LogUtil.logI(sb2.toString());
+				if (callback != null) {
+					long uploadSize = offset + CHUNKED_SIZE;
+					callback.uploadedProgress(uploadSize);
+				}
 			}
 
 			outStream.close();
@@ -198,15 +223,15 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
+	protected void onPostExecute(Void result) {
 		if (responseHandler == null)
 			return;
 
-		if (result == 200) {
-			responseHandler.handleResponse(null);
-		} else {
-			responseHandler.handleError(APIError.NETWORK_ERROR, "");
-		}
+		// if (result == 200) {
+		// responseHandler.handleResponse(null);
+		// } else {
+		// responseHandler.handleError(APIError.NETWORK_ERROR, "");
+		// }
 	}
 
 	@Override
