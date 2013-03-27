@@ -2,9 +2,9 @@ package com.gpvision.api.request;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -115,16 +115,15 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			conn.setRequestProperty("accept",
 					"application/json, text/javascript, */*; q=0.01");
 
+			conn.setRequestProperty("Content-Disposition",
+					"attachment; filename=\"" + fileName + "\"");
+
 			int to = (int) (offset + CHUNKED_SIZE - 1);
 			if (to > file.length())
-				to = (int) file.length();
+				to = (int) file.length() - 1;
 			conn.setRequestProperty("content-range", "bytes " + offset + "-"
 					+ to + "/" + file.length());
 			LogUtil.logI("bytes " + offset + "-" + to + "/" + file.length());
-
-			// conn.setRequestProperty("uuid",
-			// AppUtils.getMd5(file, offset, CHUNKED_SIZE));
-			// LogUtil.logE(AppUtils.getMd5(file, offset, CHUNKED_SIZE));
 
 			if (LocalDataBuffer.getInstance().getAccount() != null) {
 				conn.setRequestProperty("endUserToken", LocalDataBuffer
@@ -152,19 +151,19 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			outStream.write(sb1.toString().getBytes());
 			LogUtil.logE(sb1.toString());
 
-			InputStream is = new FileInputStream(file);
-			// is.seek(offset);
+			RandomAccessFile is = new RandomAccessFile(file, "r");
+			is.seek(offset);
 			byte[] buffer = new byte[1024];
 			int len = 0;
 			int count = 0;
 			while (running && (len = is.read(buffer)) != -1) {
-				// count += len;
-				// if (count < CHUNKED_SIZE) {
-				outStream.write(buffer, 0, len);
-				// } else {
-				// outStream.write(buffer, 0, 1024 - (count - CHUNKED_SIZE));
-				// break;
-				// }
+				count += len;
+				if (count < CHUNKED_SIZE) {
+					outStream.write(buffer, 0, len);
+				} else {
+					outStream.write(buffer, 0, 1024 - (count - CHUNKED_SIZE));
+					break;
+				}
 				if (callback != null) {
 					callback.uploadedProgress(count);
 				}
@@ -173,16 +172,6 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			is.close();
 			outStream.write(LINEND.getBytes());
 
-			// StringBuilder sb3 = new StringBuilder();
-			// sb3.append(PREFIX);
-			// sb3.append(BOUNDARY);
-			// sb3.append(LINEND);
-			// sb3.append("Content-Disposition: form-data; name=\"uuid\"" +
-			// LINEND);
-			// sb3.append(md5);
-			// sb3.append(LINEND);
-			// sb3.append(LINEND);
-			// outStream.write(sb3.toString().getBytes());
 			byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
 			outStream.write(end_data);
 			outStream.flush();
