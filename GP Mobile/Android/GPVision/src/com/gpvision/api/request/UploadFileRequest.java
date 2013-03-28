@@ -7,15 +7,12 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-
 import javax.net.ssl.HttpsURLConnection;
 
 import android.os.AsyncTask;
 
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
-import com.gpvision.api.response.GetUploadedSizeResponse;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
@@ -32,6 +29,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 	private String mUrl;
 	private String md5;
+	private ArrayList<Long> mUploadedSizes;
 	private ArrayList<String[]> mFiles;
 	private UploadedProgressCallback callback;
 	private volatile boolean running = true;
@@ -56,6 +54,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 
 		mUrl = requestString.toString();
 		mFiles = new ArrayList<String[]>();
+		mUploadedSizes = new ArrayList<Long>();
 	}
 
 	private String getServiceHost() {
@@ -66,8 +65,9 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		return LocalDataBuffer.getInstance().getEnvironment().getBasePath();
 	}
 
-	public void addFile(String name, String type, String path) {
+	public void addFile(String name, String type, String path, long uploadedSize) {
 		mFiles.add(new String[] { name, type, path });
+		mUploadedSizes.add(uploadedSize);
 	}
 
 	public void start(APIResponseHandler<RESPONSE> handler) {
@@ -84,37 +84,20 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				final String fileName = param[0];
 				final String fileType = param[1];
 				String filePath = param[2];
+				md5 = AppUtils.getMd5(filePath);
 				final File file = new File(filePath);
-				md5 = AppUtils.getMd5(file);
-				new GetUploadedSizeRequest(fileName, md5, file.length(),
-						Calendar.getInstance().getTimeInMillis())
-						.start(new APIResponseHandler<GetUploadedSizeResponse>() {
+				long uploadedSize = mUploadedSizes.get(i);
+				if (uploadedSize < file.length()) {
+					int chunkedSize = (int) ((file.length() - uploadedSize)
+							/ CHUNKED_SIZE + 1);
+					for (int n = 0; n < chunkedSize; n++) {
+						long offset = n * CHUNKED_SIZE + uploadedSize;
+						if (running)
+							upload(fileName, fileType, file, offset);
+					}
 
-							@Override
-							public void handleError(Long errorCode,
-									String errorMessage) {
+				}
 
-							}
-
-							@Override
-							public void handleResponse(
-									GetUploadedSizeResponse response) {
-								long uploadedSize = response.getUploadedSize();
-								if (uploadedSize < file.length()) {
-									int chunkedSize = (int) ((file.length() - uploadedSize)
-											/ CHUNKED_SIZE + 1);
-									for (int n = 0; n < chunkedSize; n++) {
-										long offset = n * CHUNKED_SIZE
-												+ uploadedSize;
-										if (running)
-											upload(fileName, fileType, file,
-													offset);
-									}
-
-								}
-							}
-
-						});
 			}
 		return null;
 	}
@@ -210,6 +193,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				if (callback != null) {
 					long uploadSize = offset + CHUNKED_SIZE;
 					callback.uploadedProgress(uploadSize);
+					LogUtil.logE("uploadsize:" + uploadSize);
 				}
 			}
 

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -39,7 +38,10 @@ public class AppUtils {
 		return String.format("%.02f", x) + "%";
 	}
 
-	public static String getMd5(File file) {
+	public static String getMd5(String absolutePath) {
+		File file = new File(absolutePath);
+		if (!file.exists())
+			return null;
 		FileInputStream accessFile = null;
 		String md5 = null;
 		try {

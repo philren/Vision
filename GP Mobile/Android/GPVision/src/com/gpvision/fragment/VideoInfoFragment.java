@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.gpvision.utils.MessageCenter;
 
 public class VideoInfoFragment extends BaseFragment {
 	public static final String TAG = VideoInfoFragment.class.getName();
+	private static final int MSG_DATA_CHANGED = 1735;
 	private VideoInfoAdapter adapter;
 	private ArrayList<Video> videos;
 
@@ -100,7 +102,7 @@ public class VideoInfoFragment extends BaseFragment {
 					video.setOriginalName(file.getName());
 					video.setStatus(Status.uploading);
 					video.setOriginalPath(file.getAbsolutePath());
-					video.setContentLength(file.length());
+					video.setVideoSize(file.length());
 					if (videos == null) {
 						videos = new ArrayList<Video>();
 					}
@@ -126,9 +128,12 @@ public class VideoInfoFragment extends BaseFragment {
 		}
 
 		@Override
-		public void onChanged() {
-			if (adapter != null)
-				adapter.notifyDataSetChanged();
+		public void onChanged(int position, Video video) {
+			if (adapter != null) {
+				if (position >= 0)
+					adapter.getVideos().set(position, video);
+				mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+			}
 		}
 
 		@Override
@@ -142,6 +147,24 @@ public class VideoInfoFragment extends BaseFragment {
 			MessageCenter.getInstance().sendMessage(
 					new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT, fragment,
 							VideoPlayFragment.TAG));
+		}
+
+	};
+
+	private Handler mHandler = new Handler() {
+
+		@Override
+		public void handleMessage(android.os.Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case MSG_DATA_CHANGED:
+				if (adapter != null)
+					adapter.notifyDataSetChanged();
+				break;
+
+			default:
+				break;
+			}
 		}
 
 	};

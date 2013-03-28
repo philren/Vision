@@ -8,8 +8,8 @@ public class Video implements Parcelable {
 	private String storeName;
 	private String originalName;
 	private String mineType;
-	private long contentLength;
-	private long uploadedLength;
+	private long videoSize;
+	private long uploadedSize;
 	private int videoLength;
 	private int width;
 	private int height;
@@ -52,20 +52,20 @@ public class Video implements Parcelable {
 		this.mineType = mineType;
 	}
 
-	public long getContentLength() {
-		return contentLength;
+	public long getVideoSize() {
+		return videoSize;
 	}
 
-	public void setContentLength(long contentLength) {
-		this.contentLength = contentLength;
+	public void setVideoSize(long contentLength) {
+		this.videoSize = contentLength;
 	}
 
-	public long getUploadedLength() {
-		return uploadedLength;
+	public long getUploadedSize() {
+		return uploadedSize;
 	}
 
-	public void setUploadedLength(long uploadedLength) {
-		this.uploadedLength = uploadedLength;
+	public void setUploadedSize(long uploadedLength) {
+		this.uploadedSize = uploadedLength;
 	}
 
 	public int getVideoLength() {
@@ -123,8 +123,8 @@ public class Video implements Parcelable {
 		dest.writeString(storeName);
 		dest.writeString(originalName);
 		dest.writeString(mineType);
-		dest.writeLong(contentLength);
-		dest.writeLong(uploadedLength);
+		dest.writeLong(videoSize);
+		dest.writeLong(uploadedSize);
 		dest.writeInt(videoLength);
 		dest.writeInt(width);
 		dest.writeInt(height);
@@ -137,8 +137,8 @@ public class Video implements Parcelable {
 		storeName = source.readString();
 		originalName = source.readString();
 		mineType = source.readString();
-		contentLength = source.readLong();
-		uploadedLength = source.readLong();
+		videoSize = source.readLong();
+		uploadedSize = source.readLong();
 		videoLength = source.readInt();
 		width = source.readInt();
 		height = source.readInt();

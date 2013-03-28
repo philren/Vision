@@ -77,8 +77,8 @@ public class VideoInfoAdapter extends BaseAdapter {
 		holder.videoName.setText(video.getOriginalName());
 		if (video.getStatus() != null) {
 			if (video.getStatus() == Status.uploading) {
-				float x = (float) (video.getUploadedLength() * 1.0 / video
-						.getContentLength());
+				float x = (float) (video.getUploadedSize() * 1.0 / video
+						.getVideoSize());
 				holder.videoStatus.setText(video.getStatus().name()
 						+ AppUtils.precentFormat(x));
 			} else {

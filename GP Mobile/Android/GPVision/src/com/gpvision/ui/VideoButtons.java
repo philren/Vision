@@ -1,14 +1,19 @@
 package com.gpvision.ui;
 
+import java.util.Calendar;
+
 import com.gpvision.R;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DeleteVideoRequest;
+import com.gpvision.api.request.GetUploadedSizeRequest;
 import com.gpvision.api.request.UploadFileRequest;
 import com.gpvision.api.request.UploadFileRequest.UploadedProgressCallback;
 import com.gpvision.api.response.DeleteVideoResponse;
+import com.gpvision.api.response.GetUploadedSizeResponse;
 import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,9 +28,11 @@ public class VideoButtons extends LinearLayout {
 	private Video video;
 	private VideoStatusChangedListener listener;
 	private UploadFileRequest<UploadFileResponse> request;
-	private volatile static Status lastStatus = Status.unknow;
+	private Status lastStatus = Status.unknow;
 
 	public void setPosition(int position) {
+		if (this.position != position)
+			lastStatus = Status.unknow;
 		this.position = position;
 	}
 
@@ -91,28 +98,40 @@ public class VideoButtons extends LinearLayout {
 		addView(abortButton);
 		addView(pauseButton);
 		// start uploading task
-		request = new UploadFileRequest<UploadFileResponse>();
-		request.addFile(video.getOriginalName(), "video/mp4",
-				video.getOriginalPath());
-		request.setCallback(new UploadedProgressCallback() {
+		new GetUploadedSizeRequest(video.getOriginalName(),
+				AppUtils.getMd5(video.getOriginalPath()), video.getVideoSize(),
+				Calendar.getInstance().getTimeInMillis())
+				.start(new APIResponseHandler<GetUploadedSizeResponse>() {
 
-			@Override
-			public void uploadedProgress(long uploadedBytes) {
-				video.setUploadedLength(uploadedBytes);
-			}
-		});
-		request.start(new APIResponseHandler<UploadFileResponse>() {
+					@Override
+					public void handleError(Long errorCode, String errorMessage) {
 
-			@Override
-			public void handleResponse(UploadFileResponse response) {
+					}
 
-			}
+					@Override
+					public void handleResponse(GetUploadedSizeResponse response) {
+						long uploadedSize = response.getUploadedSize();
+						request = new UploadFileRequest<UploadFileResponse>();
+						request.addFile(video.getOriginalName(), "video/mp4",
+								video.getOriginalPath(), uploadedSize);
+						request.setCallback(uploadedProgressCallback);
+						request.start(new APIResponseHandler<UploadFileResponse>() {
 
-			@Override
-			public void handleError(Long errorCode, String errorMessage) {
+							@Override
+							public void handleResponse(
+									UploadFileResponse response) {
 
-			}
-		});
+							}
+
+							@Override
+							public void handleError(Long errorCode,
+									String errorMessage) {
+
+							}
+						});
+					}
+				});
+
 	}
 
 	private void getPausedButtons() {
@@ -213,7 +232,7 @@ public class VideoButtons extends LinearLayout {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							video.setStatus(Status.failed);
-							listener.onChanged();
+							listener.onChanged(position, video);
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -227,7 +246,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.paused);
-			listener.onChanged();
+			listener.onChanged(position, video);
 		}
 	};
 	private OnClickListener resumeListener = new OnClickListener() {
@@ -235,7 +254,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			video.setStatus(Status.uploading);
-			listener.onChanged();
+			listener.onChanged(position, video);
 		}
 	};
 
@@ -248,9 +267,18 @@ public class VideoButtons extends LinearLayout {
 		}
 	};
 
+	private UploadedProgressCallback uploadedProgressCallback = new UploadedProgressCallback() {
+
+		@Override
+		public void uploadedProgress(long uploadedBytes) {
+			video.setUploadedSize(uploadedBytes);
+			listener.onChanged(position, video);
+		}
+	};
+
 	public interface VideoStatusChangedListener {
 
-		public void onChanged();
+		public void onChanged(int position, Video video);
 
 		public void delete(int position);
 

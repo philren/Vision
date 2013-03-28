@@ -54,17 +54,24 @@ public class ChooseFileFragment extends BaseFragment {
 			Uri uri = data.getData();
 			Cursor cursor = getActivity().getContentResolver().query(uri, null,
 					null, null, null);
-			if (cursor == null)
+			if (cursor == null || cursor.getCount() == 0)
 				return;
 			cursor.moveToFirst();
-			String choseFilePath = cursor.getString(cursor
-					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-			cursor.close();
+			String choseFilePath = null;
+			try {
+				choseFilePath = cursor.getString(cursor
+						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+				cursor.close();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			}
 			file = new File(choseFilePath);
 			// TODO add check
-			fileInfo.setText(file.getName() + "\n size:" + file.length());
-			if (file.length() > MAX_FILE_SIZE) {
-				fileInfo.append(getString(R.string.choose_file_fragment_file_big));
+			if (file.exists()) {
+				fileInfo.setText(file.getName() + "\n size:" + file.length());
+				if (file.length() > MAX_FILE_SIZE) {
+					fileInfo.append(getString(R.string.choose_file_fragment_file_big));
+				}
 			}
 		}
 	}
