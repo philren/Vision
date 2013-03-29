@@ -35,7 +35,7 @@ public class AppUtils {
 	}
 
 	public static String precentFormat(float x) {
-		return String.format("%.02f", x) + "%";
+		return String.format(":%.02f", x) + "%";
 	}
 
 	public static String getMd5(String absolutePath) {

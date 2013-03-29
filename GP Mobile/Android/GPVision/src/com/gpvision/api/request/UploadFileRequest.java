@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import android.os.AsyncTask;
 
+import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.utils.AppUtils;
@@ -18,7 +19,7 @@ import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
 
 public class UploadFileRequest<RESPONSE extends APIResponse> extends
-		AsyncTask<Void, Void, Void> {
+		AsyncTask<Void, Void, Integer> {
 
 	private static final int CHUNKED_SIZE = 1024 * 1024;
 	private static final String BOUNDARY = java.util.UUID.randomUUID()
@@ -65,6 +66,16 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		return LocalDataBuffer.getInstance().getEnvironment().getBasePath();
 	}
 
+	/**
+	 * @param name
+	 *            video's name
+	 * @param type
+	 *            video's type
+	 * @param path
+	 *            video's path
+	 * @param uploadedSize
+	 *            video's uploaded size
+	 */
 	public void addFile(String name, String type, String path, long uploadedSize) {
 		mFiles.add(new String[] { name, type, path });
 		mUploadedSizes.add(uploadedSize);
@@ -76,7 +87,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	}
 
 	@Override
-	protected Void doInBackground(Void... params) {
+	protected Integer doInBackground(Void... params) {
 
 		if (mFiles != null && mFiles.size() > 0)
 			for (int i = 0, num = mFiles.size(); i < num; i++) {
@@ -92,14 +103,19 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 							/ CHUNKED_SIZE + 1);
 					for (int n = 0; n < chunkedSize; n++) {
 						long offset = n * CHUNKED_SIZE + uploadedSize;
-						if (running)
-							upload(fileName, fileType, file, offset);
+						if (running) {
+							int res = upload(fileName, fileType, file, offset);
+							if (res != 200)
+								return res;
+						} else {
+							return 0;
+						}
 					}
 
 				}
 
 			}
-		return null;
+		return 200;
 	}
 
 	private int upload(String fileName, String fileType, File file, long offset) {
@@ -192,8 +208,9 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				LogUtil.logI(sb2.toString());
 				if (callback != null) {
 					long uploadSize = offset + CHUNKED_SIZE;
+					if (uploadSize > file.length())
+						uploadSize = file.length();
 					callback.uploadedProgress(uploadSize);
-					LogUtil.logE("uploadsize:" + uploadSize);
 				}
 			}
 
@@ -207,21 +224,21 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 	}
 
 	@Override
-	protected void onPostExecute(Void result) {
+	protected void onPostExecute(Integer result) {
 		if (responseHandler == null)
 			return;
-
-		// if (result == 200) {
-		// responseHandler.handleResponse(null);
-		// } else {
-		// responseHandler.handleError(APIError.NETWORK_ERROR, "");
-		// }
+		LogUtil.logI("uploadOnpost:" + result);
+		if (result == 200) {
+			responseHandler.handleResponse(null);
+		} else {
+			responseHandler.handleError(APIError.NETWORK_ERROR, "");
+		}
 	}
 
 	@Override
 	protected void onCancelled() {
-		super.onCancelled();
 		running = false;
+		super.onCancelled();
 	}
 
 	public interface UploadedProgressCallback {

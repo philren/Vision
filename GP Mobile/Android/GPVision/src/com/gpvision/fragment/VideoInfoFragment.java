@@ -22,9 +22,12 @@ import com.gpvision.datamodel.Video.Status;
 import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.ui.dialog.LoadingDialog;
+import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
+import com.gpvision.utils.UploadManage;
+import com.gpvision.utils.UploadManage.UploadStatusCallback;
 
 public class VideoInfoFragment extends BaseFragment {
 	public static final String TAG = VideoInfoFragment.class.getName();
@@ -45,8 +48,8 @@ public class VideoInfoFragment extends BaseFragment {
 				false);
 		ListView videoInfoList = (ListView) view
 				.findViewById(R.id.video_info_fragment_list);
-
-		adapter = new VideoInfoAdapter(videos, listener);
+		if (adapter == null)
+			adapter = new VideoInfoAdapter(videos, listener);
 		videoInfoList.setAdapter(adapter);
 
 		Button uploadButton = (Button) view
@@ -102,12 +105,16 @@ public class VideoInfoFragment extends BaseFragment {
 					video.setOriginalName(file.getName());
 					video.setStatus(Status.uploading);
 					video.setOriginalPath(file.getAbsolutePath());
+					video.setMd5(AppUtils.getMd5(file.getAbsolutePath()));
 					video.setVideoSize(file.length());
 					if (videos == null) {
 						videos = new ArrayList<Video>();
 					}
 					videos.add(0, video);
 					adapter.notifyDataSetChanged();
+					UploadManage manage = UploadManage.getInstance();
+					manage.addTask(video);
+					manage.setCallback(callback);
 				}
 			});
 			MessageCenter.getInstance().sendMessage(
@@ -123,7 +130,7 @@ public class VideoInfoFragment extends BaseFragment {
 	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
 
 		@Override
-		public void delete(int position) {
+		public void delete() {
 			getVideoList();
 		}
 
@@ -149,6 +156,42 @@ public class VideoInfoFragment extends BaseFragment {
 							VideoPlayFragment.TAG));
 		}
 
+		@Override
+		public void onUploading(int position, Video video) {
+			UploadManage.getInstance().addTask(video);
+			adapter.getVideos().set(position, video);
+			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+		}
+
+		@Override
+		public void onPaused(int position, Video video) {
+			UploadManage.getInstance().cancelTask(video.getMd5());
+			adapter.getVideos().set(position, video);
+			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+
+		}
+
+	};
+
+	private UploadStatusCallback callback = new UploadStatusCallback() {
+
+		@Override
+		public void finished(Video video) {
+
+		}
+
+		@Override
+		public void changed(Video video) {
+			int size = videos.size();
+			for (int i = 0; i < size; i++) {
+				Video v = videos.get(i);
+				if (v.getMd5() != null && v.getMd5().equals(video.getMd5())) {
+					videos.set(i, video);
+					mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+					break;
+				}
+			}
+		}
 	};
 
 	private Handler mHandler = new Handler() {

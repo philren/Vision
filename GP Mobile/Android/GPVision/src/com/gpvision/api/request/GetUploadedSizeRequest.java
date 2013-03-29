@@ -15,6 +15,17 @@ public class GetUploadedSizeRequest extends CallAPI<GetUploadedSizeResponse> {
 	private long size;
 	private long time;
 
+	/**
+	 * 
+	 * @param fileName
+	 *            video's name
+	 * @param uuid
+	 *            video's md5
+	 * @param size
+	 *            video's size
+	 * @param time
+	 *            current time
+	 */
 	public GetUploadedSizeRequest(String fileName, String uuid, long size,
 			long time) {
 		super();

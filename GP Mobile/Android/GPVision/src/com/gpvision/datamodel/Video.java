@@ -14,6 +14,7 @@ public class Video implements Parcelable {
 	private int width;
 	private int height;
 	private String originalPath;
+	private String md5;
 	private Status status;
 
 	public Video() {
@@ -100,6 +101,14 @@ public class Video implements Parcelable {
 		this.originalPath = originalPath;
 	}
 
+	public String getMd5() {
+		return md5;
+	}
+
+	public void setMd5(String md5) {
+		this.md5 = md5;
+	}
+
 	public Status getStatus() {
 		return status;
 	}
@@ -129,6 +138,7 @@ public class Video implements Parcelable {
 		dest.writeInt(width);
 		dest.writeInt(height);
 		dest.writeString(originalPath);
+		dest.writeString(md5);
 		dest.writeString(status.name());
 	}
 
@@ -143,6 +153,7 @@ public class Video implements Parcelable {
 		width = source.readInt();
 		height = source.readInt();
 		originalPath = source.readString();
+		md5 = source.readString();
 		status = Status.valueOf(source.readString());
 	}
 

@@ -1,19 +1,11 @@
 package com.gpvision.ui;
 
-import java.util.Calendar;
-
 import com.gpvision.R;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.DeleteVideoRequest;
-import com.gpvision.api.request.GetUploadedSizeRequest;
-import com.gpvision.api.request.UploadFileRequest;
-import com.gpvision.api.request.UploadFileRequest.UploadedProgressCallback;
 import com.gpvision.api.response.DeleteVideoResponse;
-import com.gpvision.api.response.GetUploadedSizeResponse;
-import com.gpvision.api.response.UploadFileResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
-import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,16 +16,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class VideoButtons extends LinearLayout {
-	private int position;
-	private Video video;
+	private int mPosition;
+	private Video mVideo;
 	private VideoStatusChangedListener listener;
-	private UploadFileRequest<UploadFileResponse> request;
-	private Status lastStatus = Status.unknow;
 
 	public void setPosition(int position) {
-		if (this.position != position)
-			lastStatus = Status.unknow;
-		this.position = position;
+		this.mPosition = position;
 	}
 
 	public void setListener(VideoStatusChangedListener listener) {
@@ -49,22 +37,18 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	public void setVideo(Video video) {
-		if (video.getStatus() == null) {
+		if (video.getStatus() == null)
 			return;
-		}
-		this.video = video;
-		switch (video.getStatus()) {
+		if (mVideo != null && video.getStatus() == mVideo.getStatus())
+			return;
+
+		this.mVideo = video;
+		switch (mVideo.getStatus()) {
 		case uploading:
-			if (lastStatus != Status.uploading) {
-				getUploadingButtons();
-				lastStatus = Status.uploading;
-			}
+			getUploadingButtons();
 			break;
 		case paused:
-			if (lastStatus != Status.paused) {
-				getPausedButtons();
-				lastStatus = Status.paused;
-			}
+			getPausedButtons();
 			break;
 		case indexed:
 		case uploaded:
@@ -97,40 +81,6 @@ public class VideoButtons extends LinearLayout {
 		abortButton.setOnClickListener(abortListener);
 		addView(abortButton);
 		addView(pauseButton);
-		// start uploading task
-		new GetUploadedSizeRequest(video.getOriginalName(),
-				AppUtils.getMd5(video.getOriginalPath()), video.getVideoSize(),
-				Calendar.getInstance().getTimeInMillis())
-				.start(new APIResponseHandler<GetUploadedSizeResponse>() {
-
-					@Override
-					public void handleError(Long errorCode, String errorMessage) {
-
-					}
-
-					@Override
-					public void handleResponse(GetUploadedSizeResponse response) {
-						long uploadedSize = response.getUploadedSize();
-						request = new UploadFileRequest<UploadFileResponse>();
-						request.addFile(video.getOriginalName(), "video/mp4",
-								video.getOriginalPath(), uploadedSize);
-						request.setCallback(uploadedProgressCallback);
-						request.start(new APIResponseHandler<UploadFileResponse>() {
-
-							@Override
-							public void handleResponse(
-									UploadFileResponse response) {
-
-							}
-
-							@Override
-							public void handleError(Long errorCode,
-									String errorMessage) {
-
-							}
-						});
-					}
-				});
 
 	}
 
@@ -144,11 +94,6 @@ public class VideoButtons extends LinearLayout {
 		abortButton.setOnClickListener(abortListener);
 		addView(abortButton);
 		addView(resumeButton);
-		// stop uploading task
-		if (request != null) {
-			request.cancel(true);
-			request = null;
-		}
 	}
 
 	private void getAnalysedButtons() {
@@ -171,16 +116,8 @@ public class VideoButtons extends LinearLayout {
 		addView(deletedButton);
 	}
 
-	// private void getFailedButtons() {
-	// removeAllViews();
-	// Button deletedButton = new Button(getContext());
-	// deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
-	// deletedButton.setOnClickListener(deletedListener);
-	// addView(deletedButton);
-	// }
-
 	public void deleteVideo() {
-		new DeleteVideoRequest(video.getUuid())
+		new DeleteVideoRequest(mVideo.getUuid())
 				.start(new APIResponseHandler<DeleteVideoResponse>() {
 
 					@Override
@@ -190,7 +127,7 @@ public class VideoButtons extends LinearLayout {
 
 					@Override
 					public void handleResponse(DeleteVideoResponse response) {
-						listener.delete(position);
+						listener.delete();
 					}
 				});
 	}
@@ -203,7 +140,7 @@ public class VideoButtons extends LinearLayout {
 			dialog.setTitle(R.string.video_info_fragment_alert_dialog_title_warning);
 			String message = getResources().getString(
 					R.string.video_info_fragment_alert_dialog_message_delete);
-			dialog.setMessage(String.format(message, video.getOriginalName()));
+			dialog.setMessage(String.format(message, mVideo.getOriginalName()));
 			dialog.setPositiveButton(R.string.base_ok,
 					new DialogInterface.OnClickListener() {
 
@@ -225,14 +162,14 @@ public class VideoButtons extends LinearLayout {
 			dialog.setTitle(R.string.video_info_fragment_alert_dialog_title_warning);
 			String message = getResources().getString(
 					R.string.video_info_fragment_alert_dialog_message_abort);
-			dialog.setMessage(String.format(message, video.getOriginalName()));
+			dialog.setMessage(String.format(message, mVideo.getOriginalName()));
 			dialog.setPositiveButton(R.string.base_ok,
 					new DialogInterface.OnClickListener() {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							video.setStatus(Status.failed);
-							listener.onChanged(position, video);
+							mVideo.setStatus(Status.failed);
+							listener.onChanged(mPosition, mVideo);
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -245,16 +182,17 @@ public class VideoButtons extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			video.setStatus(Status.paused);
-			listener.onChanged(position, video);
+			mVideo.setStatus(Status.paused);
+			listener.onPaused(mPosition, mVideo);
 		}
 	};
+
 	private OnClickListener resumeListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			video.setStatus(Status.uploading);
-			listener.onChanged(position, video);
+			mVideo.setStatus(Status.uploading);
+			listener.onUploading(mPosition, mVideo);
 		}
 	};
 
@@ -263,16 +201,7 @@ public class VideoButtons extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			if (listener != null)
-				listener.onPlay(video);
-		}
-	};
-
-	private UploadedProgressCallback uploadedProgressCallback = new UploadedProgressCallback() {
-
-		@Override
-		public void uploadedProgress(long uploadedBytes) {
-			video.setUploadedSize(uploadedBytes);
-			listener.onChanged(position, video);
+				listener.onPlay(mVideo);
 		}
 	};
 
@@ -280,8 +209,12 @@ public class VideoButtons extends LinearLayout {
 
 		public void onChanged(int position, Video video);
 
-		public void delete(int position);
+		public void delete();
 
 		public void onPlay(Video video);
+
+		public void onUploading(int position, Video video);
+
+		public void onPaused(int position, Video video);
 	}
 }
