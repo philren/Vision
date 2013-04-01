@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,11 +93,15 @@ public class ChooseFileFragment extends BaseFragment {
 					break;
 				}
 				listener.onChose(file);
-				getFragmentManager().popBackStack();
+				FragmentManager manager = getFragmentManager();
+				if (manager != null)
+					manager.popBackStack();
 			}
 			break;
 		case R.id.choose_file_fragment_cancel_btn:
-			getFragmentManager().popBackStack();
+			FragmentManager manager = getFragmentManager();
+			if (manager != null)
+				manager.popBackStack();
 			break;
 		default:
 			break;

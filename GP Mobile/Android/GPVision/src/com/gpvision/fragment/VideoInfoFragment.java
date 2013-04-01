@@ -32,8 +32,8 @@ import com.gpvision.utils.UploadManage.UploadStatusCallback;
 public class VideoInfoFragment extends BaseFragment {
 	public static final String TAG = VideoInfoFragment.class.getName();
 	private static final int MSG_DATA_CHANGED = 1735;
-	private VideoInfoAdapter adapter;
-	private ArrayList<Video> videos;
+	private VideoInfoAdapter mAdapter;
+	private ArrayList<Video> mVideos;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,9 +48,9 @@ public class VideoInfoFragment extends BaseFragment {
 				false);
 		ListView videoInfoList = (ListView) view
 				.findViewById(R.id.video_info_fragment_list);
-		if (adapter == null)
-			adapter = new VideoInfoAdapter(videos, listener);
-		videoInfoList.setAdapter(adapter);
+		if (mAdapter == null)
+			mAdapter = new VideoInfoAdapter(mVideos, listener);
+		videoInfoList.setAdapter(mAdapter);
 
 		Button uploadButton = (Button) view
 				.findViewById(R.id.video_info_fragment_upload_more_button);
@@ -66,16 +66,16 @@ public class VideoInfoFragment extends BaseFragment {
 
 					@Override
 					public void handleResponse(GetMediaListResponse response) {
-						videos = response.getVideos();
+						ArrayList<Video> videos = response.getVideos();
 						// clean status deleted
 						for (Video video : videos) {
 							if (video.getStatus() == Status.deleted) {
 								videos.remove(video);
 							}
 						}
-						if (adapter != null) {
-							adapter.setVideos(videos);
-							adapter.notifyDataSetChanged();
+						if (mAdapter != null) {
+							mAdapter.setVideos(videos);
+							mAdapter.notifyDataSetChanged();
 						}
 						dialog.dismiss();
 					}
@@ -107,11 +107,13 @@ public class VideoInfoFragment extends BaseFragment {
 					video.setOriginalPath(file.getAbsolutePath());
 					video.setMd5(AppUtils.getMd5(file.getAbsolutePath()));
 					video.setVideoSize(file.length());
+					video.setMineType("video/mp4");
+					ArrayList<Video> videos = mAdapter.getVideos();
 					if (videos == null) {
 						videos = new ArrayList<Video>();
 					}
 					videos.add(0, video);
-					adapter.notifyDataSetChanged();
+					mAdapter.notifyDataSetChanged();
 					UploadManage manage = UploadManage.getInstance();
 					manage.addTask(video);
 					manage.setCallback(callback);
@@ -136,9 +138,9 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onChanged(int position, Video video) {
-			if (adapter != null) {
+			if (mAdapter != null) {
 				if (position >= 0)
-					adapter.getVideos().set(position, video);
+					mAdapter.getVideos().set(position, video);
 				mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 			}
 		}
@@ -159,14 +161,14 @@ public class VideoInfoFragment extends BaseFragment {
 		@Override
 		public void onUploading(int position, Video video) {
 			UploadManage.getInstance().addTask(video);
-			adapter.getVideos().set(position, video);
+			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 		}
 
 		@Override
 		public void onPaused(int position, Video video) {
 			UploadManage.getInstance().cancelTask(video.getMd5());
-			adapter.getVideos().set(position, video);
+			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 
 		}
@@ -182,6 +184,7 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void changed(Video video) {
+			ArrayList<Video> videos = mAdapter.getVideos();
 			int size = videos.size();
 			for (int i = 0; i < size; i++) {
 				Video v = videos.get(i);
@@ -201,8 +204,8 @@ public class VideoInfoFragment extends BaseFragment {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case MSG_DATA_CHANGED:
-				if (adapter != null)
-					adapter.notifyDataSetChanged();
+				if (mAdapter != null)
+					mAdapter.notifyDataSetChanged();
 				break;
 
 			default:

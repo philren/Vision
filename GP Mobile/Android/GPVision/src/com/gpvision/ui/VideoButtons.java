@@ -37,10 +37,6 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	public void setVideo(Video video) {
-		if (video.getStatus() == null)
-			return;
-		if (mVideo != null && video.getStatus() == mVideo.getStatus())
-			return;
 
 		this.mVideo = video;
 		switch (mVideo.getStatus()) {

@@ -86,7 +86,8 @@ public class UploadManage {
 		Pair pair = taskMap.get(key);
 		pair.uploadFileRequest = new UploadFileRequest<UploadFileResponse>();
 		pair.uploadFileRequest.addFile(pair.video.getOriginalName(),
-				"video/mp4", pair.video.getOriginalPath(), uploadedSize);
+				pair.video.getMineType(), pair.video.getOriginalPath(),
+				uploadedSize);
 		pair.uploadFileRequest.setCallback(new UploadedProgressCallback() {
 
 			@Override
@@ -113,7 +114,7 @@ public class UploadManage {
 
 	}
 
-	public class Pair {
+	private class Pair {
 		Video video;
 		UploadFileRequest<UploadFileResponse> uploadFileRequest;
 

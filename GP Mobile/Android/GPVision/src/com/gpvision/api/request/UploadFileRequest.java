@@ -172,7 +172,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			sb1.append("Content-Type: " + fileType + LINEND);
 			sb1.append(LINEND);
 			outStream.write(sb1.toString().getBytes());
-			LogUtil.logE(sb1.toString());
+			// LogUtil.logE(sb1.toString());
 
 			RandomAccessFile is = new RandomAccessFile(file, "r");
 			is.seek(offset);
@@ -205,7 +205,7 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				while ((ch = in.read()) != -1) {
 					sb2.append((char) ch);
 				}
-				LogUtil.logI(sb2.toString());
+				// LogUtil.logI(sb2.toString());
 				if (callback != null) {
 					long uploadSize = offset + CHUNKED_SIZE;
 					if (uploadSize > file.length())

@@ -16,16 +16,6 @@ public class GetMediaListRequset extends CallAPI<GetMediaListResponse> {
 	}
 
 	@Override
-	protected HashMap<String, String> getParameters() {
-		HashMap<String, String> parameters = super.getParameters();
-		if (LocalDataBuffer.getInstance().getAccount() != null) {
-			parameters.put("endUserToken", LocalDataBuffer.getInstance()
-					.getAccount().getUserToken());
-		}
-		return parameters;
-	}
-
-	@Override
 	protected HashMap<String, String> getHeaders() {
 		HashMap<String, String> headers = super.getHeaders();
 		if (LocalDataBuffer.getInstance().getAccount() != null) {
