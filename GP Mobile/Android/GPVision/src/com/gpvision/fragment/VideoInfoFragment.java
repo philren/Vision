@@ -19,6 +19,7 @@ import com.gpvision.api.request.GetMediaListRequset;
 import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.db.DBUtil;
 import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.ui.dialog.LoadingDialog;
@@ -74,6 +75,10 @@ public class VideoInfoFragment extends BaseFragment {
 							}
 						}
 						if (mAdapter != null) {
+							ArrayList<Video> list = new DBUtil(getActivity())
+									.query();
+							if (list != null)
+								videos.addAll(0, list);
 							mAdapter.setVideos(videos);
 							mAdapter.notifyDataSetChanged();
 						}
@@ -214,4 +219,17 @@ public class VideoInfoFragment extends BaseFragment {
 		}
 
 	};
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		ArrayList<Video> videos = mAdapter.getVideos();
+		DBUtil dbUtil = new DBUtil(getActivity());
+		for (Video video : videos) {
+			if (video.getStatus() == Status.uploading
+					|| video.getStatus() == Status.paused)
+				dbUtil.addVideo(video);
+		}
+	}
+
 }
