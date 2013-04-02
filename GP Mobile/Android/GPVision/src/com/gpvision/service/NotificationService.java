@@ -8,11 +8,14 @@ import com.gpvision.api.request.GetMediaListRequset;
 import com.gpvision.api.response.GetMediaListResponse;
 import com.gpvision.datamodel.Notification;
 import com.gpvision.datamodel.Video;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,6 +37,17 @@ public class NotificationService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		handler.sendEmptyMessage(MESSAGE_WHAT);
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_SCREEN_OFF);
+		filter.addAction(Intent.ACTION_SCREEN_ON);
+		registerReceiver(receiver, filter);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(receiver);
 	}
 
 	private Handler handler = new Handler() {
@@ -120,4 +134,18 @@ public class NotificationService extends Service {
 		nm.notify(NOTIFICATION_ID, notification);
 
 	}
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(Intent.ACTION_SCREEN_ON)) {
+				handler.removeMessages(MESSAGE_WHAT);
+				handler.sendEmptyMessage(MESSAGE_WHAT);
+			} else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+				handler.removeMessages(MESSAGE_WHAT);
+			}
+		}
+	};
 }
