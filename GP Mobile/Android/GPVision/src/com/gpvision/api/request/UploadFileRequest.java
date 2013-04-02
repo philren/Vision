@@ -101,8 +101,9 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 				final File file = new File(filePath);
 				long uploadedSize = mUploadedSizes.get(i);
 				if (uploadedSize < file.length()) {
-					int chunkedSize = (int) ((file.length() - uploadedSize)
-							/ CHUNKED_SIZE + 1);
+					int chunkedSize = (int) Math
+							.ceil((file.length() - uploadedSize * 1.0)
+									/ CHUNKED_SIZE);
 					for (int n = 0; n < chunkedSize; n++) {
 						long offset = n * CHUNKED_SIZE + uploadedSize;
 						if (running) {
@@ -143,12 +144,14 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 			conn.setRequestProperty("Content-Disposition",
 					"attachment; filename=\"" + fileName + "\"");
 
-			int to = (int) (offset + CHUNKED_SIZE - 1);
-			if (to > file.length())
-				to = (int) file.length() - 1;
-			conn.setRequestProperty("content-range", "bytes " + offset + "-"
-					+ to + "/" + file.length());
-			LogUtil.logI("bytes " + offset + "-" + to + "/" + file.length());
+			if (file.length() > CHUNKED_SIZE) {
+				long to = offset + CHUNKED_SIZE - 1;
+				if (to > file.length())
+					to = file.length() - 1;
+				conn.setRequestProperty("content-range", "bytes " + offset
+						+ "-" + to + "/" + file.length());
+				LogUtil.logI("bytes " + offset + "-" + to + "/" + file.length());
+			}
 
 			if (LocalDataBuffer.getInstance().getAccount() != null) {
 				conn.setRequestProperty("endUserToken", LocalDataBuffer

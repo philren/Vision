@@ -49,30 +49,32 @@ public class UploadManage {
 	private void startTask(final String key) {
 		Pair pair = taskMap.get(key);
 		if (pair.video.getStatus() == Status.uploading) {
-			if (pair.uploadFileRequest != null
-					&& !pair.uploadFileRequest.isCancelled()) {
-				// TODO task has set or running
+			// if (pair.uploadFileRequest != null
+			// && ((!pair.uploadFileRequest.isCancelled())||
+			// pair.uploadFileRequest.getStatus()!= AsyncTask.Status.FINISHED))
+			// {
+			// // TODO task has set or running
+			//
+			// } else {
+			new GetUploadedSizeRequest(pair.video.getOriginalName(),
+					pair.video.getMd5(), pair.video.getVideoSize(), Calendar
+							.getInstance().getTimeInMillis())
+					.start(new APIResponseHandler<GetUploadedSizeResponse>() {
 
-			} else {
-				new GetUploadedSizeRequest(pair.video.getOriginalName(),
-						pair.video.getMd5(), pair.video.getVideoSize(),
-						Calendar.getInstance().getTimeInMillis())
-						.start(new APIResponseHandler<GetUploadedSizeResponse>() {
+						@Override
+						public void handleResponse(
+								GetUploadedSizeResponse response) {
+							long uploadedSize = response.getUploadedSize();
+							setUploadRequest(key, uploadedSize);
+						}
 
-							@Override
-							public void handleResponse(
-									GetUploadedSizeResponse response) {
-								long uploadedSize = response.getUploadedSize();
-								setUploadRequest(key, uploadedSize);
-							}
+						@Override
+						public void handleError(Long errorCode,
+								String errorMessage) {
 
-							@Override
-							public void handleError(Long errorCode,
-									String errorMessage) {
-
-							}
-						});
-			}
+						}
+					});
+			// }
 		}
 	}
 
@@ -103,12 +105,21 @@ public class UploadManage {
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
-
+						LogUtil.logE("error:" + errorCode);
+						if (mCallback != null) {
+							Video video = taskMap.get(key).video;
+							video.setStatus(Status.paused);
+							mCallback.onError(errorCode.intValue(), video);
+						}
 					}
 
 					@Override
 					public void handleResponse(UploadFileResponse response) {
-
+						if (mCallback != null) {
+							Video video = taskMap.get(key).video;
+							video.setStatus(Status.uploaded);
+							mCallback.finished(video);
+						}
 					}
 				});
 
@@ -131,5 +142,7 @@ public class UploadManage {
 		public void changed(Video video);
 
 		public void finished(Video video);
+
+		public void onError(int errorCode, Video video);
 	}
 }

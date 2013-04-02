@@ -3,6 +3,7 @@ package com.gpvision.fragment;
 import java.io.File;
 import java.util.ArrayList;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -75,12 +76,14 @@ public class VideoInfoFragment extends BaseFragment {
 							}
 						}
 						if (mAdapter != null) {
-							ArrayList<Video> list = new DBUtil(getActivity())
+							DBUtil db = new DBUtil(getActivity());
+							ArrayList<Video> list = db
 									.query();
 							if (list != null)
 								videos.addAll(0, list);
 							mAdapter.setVideos(videos);
 							mAdapter.notifyDataSetChanged();
+							db.close();
 						}
 						dialog.dismiss();
 					}
@@ -105,23 +108,45 @@ public class VideoInfoFragment extends BaseFragment {
 			fragment.setOnChoseListener(new OnChoseListener() {
 
 				@Override
-				public void onChose(File file) {
-					Video video = new Video();
-					video.setOriginalName(file.getName());
-					video.setStatus(Status.uploading);
-					video.setOriginalPath(file.getAbsolutePath());
-					video.setMd5(AppUtils.getMd5(file.getAbsolutePath()));
-					video.setVideoSize(file.length());
-					video.setMineType("video/mp4");
-					ArrayList<Video> videos = mAdapter.getVideos();
-					if (videos == null) {
-						videos = new ArrayList<Video>();
-					}
-					videos.add(0, video);
-					mAdapter.notifyDataSetChanged();
-					UploadManage manage = UploadManage.getInstance();
-					manage.addTask(video);
-					manage.setCallback(callback);
+				public void onChose(final File file) {
+					new AsyncTask<Void, Void, Video>() {
+						LoadingDialog dialog;
+
+						@Override
+						protected void onPreExecute() {
+							super.onPreExecute();
+							dialog = new LoadingDialog(getActivity());
+							dialog.show();
+						}
+
+						@Override
+						protected Video doInBackground(Void... params) {
+							Video video = new Video();
+							video.setOriginalName(file.getName());
+							video.setStatus(Video.Status.uploading);
+							video.setOriginalPath(file.getAbsolutePath());
+							video.setMd5(AppUtils.getMd5(file.getAbsolutePath()));
+							video.setVideoSize(file.length());
+							video.setMineType("video/mp4");
+							return video;
+						}
+
+						@Override
+						protected void onPostExecute(Video video) {
+							super.onPostExecute(video);
+							ArrayList<Video> videos = mAdapter.getVideos();
+							if (videos == null) {
+								videos = new ArrayList<Video>();
+							}
+							videos.add(0, video);
+							mAdapter.notifyDataSetChanged();
+							UploadManage manage = UploadManage.getInstance();
+							manage.addTask(video);
+							manage.setCallback(callback);
+							dialog.dismiss();
+						}
+					}.execute();
+
 				}
 			});
 			MessageCenter.getInstance().sendMessage(
@@ -165,7 +190,9 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onUploading(int position, Video video) {
-			UploadManage.getInstance().addTask(video);
+			UploadManage manage = UploadManage.getInstance();
+			manage.setCallback(callback);
+			manage.addTask(video);
 			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 		}
@@ -184,11 +211,39 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void finished(Video video) {
-
+			LogUtil.logI(video.getOriginalName() + "---finished");
+			DBUtil db = new DBUtil(getActivity());
+			db.delete(video);
+			db.close();
+			ArrayList<Video> videos = mAdapter.getVideos();
+			int size = videos.size();
+			for (int i = 0; i < size; i++) {
+				Video v = videos.get(i);
+				if (v.getMd5() != null && v.getMd5().equals(video.getMd5())) {
+					videos.set(i, video);
+					mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+					break;
+				}
+			}
 		}
 
 		@Override
 		public void changed(Video video) {
+			ArrayList<Video> videos = mAdapter.getVideos();
+			int size = videos.size();
+			for (int i = 0; i < size; i++) {
+				Video v = videos.get(i);
+				if (v.getMd5() != null && v.getMd5().equals(video.getMd5())) {
+					videos.set(i, video);
+					mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void onError(int errorCode, Video video) {
+			LogUtil.logI(video.getOriginalName() + "---error");
 			ArrayList<Video> videos = mAdapter.getVideos();
 			int size = videos.size();
 			for (int i = 0; i < size; i++) {
@@ -232,6 +287,7 @@ public class VideoInfoFragment extends BaseFragment {
 					if (dbUtil.update(video) < 1)
 						dbUtil.addVideo(video);
 			}
+			dbUtil.close();
 		}
 	}
 

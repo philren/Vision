@@ -30,6 +30,7 @@ public class DBUtil {
 	}
 
 	/**
+	 * add video info
 	 * 
 	 * @param video
 	 * @return the row ID of the newly inserted row, or -1 if an error occurred
@@ -50,6 +51,7 @@ public class DBUtil {
 	}
 
 	/**
+	 * update video info
 	 * 
 	 * @param video
 	 * @return the number of rows affected
@@ -65,12 +67,22 @@ public class DBUtil {
 		return row;
 	}
 
+	/**
+	 * delete video
+	 * 
+	 * @param video
+	 */
 	public void delete(Video video) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		db.delete(TABLE_VIDEO, VIDEO_MD5 + "=?",
 				new String[] { video.getMd5() });
 	}
 
+	/**
+	 * query the db
+	 * 
+	 * @return all video info from db
+	 */
 	public ArrayList<Video> query() {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_VIDEO, new String[] { VIDEO_NAME,
@@ -101,6 +113,10 @@ public class DBUtil {
 		}
 		db.close();
 		return null;
+	}
+
+	public void close() {
+		mOpenHelper.close();
 	}
 
 	class DatabaseHelper extends SQLiteOpenHelper {
