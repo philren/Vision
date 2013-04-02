@@ -2,6 +2,8 @@ package com.gpvision.utils;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.GetUploadedSizeRequest;
@@ -82,6 +84,16 @@ public class UploadManage {
 		Pair pair = taskMap.get(key);
 		if (pair.uploadFileRequest != null)
 			pair.uploadFileRequest.cancel(true);
+	}
+
+	public void cancelAllTask() {
+		Set<String> kSet = taskMap.keySet();
+		for (Iterator<String> iterator = kSet.iterator(); iterator.hasNext();) {
+			String key = (String) iterator.next();
+			Pair pair = taskMap.get(key);
+			if (pair.uploadFileRequest != null)
+				pair.uploadFileRequest.cancel(true);
+		}
 	}
 
 	private void setUploadRequest(final String key, long uploadedSize) {

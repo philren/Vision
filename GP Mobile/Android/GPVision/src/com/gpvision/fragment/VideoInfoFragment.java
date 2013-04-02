@@ -77,8 +77,7 @@ public class VideoInfoFragment extends BaseFragment {
 						}
 						if (mAdapter != null) {
 							DBUtil db = new DBUtil(getActivity());
-							ArrayList<Video> list = db
-									.query();
+							ArrayList<Video> list = db.query();
 							if (list != null)
 								videos.addAll(0, list);
 							mAdapter.setVideos(videos);
@@ -276,8 +275,8 @@ public class VideoInfoFragment extends BaseFragment {
 	};
 
 	@Override
-	public void onPause() {
-		super.onPause();
+	public void onDestroy() {
+		super.onDestroy();
 		ArrayList<Video> videos = mAdapter.getVideos();
 		if (videos != null && videos.size() > 0) {
 			DBUtil dbUtil = new DBUtil(getActivity());
