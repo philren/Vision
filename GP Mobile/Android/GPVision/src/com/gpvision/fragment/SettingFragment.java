@@ -4,12 +4,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gpvision.R;
-import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.ChangePassRequest;
 import com.gpvision.api.response.ChangePassResponse;
 import com.gpvision.ui.dialog.ErrorDialog;
 import com.gpvision.ui.dialog.LoadingDialog;
+import com.gpvision.utils.ApiErrorHandler;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
@@ -113,19 +113,7 @@ public class SettingFragment extends BaseFragment {
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
 						dialog.dismiss();
-						if (errorCode == APIError.SETTING_ERROR_PASS_NOT_CORRENT) {
-							new ErrorDialog(
-									getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_setting_error_pass_not_corrent);
-							return;
-						}
-						if (errorCode == APIError.NETWORK_ERROR) {
-							new ErrorDialog(getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_network_error);
-							return;
-						}
+						ApiErrorHandler.handler(getActivity(), errorCode);
 					}
 				});
 	}

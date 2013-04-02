@@ -24,6 +24,7 @@ import com.gpvision.api.response.GetUserTokenResponse;
 import com.gpvision.datamodel.Account;
 import com.gpvision.ui.dialog.ErrorDialog;
 import com.gpvision.ui.dialog.LoginDialog;
+import com.gpvision.utils.ApiErrorHandler;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LocalDataBuffer;
 import com.gpvision.utils.LogUtil;
@@ -167,26 +168,7 @@ public class LoginFragment extends BaseFragment {
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
 						dialog.dismiss();
-						if (errorCode == APIError.LOGIN_ERROR_PASS_NOT_CORRENT) {
-							new ErrorDialog(
-									getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_login_error_pass_not_corrent);
-							return;
-						}
-						if (errorCode == APIError.LOGIN_ERROR_USER_NOT_EXIST) {
-							new ErrorDialog(
-									getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_login_error_user_not_exist);
-							return;
-						}
-						if (errorCode == APIError.NETWORK_ERROR) {
-							new ErrorDialog(getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_network_error);
-							return;
-						}
+						ApiErrorHandler.handler(getActivity(), errorCode);
 					}
 				});
 	}

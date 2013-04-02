@@ -87,9 +87,14 @@
 
     <!-- api error message -->
     <string name="api_error_network_error">Network Error!</string>
-    <string name="api_error_login_error_pass_not_corrent">pass not corrent</string>
-    <string name="api_error_login_error_user_not_exist">user not exist</string>
-    <string name="api_error_sign_up_error_user_existed">user already existed</string>
-    <string name="api_error_setting_error_pass_not_corrent">pass not corrent</string>
+    <string name="api_error_pass_not_corrent">pass not corrent</string>
+    <string name="api_error_user_not_exist">user not exist</string>
+    <string name="api_error_internal_error_occur">internal error occur</string>
+    <string name="api_error_permission_error">permission error</string>
+    <string name="api_error_argument_has_mistake">argument has mistake</string>
+    <string name="api_error_media_file_does_not_exist">media file does not exist</string>
+    <string name="api_error_crypto_error">crypto error</string>
+    <string name="api_error_mongo_db_error">mongo db error</string>
+    <string name="api_error_user_existed">user already existed</string>
 
 </resources>

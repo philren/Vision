@@ -4,12 +4,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gpvision.R;
-import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.api.request.SignUpRequest;
 import com.gpvision.api.response.SignUpResponse;
 import com.gpvision.ui.dialog.ErrorDialog;
 import com.gpvision.ui.dialog.SignUpDialog;
+import com.gpvision.utils.ApiErrorHandler;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 
@@ -135,19 +135,7 @@ public class SignUpFragment extends BaseFragment {
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
 						dialog.dismiss();
-						if (errorCode == APIError.SIGN_UP_ERROR_USER_EXISTED) {
-							new ErrorDialog(
-									getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_sign_up_error_user_existed);
-							return;
-						}
-						if (errorCode == APIError.NETWORK_ERROR) {
-							new ErrorDialog(getActivity(),
-									R.string.base_error_title,
-									R.string.api_error_network_error);
-							return;
-						}
+						ApiErrorHandler.handler(getActivity(), errorCode);
 					}
 				});
 	}
