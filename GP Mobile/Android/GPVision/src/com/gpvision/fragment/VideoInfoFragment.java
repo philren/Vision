@@ -224,11 +224,14 @@ public class VideoInfoFragment extends BaseFragment {
 	public void onPause() {
 		super.onPause();
 		ArrayList<Video> videos = mAdapter.getVideos();
-		DBUtil dbUtil = new DBUtil(getActivity());
-		for (Video video : videos) {
-			if (video.getStatus() == Status.uploading
-					|| video.getStatus() == Status.paused)
-				dbUtil.addVideo(video);
+		if (videos != null && videos.size() > 0) {
+			DBUtil dbUtil = new DBUtil(getActivity());
+			for (Video video : videos) {
+				if (video.getStatus() == Status.uploading
+						|| video.getStatus() == Status.paused)
+					if (dbUtil.update(video) < 1)
+						dbUtil.addVideo(video);
+			}
 		}
 	}
 

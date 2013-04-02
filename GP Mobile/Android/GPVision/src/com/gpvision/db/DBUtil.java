@@ -29,7 +29,12 @@ public class DBUtil {
 		mOpenHelper = new DatabaseHelper(context);
 	}
 
-	public void addVideo(Video video) {
+	/**
+	 * 
+	 * @param video
+	 * @return the row ID of the newly inserted row, or -1 if an error occurred
+	 */
+	public long addVideo(Video video) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(VIDEO_NAME, video.getOriginalName());
@@ -41,25 +46,39 @@ public class DBUtil {
 		long c = db.insert(TABLE_VIDEO, null, values);
 		LogUtil.logI("insert:" + c);
 		db.close();
+		return c;
 	}
 
-	public void update(Video video) {
+	/**
+	 * 
+	 * @param video
+	 * @return the number of rows affected
+	 */
+	public int update(Video video) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(VIDEO_UPLOADED_SIZE, video.getUploadedSize());
-		db.update(TABLE_VIDEO, values, VIDEO_MD5 + "=?",
+		int row = db.update(TABLE_VIDEO, values, VIDEO_MD5 + "=?",
 				new String[] { video.getMd5() });
 		db.close();
+		LogUtil.logI("update:" + row);
+		return row;
+	}
+
+	public void delete(Video video) {
+		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+		db.delete(TABLE_VIDEO, VIDEO_MD5 + "=?",
+				new String[] { video.getMd5() });
 	}
 
 	public ArrayList<Video> query() {
-		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_VIDEO, new String[] { VIDEO_NAME,
 				VIDEO_MD5, VIDEO_PATH, VIDEO_MINE_TYPE, VIDEO_SIZE,
 				VIDEO_UPLOADED_SIZE }, null, null, null, null, null);
 		if (cursor != null && cursor.getCount() > 0) {
 			ArrayList<Video> videos = new ArrayList<Video>();
-			for (cursor.moveToFirst(); cursor.isAfterLast(); cursor
+			for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor
 					.moveToNext()) {
 				Video video = new Video();
 				video.setOriginalName(cursor.getString(cursor
@@ -94,11 +113,11 @@ public class DBUtil {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			String sql = "CREATE TABLE " + TABLE_VIDEO + "(" + ID
+			String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_VIDEO + "(" + ID
 					+ " INTEGER PRIMARY KEY," + VIDEO_NAME + " TEXT,"
 					+ VIDEO_MD5 + " TEXT," + VIDEO_PATH + " TEXT,"
 					+ VIDEO_MINE_TYPE + " TEXT," + VIDEO_SIZE + " INTEGER,"
-					+ VIDEO_UPLOADED_SIZE + " INTEGER" + ");";
+					+ VIDEO_UPLOADED_SIZE + " INTEGER" + ")";
 			db.execSQL(sql);
 		}
 

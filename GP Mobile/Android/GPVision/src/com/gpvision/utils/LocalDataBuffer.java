@@ -30,10 +30,6 @@ public class LocalDataBuffer {
 		return environment;
 	}
 
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
-
 	public Environment getVideoEnvironment() {
 		return videoEnvironment;
 	}

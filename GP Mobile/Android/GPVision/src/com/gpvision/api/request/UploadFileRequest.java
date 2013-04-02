@@ -11,7 +11,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 import android.os.AsyncTask;
 
-import com.gpvision.api.APIError;
 import com.gpvision.api.APIResponse;
 import com.gpvision.api.APIResponseHandler;
 import com.gpvision.utils.AppUtils;
@@ -20,6 +19,9 @@ import com.gpvision.utils.LogUtil;
 
 public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		AsyncTask<Void, Void, Integer> {
+	public static final int API_SUCCESS = 200;
+	public static final int API_CANCELED = 999;
+	public static final int API_FAILED = 998;
 
 	private static final int CHUNKED_SIZE = 1024 * 1024;
 	private static final String BOUNDARY = java.util.UUID.randomUUID()
@@ -105,17 +107,17 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 						long offset = n * CHUNKED_SIZE + uploadedSize;
 						if (running) {
 							int res = upload(fileName, fileType, file, offset);
-							if (res != 200)
+							if (res != API_SUCCESS)
 								return res;
 						} else {
-							return 0;
+							return API_CANCELED;
 						}
 					}
 
 				}
 
 			}
-		return 200;
+		return API_SUCCESS;
 	}
 
 	private int upload(String fileName, String fileType, File file, long offset) {
@@ -228,10 +230,10 @@ public class UploadFileRequest<RESPONSE extends APIResponse> extends
 		if (responseHandler == null)
 			return;
 		LogUtil.logI("uploadOnpost:" + result);
-		if (result == 200) {
+		if (result == API_SUCCESS) {
 			responseHandler.handleResponse(null);
 		} else {
-			responseHandler.handleError(APIError.NETWORK_ERROR, "");
+			responseHandler.handleError((long) result, null);
 		}
 	}
 
