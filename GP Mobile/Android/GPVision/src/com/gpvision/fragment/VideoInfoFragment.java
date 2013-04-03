@@ -22,6 +22,8 @@ import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
 import com.gpvision.db.DBUtil;
 import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
+import com.gpvision.service.DataManage;
+import com.gpvision.service.DataMessage;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.ui.dialog.LoadingDialog;
 import com.gpvision.utils.AppUtils;
@@ -36,10 +38,12 @@ public class VideoInfoFragment extends BaseFragment {
 	private static final int MSG_DATA_CHANGED = 1735;
 	private VideoInfoAdapter mAdapter;
 	private ArrayList<Video> mVideos;
+	private DataManage dataManage;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		dataManage = new DataManage(getActivity());
 		getVideoList();
 	}
 
@@ -194,6 +198,8 @@ public class VideoInfoFragment extends BaseFragment {
 			manage.addTask(video);
 			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+			dataManage.sendMessage(new DataMessage(DataManage.MSG_ADD_TASK,
+					video));
 		}
 
 		@Override

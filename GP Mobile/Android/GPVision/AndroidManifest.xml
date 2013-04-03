@@ -39,6 +39,8 @@
 
         <service android:name=".service.NotificationService" >
         </service>
+        <service android:name=".service.UploadService" >
+        </service>
     </application>
 
 </manifest>
