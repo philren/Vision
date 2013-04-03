@@ -21,6 +21,7 @@ public class DBUtil {
 	private static final String VIDEO_MINE_TYPE = "videoMineType";
 	private static final String VIDEO_SIZE = "videoSize";
 	private static final String VIDEO_UPLOADED_SIZE = "videoUploadedSize";
+	private static final String VIDEO_STATUS = "videoStatus";
 
 	private DatabaseHelper mOpenHelper;
 
@@ -44,6 +45,7 @@ public class DBUtil {
 		values.put(VIDEO_MINE_TYPE, video.getMineType());
 		values.put(VIDEO_SIZE, video.getVideoSize());
 		values.put(VIDEO_UPLOADED_SIZE, video.getUploadedSize());
+		values.put(VIDEO_STATUS, video.getStatus().name());
 		long c = db.insert(TABLE_VIDEO, null, values);
 		LogUtil.logI("insert:" + c);
 		db.close();
@@ -60,6 +62,7 @@ public class DBUtil {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(VIDEO_UPLOADED_SIZE, video.getUploadedSize());
+		values.put(VIDEO_STATUS, video.getStatus().name());
 		int row = db.update(TABLE_VIDEO, values, VIDEO_MD5 + "=?",
 				new String[] { video.getMd5() });
 		db.close();
@@ -87,7 +90,8 @@ public class DBUtil {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_VIDEO, new String[] { VIDEO_NAME,
 				VIDEO_MD5, VIDEO_PATH, VIDEO_MINE_TYPE, VIDEO_SIZE,
-				VIDEO_UPLOADED_SIZE }, null, null, null, null, null);
+				VIDEO_UPLOADED_SIZE, VIDEO_STATUS }, null, null, null, null,
+				null);
 		if (cursor != null && cursor.getCount() > 0) {
 			ArrayList<Video> videos = new ArrayList<Video>();
 			for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor
@@ -104,7 +108,13 @@ public class DBUtil {
 						.getColumnIndex(VIDEO_SIZE)));
 				video.setUploadedSize(cursor.getLong(cursor
 						.getColumnIndex(VIDEO_UPLOADED_SIZE)));
-				video.setStatus(Status.paused);
+				String status = cursor.getString(cursor
+						.getColumnIndex(VIDEO_STATUS));
+				if (status.equals(Status.uploading.name())) {
+					video.setStatus(Status.uploading);
+				} else if (status.equals(Status.paused.name())) {
+					video.setStatus(Status.paused);
+				}
 				videos.add(video);
 			}
 			cursor.close();
@@ -133,7 +143,8 @@ public class DBUtil {
 					+ " INTEGER PRIMARY KEY," + VIDEO_NAME + " TEXT,"
 					+ VIDEO_MD5 + " TEXT," + VIDEO_PATH + " TEXT,"
 					+ VIDEO_MINE_TYPE + " TEXT," + VIDEO_SIZE + " INTEGER,"
-					+ VIDEO_UPLOADED_SIZE + " INTEGER" + ")";
+					+ VIDEO_UPLOADED_SIZE + " INTEGER," + VIDEO_STATUS
+					+ " TEXT" + ");";
 			db.execSQL(sql);
 		}
 

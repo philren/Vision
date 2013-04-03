@@ -30,7 +30,6 @@ import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
 import com.gpvision.utils.MessageCenter;
-import com.gpvision.utils.UploadManage;
 import com.gpvision.utils.UploadManage.UploadStatusCallback;
 
 public class VideoInfoFragment extends BaseFragment {
@@ -44,6 +43,7 @@ public class VideoInfoFragment extends BaseFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataManage = new DataManage(getActivity());
+		dataManage.setCallback(callback);
 		getVideoList();
 	}
 
@@ -143,9 +143,8 @@ public class VideoInfoFragment extends BaseFragment {
 							}
 							videos.add(0, video);
 							mAdapter.notifyDataSetChanged();
-							UploadManage manage = UploadManage.getInstance();
-							manage.addTask(video);
-							manage.setCallback(callback);
+							dataManage.sendMessage(new DataMessage(
+									DataManage.MSG_ADD_TASK, video));
 							dialog.dismiss();
 						}
 					}.execute();
@@ -193,9 +192,6 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onUploading(int position, Video video) {
-			UploadManage manage = UploadManage.getInstance();
-			manage.setCallback(callback);
-			manage.addTask(video);
 			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 			dataManage.sendMessage(new DataMessage(DataManage.MSG_ADD_TASK,
@@ -204,7 +200,8 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onPaused(int position, Video video) {
-			UploadManage.getInstance().cancelTask(video.getMd5());
+			dataManage.sendMessage(new DataMessage(DataManage.MSG_CANCEL_TASK,
+					video));
 			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 
@@ -217,9 +214,6 @@ public class VideoInfoFragment extends BaseFragment {
 		@Override
 		public void finished(Video video) {
 			LogUtil.logI(video.getOriginalName() + "---finished");
-			DBUtil db = new DBUtil(getActivity());
-			db.delete(video);
-			db.close();
 			ArrayList<Video> videos = mAdapter.getVideos();
 			int size = videos.size();
 			for (int i = 0; i < size; i++) {
@@ -248,7 +242,6 @@ public class VideoInfoFragment extends BaseFragment {
 
 		@Override
 		public void onError(int errorCode, Video video) {
-			LogUtil.logI(video.getOriginalName() + "---error");
 			ArrayList<Video> videos = mAdapter.getVideos();
 			int size = videos.size();
 			for (int i = 0; i < size; i++) {
@@ -279,21 +272,5 @@ public class VideoInfoFragment extends BaseFragment {
 		}
 
 	};
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		ArrayList<Video> videos = mAdapter.getVideos();
-		if (videos != null && videos.size() > 0) {
-			DBUtil dbUtil = new DBUtil(getActivity());
-			for (Video video : videos) {
-				if (video.getStatus() == Status.uploading
-						|| video.getStatus() == Status.paused)
-					if (dbUtil.update(video) < 1)
-						dbUtil.addVideo(video);
-			}
-			dbUtil.close();
-		}
-	}
 
 }

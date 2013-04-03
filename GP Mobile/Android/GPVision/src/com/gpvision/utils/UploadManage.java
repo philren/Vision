@@ -1,5 +1,6 @@
 package com.gpvision.utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +74,7 @@ public class UploadManage {
 						@Override
 						public void handleError(Long errorCode,
 								String errorMessage) {
-
+							LogUtil.logE("error:" + errorCode);
 						}
 					});
 			// }
@@ -94,6 +95,17 @@ public class UploadManage {
 			if (pair.uploadFileRequest != null)
 				pair.uploadFileRequest.cancel(true);
 		}
+	}
+
+	public ArrayList<Video> getUploadStatus() {
+		Set<String> kSet = taskMap.keySet();
+		ArrayList<Video> videos = new ArrayList<Video>();
+		for (Iterator<String> iterator = kSet.iterator(); iterator.hasNext();) {
+			String key = (String) iterator.next();
+			Pair pair = taskMap.get(key);
+			videos.add(pair.video);
+		}
+		return videos;
 	}
 
 	private void setUploadRequest(final String key, long uploadedSize) {

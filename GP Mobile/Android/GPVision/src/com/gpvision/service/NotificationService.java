@@ -23,7 +23,7 @@ import android.os.Message;
 
 public class NotificationService extends Service {
 
-	private static final int DELAY = 1000 * 60 * 5;
+	private static final int DELAY = 1000 * 60 * 60;
 	private static final int MESSAGE_WHAT = 1544;
 	private static final int NOTIFICATION_ID = 2115;
 	private ArrayList<Video> old;
