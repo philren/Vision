@@ -22,7 +22,6 @@ public class DataManage {
 	public static final int MSG_FINISHED = MSG_CHANGED + 1;
 	public static final int MSG_ERROR = MSG_CHANGED + 2;
 
-	private Context context;
 	private boolean isBind = false;
 	private UploadStatusCallback callback;
 
@@ -30,13 +29,11 @@ public class DataManage {
 		this.callback = callback;
 	}
 
-	public DataManage(Context context) {
+	public DataManage() {
 		super();
-		this.context = context;
-		bindService(context);
 	}
 
-	private void bindService(Context context) {
+	public void bindService(Context context) {
 		Intent intent = new Intent();
 		intent.setClass(context, UploadService.class);
 		context.startService(intent);
@@ -44,7 +41,7 @@ public class DataManage {
 				Context.BIND_AUTO_CREATE);
 	}
 
-	public void unBindService() {
+	public void unBindService(Context context) {
 		if (isBind)
 			context.unbindService(serviceConnection);
 	}

@@ -83,8 +83,10 @@ public class UploadManage {
 
 	public void cancelTask(String key) {
 		Pair pair = taskMap.get(key);
-		if (pair.uploadFileRequest != null)
+		if (pair != null && pair.uploadFileRequest != null) {
 			pair.uploadFileRequest.cancel(true);
+			pair.video.setStatus(Status.paused);
+		}
 	}
 
 	public void cancelAllTask() {
@@ -92,8 +94,10 @@ public class UploadManage {
 		for (Iterator<String> iterator = kSet.iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
 			Pair pair = taskMap.get(key);
-			if (pair.uploadFileRequest != null)
+			if (pair.uploadFileRequest != null) {
 				pair.uploadFileRequest.cancel(true);
+				pair.video.setStatus(Status.paused);
+			}
 		}
 	}
 

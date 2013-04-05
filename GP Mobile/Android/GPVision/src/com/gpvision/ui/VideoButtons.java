@@ -6,6 +6,7 @@ import com.gpvision.api.request.DeleteVideoRequest;
 import com.gpvision.api.response.DeleteVideoResponse;
 import com.gpvision.datamodel.Video;
 import com.gpvision.datamodel.Video.Status;
+import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -37,7 +38,8 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	public void setVideo(Video video) {
-
+		if (video == null)
+			return;
 		this.mVideo = video;
 		switch (mVideo.getStatus()) {
 		case uploading:
@@ -113,19 +115,24 @@ public class VideoButtons extends LinearLayout {
 	}
 
 	public void deleteVideo() {
-		new DeleteVideoRequest(mVideo.getUuid())
-				.start(new APIResponseHandler<DeleteVideoResponse>() {
+		if (!AppUtils.isEmpty(mVideo.getUuid())) {
+			new DeleteVideoRequest(mVideo.getUuid())
+					.start(new APIResponseHandler<DeleteVideoResponse>() {
 
-					@Override
-					public void handleError(Long errorCode, String errorMessage) {
-						LogUtil.logE(errorMessage);
-					}
+						@Override
+						public void handleError(Long errorCode,
+								String errorMessage) {
+							LogUtil.logE(errorMessage);
+						}
 
-					@Override
-					public void handleResponse(DeleteVideoResponse response) {
-						listener.delete();
-					}
-				});
+						@Override
+						public void handleResponse(DeleteVideoResponse response) {
+							listener.delete();
+						}
+					});
+		} else {
+			listener.delete();
+		}
 	}
 
 	private OnClickListener deletedListener = new OnClickListener() {

@@ -42,9 +42,16 @@ public class VideoInfoFragment extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dataManage = new DataManage(getActivity());
+		dataManage = new DataManage();
+		dataManage.bindService(getActivity());
 		dataManage.setCallback(callback);
 		getVideoList();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		dataManage.unBindService(getActivity());
 	}
 
 	@Override

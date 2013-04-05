@@ -37,10 +37,11 @@ public class UploadService extends Service {
 		if (videos != null && videos.size() > 0) {
 			DBUtil dbUtil = new DBUtil(getApplicationContext());
 			for (Video video : videos) {
-				if (video.getStatus() == Status.uploading
-						|| video.getStatus() == Status.paused)
-					if (dbUtil.update(video) < 1)
-						dbUtil.addVideo(video);
+				if (video.getStatus() == Status.uploading) {
+					video.setStatus(Status.paused);
+				}
+				if (dbUtil.update(video) < 1)
+					dbUtil.addVideo(video);
 			}
 			dbUtil.close();
 		}

@@ -2,9 +2,9 @@ package com.gpvision.utils;
 
 public class Environment {
 
-	public static final Environment E9 = new Environment("172.20.230.9:3008",
+	public static final Environment E9 = new Environment("172.20.230.9:3800",
 			null);
-	public static final Environment E9S = new Environment("172.20.230.9:3088",
+	public static final Environment E9S = new Environment("172.20.230.9:3801",
 			null);
 	private final String host;
 	private final String basePath;
