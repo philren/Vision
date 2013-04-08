@@ -44,6 +44,11 @@ public class DataManage {
 	}
 
 	public void unBindService(Context context) {
+		try {
+			mService.message(new DataMessage(MSG_DISS_CONNECT, receiver));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		if (isBind)
 			context.unbindService(serviceConnection);
 	}
@@ -53,11 +58,6 @@ public class DataManage {
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			try {
-				mService.message(new DataMessage(MSG_DISS_CONNECT, receiver));
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
 			mService = null;
 		}
 
