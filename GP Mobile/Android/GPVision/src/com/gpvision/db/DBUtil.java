@@ -74,11 +74,15 @@ public class DBUtil {
 	 * delete video
 	 * 
 	 * @param video
+	 * @return the number of rows affected if a whereClause is passed in, 0
+	 *         otherwise. To remove all rows and get a count pass "1" as the
+	 *         whereClause.
 	 */
 	public void delete(Video video) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-		db.delete(TABLE_VIDEO, VIDEO_MD5 + "=?",
+		int row = db.delete(TABLE_VIDEO, VIDEO_MD5 + "=?",
 				new String[] { video.getMd5() });
+		LogUtil.logI("delete:" + row);
 	}
 
 	/**
@@ -114,6 +118,8 @@ public class DBUtil {
 					video.setStatus(Status.uploading);
 				} else if (status.equals(Status.paused.name())) {
 					video.setStatus(Status.paused);
+				} else if (status.equals(Status.failed.name())) {
+					video.setStatus(Status.failed);
 				}
 				videos.add(video);
 			}

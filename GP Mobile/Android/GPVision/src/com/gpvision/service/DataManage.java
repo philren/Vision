@@ -17,6 +17,8 @@ public class DataManage {
 	// message send to service
 	public static final int MSG_ADD_TASK = 10;
 	public static final int MSG_CANCEL_TASK = MSG_ADD_TASK + 1;
+	public static final int MSG_ABORT_TASK = MSG_ADD_TASK + 2;
+	public static final int MSG_DELETE_TASK = MSG_ADD_TASK + 3;
 	// message from service
 	public static final int MSG_CHANGED = 20;
 	public static final int MSG_FINISHED = MSG_CHANGED + 1;

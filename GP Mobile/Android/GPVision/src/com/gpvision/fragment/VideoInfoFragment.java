@@ -171,8 +171,15 @@ public class VideoInfoFragment extends BaseFragment {
 	private VideoStatusChangedListener listener = new VideoStatusChangedListener() {
 
 		@Override
-		public void delete() {
-			getVideoList();
+		public void delete(int position, Video video) {
+			if (AppUtils.isEmpty(video.getUuid())) {
+				dataManage.sendMessage(new DataMessage(
+						DataManage.MSG_DELETE_TASK, video));
+				mAdapter.getVideos().remove(position);
+				mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
+			} else {
+				getVideoList();
+			}
 		}
 
 		@Override
@@ -212,6 +219,14 @@ public class VideoInfoFragment extends BaseFragment {
 			mAdapter.getVideos().set(position, video);
 			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 
+		}
+
+		@Override
+		public void onAbort(int position, Video video) {
+			dataManage.sendMessage(new DataMessage(DataManage.MSG_ABORT_TASK,
+					video));
+			mAdapter.getVideos().set(position, video);
+			mHandler.sendEmptyMessage(MSG_DATA_CHANGED);
 		}
 
 	};

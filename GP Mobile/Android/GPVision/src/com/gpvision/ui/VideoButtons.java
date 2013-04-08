@@ -127,11 +127,11 @@ public class VideoButtons extends LinearLayout {
 
 						@Override
 						public void handleResponse(DeleteVideoResponse response) {
-							listener.delete();
+							listener.delete(mPosition, mVideo);
 						}
 					});
 		} else {
-			listener.delete();
+			listener.delete(mPosition, mVideo);
 		}
 	}
 
@@ -172,7 +172,7 @@ public class VideoButtons extends LinearLayout {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							mVideo.setStatus(Status.failed);
-							listener.onChanged(mPosition, mVideo);
+							listener.onAbort(mPosition, mVideo);
 						}
 					});
 			dialog.setNegativeButton(R.string.base_cancel, null);
@@ -212,12 +212,14 @@ public class VideoButtons extends LinearLayout {
 
 		public void onChanged(int position, Video video);
 
-		public void delete();
+		public void delete(int position, Video video);
 
 		public void onPlay(Video video);
 
 		public void onUploading(int position, Video video);
 
 		public void onPaused(int position, Video video);
+
+		public void onAbort(int position, Video video);
 	}
 }

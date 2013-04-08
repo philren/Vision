@@ -69,6 +69,17 @@ public class UploadService extends Service {
 				UploadManage manage2 = UploadManage.getInstance();
 				manage2.cancelTask(video2.getMd5());
 				break;
+			case DataManage.MSG_ABORT_TASK:
+				Video video3 = (Video) message.data;
+				UploadManage manage3 = UploadManage.getInstance();
+				manage3.abortTask(video3.getMd5());
+				break;
+			case DataManage.MSG_DELETE_TASK:
+				Video video4 = (Video) message.data;
+				DBUtil db = new DBUtil(getApplicationContext());
+				db.delete(video4);
+				db.close();
+				break;
 
 			default:
 				break;

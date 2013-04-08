@@ -89,6 +89,14 @@ public class UploadManage {
 		}
 	}
 
+	public void abortTask(String key) {
+		Pair pair = taskMap.get(key);
+		if (pair != null && pair.uploadFileRequest != null) {
+			pair.uploadFileRequest.cancel(true);
+			pair.video.setStatus(Status.failed);
+		}
+	}
+
 	public void cancelAllTask() {
 		Set<String> kSet = taskMap.keySet();
 		for (Iterator<String> iterator = kSet.iterator(); iterator.hasNext();) {
@@ -96,7 +104,9 @@ public class UploadManage {
 			Pair pair = taskMap.get(key);
 			if (pair.uploadFileRequest != null) {
 				pair.uploadFileRequest.cancel(true);
-				pair.video.setStatus(Status.paused);
+				if (pair.video.getStatus() == Status.uploading) {
+					pair.video.setStatus(Status.paused);
+				}
 			}
 		}
 	}
