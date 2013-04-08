@@ -293,16 +293,15 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	}
 
 	@Override
-	@Deprecated
 	public void seekTo(int pos) {
-		// if (mPlayer != null) {
-		// try {
-		// mPlayer.seekTo(pos);
-		// mCurrentPosition = mPlayer.getCurrentPosition();
-		// } catch (IllegalStateException e) {
-		// e.printStackTrace();
-		// }
-		// }
+		if (mPlayer != null) {
+			try {
+				mPlayer.seekTo(pos);
+				mCurrentPosition = mPlayer.getCurrentPosition();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override

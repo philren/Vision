@@ -170,8 +170,8 @@ public class VideoPlayFragment extends BaseFragment {
 			return null;
 		ArrayList<String> list = new ArrayList<String>();
 		int p = position / 250;
-		int from = p - TASK_SCAN_TIME / 250;
-		int to = p + TASK_SCAN_TIME / 250;
+		int from = p - TASK_SCAN_TIME / 250 / 2;
+		int to = p + TASK_SCAN_TIME / 250 / 2;
 		for (int i = from; i < to; i++) {
 			if (indexMap.containsKey(i)) {
 				ArrayList<Index> indexs = indexMap.get(i);
