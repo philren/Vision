@@ -128,8 +128,12 @@ public class NotificationService extends Service {
 		android.app.Notification notification = new android.app.Notification(
 				R.drawable.ic_launcher, "Status changed",
 				System.currentTimeMillis());
+		StringBuilder builder = new StringBuilder();
+		for (Notification not : notifications) {
+			builder.append(not.getTitle() + not.getMessage() + '\n');
+		}
 		notification.setLatestEventInfo(getApplicationContext(),
-				"Status changed", "", pendingIntent);
+				"Status changed", builder.toString(), pendingIntent);
 		notification.flags |= android.app.Notification.FLAG_AUTO_CANCEL;
 		nm.notify(NOTIFICATION_ID, notification);
 

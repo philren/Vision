@@ -7,7 +7,9 @@ import java.util.HashMap;
 import android.content.Context;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -25,8 +27,11 @@ import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaController.MediaPlayerControl;
 import com.gpvision.utils.Environment;
 import com.gpvision.utils.LocalDataBuffer;
+import com.gpvision.utils.LogUtil;
 
 public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
+
+	private static final int BUFFER_PERCENT = 5;
 
 	private SurfaceView mSurfaceView;
 	private MediaPlayer mPlayer;
@@ -40,6 +45,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private Video video;
 	private com.gpvision.ui.MediaController.Callback callback;
 	private static boolean prepared = false;
+	private boolean onSeek = true;
+	private int soughtPercent = 0;
 
 	public enum Model {
 		Normal, FullScreen
@@ -144,7 +151,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	public void preparePlayer() {
 		try {
 			prepared = false;
-			mPlayer = new MediaPlayer();
+			if (mPlayer == null)
+				mPlayer = new MediaPlayer();
 			mPlayer.reset();
 			mPlayer.setDataSource(getContext(),
 					getVideoUri(video.getStoreName()));
@@ -155,12 +163,10 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					prepared = true;
-					mController.updatePausePlay();
 					int videoHeigth = video.getHeight();
 					int videoWidth = video.getWidth();
 					scaleWidth = width / (videoWidth * 1.0f);
-					scaleHeigth = MediaPlayUI.this.heigth
-							/ (videoHeigth * 1.0f);
+					scaleHeigth = heigth / (videoHeigth * 1.0f);
 				}
 			});
 			mPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -169,6 +175,31 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				public void onCompletion(MediaPlayer mp) {
 					mPlayer.pause();
 					mController.updatePausePlay();
+				}
+			});
+			mPlayer.setOnErrorListener(new OnErrorListener() {
+
+				@Override
+				public boolean onError(MediaPlayer mp, int what, int extra) {
+					mp.pause();
+					preparePlayer();
+					return false;
+				}
+			});
+			mPlayer.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
+
+				@Override
+				public void onBufferingUpdate(MediaPlayer mp, int percent) {
+					LogUtil.logI("buffered:" + percent);
+					if (onSeek) {
+						if (mp.isPlaying())
+							mp.pause();
+						if (percent - soughtPercent > BUFFER_PERCENT) {
+							if (!mp.isPlaying())
+								mp.start();
+							onSeek = false;
+						}
+					}
 				}
 			});
 		} catch (IllegalArgumentException e) {
@@ -294,6 +325,8 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public void seekTo(int pos) {
+		onSeek = true;
+		soughtPercent = getBufferPercentage();
 		if (mPlayer != null) {
 			try {
 				mPlayer.seekTo(pos);
