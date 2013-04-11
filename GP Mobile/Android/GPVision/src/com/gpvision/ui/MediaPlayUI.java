@@ -31,7 +31,7 @@ import com.gpvision.utils.LogUtil;
 
 public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
-	private static final int BUFFER_PERCENT = 5;
+	// private static final int BUFFER_PERCENT = 5;
 
 	private SurfaceView mSurfaceView;
 	private MediaPlayer mPlayer;
@@ -45,8 +45,9 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 	private Video video;
 	private com.gpvision.ui.MediaController.Callback callback;
 	private static boolean prepared = false;
-	private boolean onSeek = true;
-	private int soughtPercent = 0;
+
+	// private boolean onSeek = true;
+	// private int soughtPercent = 0;
 
 	public enum Model {
 		Normal, FullScreen
@@ -191,15 +192,15 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 				@Override
 				public void onBufferingUpdate(MediaPlayer mp, int percent) {
 					LogUtil.logI("buffered:" + percent);
-					if (onSeek) {
-						if (mp.isPlaying())
-							mp.pause();
-						if (percent - soughtPercent > BUFFER_PERCENT) {
-							if (!mp.isPlaying())
-								mp.start();
-							onSeek = false;
-						}
-					}
+					// if (onSeek) {
+					// if (mp.isPlaying())
+					// mp.pause();
+					// if (percent - soughtPercent > BUFFER_PERCENT) {
+					// if (!mp.isPlaying())
+					// mp.start();
+					// onSeek = false;
+					// }
+					// }
 				}
 			});
 		} catch (IllegalArgumentException e) {
@@ -325,8 +326,6 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 	@Override
 	public void seekTo(int pos) {
-		onSeek = true;
-		soughtPercent = getBufferPercentage();
 		if (mPlayer != null) {
 			try {
 				mPlayer.seekTo(pos);

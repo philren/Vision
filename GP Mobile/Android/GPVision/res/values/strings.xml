@@ -84,6 +84,7 @@
     <string name="dialog_message_loading">Loading...</string>
     <string name="dialog_message_login">Logining...</string>
     <string name="dialog_message_sign_up">Sign up...</string>
+    <string name="dialog_message_buffering">Buffering...Please Wait</string>
 
     <!-- api error message -->
     <string name="api_error_network_error">Network Error!</string>
