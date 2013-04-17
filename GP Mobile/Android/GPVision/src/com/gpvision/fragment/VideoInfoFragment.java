@@ -25,6 +25,7 @@ import com.gpvision.fragment.ChooseFileFragment.OnChoseListener;
 import com.gpvision.service.DataManage;
 import com.gpvision.service.DataMessage;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
+import com.gpvision.ui.dialog.ErrorDialog;
 import com.gpvision.ui.dialog.LoadingDialog;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
@@ -34,6 +35,7 @@ import com.gpvision.utils.UploadManage.UploadStatusCallback;
 
 public class VideoInfoFragment extends BaseFragment {
 	public static final String TAG = VideoInfoFragment.class.getName();
+	private static final long MAX_SPACE_USER = 1024 * 1024 * 1024 * 2L;// 2GB
 	private static final int MSG_DATA_CHANGED = 1735;
 	private VideoInfoAdapter mAdapter;
 	private ArrayList<Video> mVideos;
@@ -132,12 +134,15 @@ public class VideoInfoFragment extends BaseFragment {
 						@Override
 						protected Video doInBackground(Void... params) {
 							Video video = new Video();
-							video.setOriginalName(file.getName());
+							String fileName = file.getName();
+							video.setOriginalName(fileName);
 							video.setStatus(Video.Status.uploading);
 							video.setOriginalPath(file.getAbsolutePath());
 							video.setMd5(AppUtils.getMd5(file.getAbsolutePath()));
 							video.setVideoSize(file.length());
-							video.setMineType("video/mp4");
+							video.setMineType("video/"
+									+ fileName.substring(fileName
+											.lastIndexOf(".") + 1));
 							return video;
 						}
 
@@ -147,6 +152,39 @@ public class VideoInfoFragment extends BaseFragment {
 							ArrayList<Video> videos = mAdapter.getVideos();
 							if (videos == null) {
 								videos = new ArrayList<Video>();
+							}
+							String name = video.getOriginalName();
+							String type = video.getMineType();
+							if (!(type.equals("video/mp4")
+									|| type.equals("video/ogg") || type
+									.equals("video/webm"))) {
+								new ErrorDialog(
+										getActivity(),
+										R.string.base_error_title,
+										R.string.video_in_fragment_error_message_mine_type_error);
+								dialog.dismiss();
+								return;
+							}
+							long sizeCount = video.getVideoSize();
+							for (Video v : videos) {
+								sizeCount += v.getVideoSize();
+								if (name.equals(v.getOriginalName())) {
+									new ErrorDialog(
+											getActivity(),
+											R.string.base_error_title,
+											R.string.video_in_fragment_error_message_file_exist_error);
+									dialog.dismiss();
+									return;
+								}
+							}
+							if (sizeCount > MAX_SPACE_USER) {
+								LogUtil.logI("size:" + sizeCount);
+								new ErrorDialog(
+										getActivity(),
+										R.string.base_error_title,
+										R.string.video_in_fragment_error_message_user_space_error);
+								dialog.dismiss();
+								return;
 							}
 							videos.add(0, video);
 							mAdapter.notifyDataSetChanged();

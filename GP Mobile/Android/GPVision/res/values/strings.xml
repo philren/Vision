@@ -44,6 +44,9 @@
     <string name="video_info_fragment_alert_dialog_title_warning">Warning!</string>
     <string name="video_info_fragment_alert_dialog_message_delete">Are your sure to delete %s ?</string>
     <string name="video_info_fragment_alert_dialog_message_abort">Are your sure to abort %s ?</string>
+    <string name="video_in_fragment_error_message_mine_type_error">MineType Error!</string>
+    <string name="video_in_fragment_error_message_file_exist_error">File Exist!</string>
+    <string name="video_in_fragment_error_message_user_space_error">Your Space Only 2GB!</string>
 
     <!-- choose file fragment -->
     <string name="choose_file_fragment_choose_file">Choose a file</string>
