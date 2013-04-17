@@ -1,14 +1,18 @@
 package com.gpvision.utils;
 
 import com.gpvision.R;
+import com.gpvision.activity.LoginActivity;
 import com.gpvision.api.APIError;
 import com.gpvision.ui.dialog.ErrorDialog;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 
 public class ApiErrorHandler {
 
-	public static void handler(Context context, long errorCode) {
+	public static void handler(final Context context, long errorCode) {
 
 		if (errorCode == APIError.NETWORK_ERROR) {
 			new ErrorDialog(context, R.string.base_error_title,
@@ -53,8 +57,19 @@ public class ApiErrorHandler {
 		}
 
 		if (errorCode == APIError.ERROR_PERMISSION_ERROR) {
-			new ErrorDialog(context, R.string.base_error_title,
+			ErrorDialog dialog = new ErrorDialog(context,
+					R.string.base_error_title,
 					R.string.api_error_permission_error);
+			dialog.setPositiveButton(R.string.base_ok, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					LocalDataBuffer.getInstance().setAccount(null);
+					Intent intent = new Intent();
+					intent.setClass(context, LoginActivity.class);
+					context.startActivity(intent);
+				}
+			});
 			return;
 		}
 
