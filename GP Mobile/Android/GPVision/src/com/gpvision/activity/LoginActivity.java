@@ -17,23 +17,22 @@ public class LoginActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+		FragmentManager manager = getSupportFragmentManager();
+		LoginFragment fragment = (LoginFragment) manager
+				.findFragmentByTag(LoginFragment.TAG);
+		if (fragment == null)
+			fragment = new LoginFragment();
+
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.replace(R.id.login_activity_content, fragment,
+				LoginFragment.TAG);
+		transaction.commit();
 		Account account = LocalDataBuffer.getInstance().getAccount();
 		if (account != null && !AppUtils.isEmpty(account.getAppToken())
 				&& !AppUtils.isEmpty(account.getUserToken())) {
 			Intent intent = new Intent();
 			intent.setClass(getApplicationContext(), MainActivity.class);
 			startActivity(intent);
-		} else {
-			FragmentManager manager = getSupportFragmentManager();
-			LoginFragment fragment = (LoginFragment) manager
-					.findFragmentByTag(LoginFragment.TAG);
-			if (fragment == null)
-				fragment = new LoginFragment();
-
-			FragmentTransaction transaction = manager.beginTransaction();
-			transaction.replace(R.id.login_activity_content, fragment,
-					LoginFragment.TAG);
-			transaction.commit();
 		}
 
 	}

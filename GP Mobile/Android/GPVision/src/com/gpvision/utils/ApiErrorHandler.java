@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 
 public class ApiErrorHandler {
 
@@ -57,19 +58,23 @@ public class ApiErrorHandler {
 		}
 
 		if (errorCode == APIError.ERROR_PERMISSION_ERROR) {
-			ErrorDialog dialog = new ErrorDialog(context,
-					R.string.base_error_title,
-					R.string.api_error_permission_error);
-			dialog.setPositiveButton(R.string.base_ok, new OnClickListener() {
+			new ErrorDialog(context, R.string.base_error_title,
+					R.string.api_error_permission_error, new OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					LocalDataBuffer.getInstance().setAccount(null);
-					Intent intent = new Intent();
-					intent.setClass(context, LoginActivity.class);
-					context.startActivity(intent);
-				}
-			});
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							LocalDataBuffer.getInstance().setAccount(null);
+							try {
+								FragmentActivity activity = (FragmentActivity) context;
+								activity.finish();
+							} catch (ClassCastException e) {
+								Intent intent = new Intent();
+								intent.setClass(context, LoginActivity.class);
+								context.startActivity(intent);
+							}
+
+						}
+					});
 			return;
 		}
 

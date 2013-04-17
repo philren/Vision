@@ -27,6 +27,7 @@ import com.gpvision.service.DataMessage;
 import com.gpvision.ui.VideoButtons.VideoStatusChangedListener;
 import com.gpvision.ui.dialog.ErrorDialog;
 import com.gpvision.ui.dialog.LoadingDialog;
+import com.gpvision.utils.ApiErrorHandler;
 import com.gpvision.utils.AppUtils;
 import com.gpvision.utils.LogUtil;
 import com.gpvision.utils.Message;
@@ -104,6 +105,7 @@ public class VideoInfoFragment extends BaseFragment {
 					public void handleError(Long errorCode, String errorMessage) {
 						LogUtil.logE(errorMessage);
 						dialog.dismiss();
+						ApiErrorHandler.handler(getActivity(), errorCode);
 					}
 				});
 	}

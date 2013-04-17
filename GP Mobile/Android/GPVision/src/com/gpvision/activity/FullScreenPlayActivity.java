@@ -12,6 +12,7 @@ import com.gpvision.datamodel.Video;
 import com.gpvision.ui.MediaPlayUI;
 import com.gpvision.ui.MediaPlayUI.FullScreenModelListener;
 import com.gpvision.ui.MediaPlayUI.Model;
+import com.gpvision.utils.ApiErrorHandler;
 import com.gpvision.utils.LogUtil;
 
 import android.content.Intent;
@@ -81,7 +82,8 @@ public class FullScreenPlayActivity extends BaseActivity {
 
 					@Override
 					public void handleError(Long errorCode, String errorMessage) {
-
+						ApiErrorHandler.handler(FullScreenPlayActivity.this,
+								errorCode);
 					}
 				});
 	}
