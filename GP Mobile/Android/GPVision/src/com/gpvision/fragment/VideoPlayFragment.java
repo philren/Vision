@@ -100,8 +100,8 @@ public class VideoPlayFragment extends BaseFragment {
 		if (requestCode == REQUEST_CODE_FULL_SCREEN) {
 			// currentPosition = data.getIntExtra(
 			// FullScreenPlayActivity.ARGS_POSITION_KEY, 0);
-			mediaPlayer.setVideo(video, Model.Normal, currentPosition);
-			mediaPlayer.setIndexMap(indexMap);
+			// mediaPlayer.setIndexMap(indexMap);
+			// mediaPlayer.setVideo(video, Model.Normal, currentPosition);
 		}
 	}
 

@@ -182,7 +182,6 @@ public class MediaPlayUI extends FrameLayout implements MediaPlayerControl {
 
 				@Override
 				public boolean onError(MediaPlayer mp, int what, int extra) {
-					mp.pause();
 					preparePlayer();
 					return false;
 				}
