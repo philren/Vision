@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.gpvision.R;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -55,6 +58,8 @@ public class MainActivity extends BaseActivity {
 		Intent intent = new Intent();
 		intent.setClass(getApplicationContext(), NotificationService.class);
 		startService(intent);
+
+		findViewById(R.id.main_activity_logout).setOnClickListener(this);
 	}
 
 	@Override
@@ -144,9 +149,27 @@ public class MainActivity extends BaseActivity {
 								SettingFragment.TAG));
 			}
 			break;
+		case R.id.main_activity_logout:
+			logout();
+			break;
 		default:
 			break;
 		}
 	}
 
+	private void logout() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.base_warning);
+		builder.setMessage(R.string.main_activity_dialog_message_logout);
+		builder.setPositiveButton(R.string.base_ok, new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				LocalDataBuffer.getInstance().setAccount(null);
+				finish();
+			}
+		});
+		builder.setNegativeButton(R.string.base_cancel, null);
+		builder.create().show();
+	}
 }

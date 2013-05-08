@@ -12,4 +12,7 @@
     <!-- video player controller button -->
     <dimen name="video_player_button_size">25dip</dimen>
 
+    <!-- app icon -->
+    <dimen name="app_icon_size">45dip</dimen>
+
 </resources>
