@@ -194,6 +194,10 @@ public class VideoInfoFragment extends BaseFragment {
 							mAdapter.notifyDataSetChanged();
 							dataManage.sendMessage(new DataMessage(
 									DataManage.MSG_ADD_TASK, video));
+							DBUtil dbUtil = new DBUtil(getActivity());
+							if (dbUtil.update(video) < 1)
+								dbUtil.addVideo(video);
+							dbUtil.close();
 							dialog.dismiss();
 						}
 					}.execute();
