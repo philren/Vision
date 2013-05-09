@@ -71,6 +71,8 @@ public class VideoInfoFragment extends BaseFragment {
 		Button uploadButton = (Button) view
 				.findViewById(R.id.video_info_fragment_upload_more_button);
 		uploadButton.setOnClickListener(this);
+		view.findViewById(R.id.video_info_fragment_refresh).setOnClickListener(
+				this);
 		return view;
 	}
 
@@ -202,7 +204,9 @@ public class VideoInfoFragment extends BaseFragment {
 					new Message(MainActivity.MESSAGE_UPDATE_FRAGMENT, fragment,
 							ChooseFileFragment.TAG));
 			break;
-
+		case R.id.video_info_fragment_refresh:
+			getVideoList();
+			break;
 		default:
 			break;
 		}

@@ -25,7 +25,7 @@
     </LinearLayout>
 
     <com.gpvision.ui.VideoButtons
-        android:id="@+id/video_info_list_videoButtons"
+        android:id="@+id/video_info_list_video_buttons"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_weight="1"

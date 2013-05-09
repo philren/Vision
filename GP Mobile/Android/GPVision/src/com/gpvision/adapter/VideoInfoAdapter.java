@@ -69,7 +69,7 @@ public class VideoInfoAdapter extends BaseAdapter {
 			holder.videoStatus = (TextView) view
 					.findViewById(R.id.video_info_list_video_status);
 			holder.videoButtons = (VideoButtons) view
-					.findViewById(R.id.video_info_list_videoButtons);
+					.findViewById(R.id.video_info_list_video_buttons);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();

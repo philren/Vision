@@ -2,6 +2,7 @@ package com.gpvision.utils;
 
 import com.gpvision.R;
 import com.gpvision.activity.LoginActivity;
+import com.gpvision.activity.MainActivity;
 import com.gpvision.api.APIError;
 import com.gpvision.ui.dialog.ErrorDialog;
 
@@ -9,7 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 
 public class ApiErrorHandler {
 
@@ -65,9 +65,10 @@ public class ApiErrorHandler {
 						public void onClick(DialogInterface dialog, int which) {
 							LocalDataBuffer.getInstance().setAccount(null);
 							try {
-								FragmentActivity activity = (FragmentActivity) context;
+								MainActivity activity = (MainActivity) context;
 								activity.finish();
 							} catch (ClassCastException e) {
+							} finally {
 								Intent intent = new Intent();
 								intent.setClass(context, LoginActivity.class);
 								context.startActivity(intent);
