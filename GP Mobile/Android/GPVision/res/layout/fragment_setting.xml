@@ -46,7 +46,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/base_ok" />
 
@@ -57,7 +57,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/base_cancel" />
     </LinearLayout>

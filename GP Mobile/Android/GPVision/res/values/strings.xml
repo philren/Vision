@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">GPVision</string>
+    <string name="app_name">Vision</string>
     <string name="base_ok">OK</string>
     <string name="base_cancel">Cancel</string>
     <string name="base_warning">Warning!</string>
@@ -38,7 +38,7 @@
     <string name="main_activity_videos">Videos</string>
     <string name="main_activity_notifications">Notifications</string>
     <string name="main_activity_settings">Settings</string>
-    <string name="main_activity_logout">Logout</string>
+    <string name="main_activity_logout">Signout</string>
     <string name="main_activity_dialog_message_logout">Are You Sure To Logout?</string>
 
     <!-- video info fragment -->

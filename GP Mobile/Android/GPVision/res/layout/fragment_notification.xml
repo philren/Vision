@@ -25,7 +25,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/notification_fragment_remove_button_text" />
 
@@ -36,7 +36,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/notification_fragment_clean_button_text" />
     </LinearLayout>

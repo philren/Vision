@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/padding_large"
-            android:background="@drawable/bg_button_blue"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/signup_fragment_signup_button_text" />
 
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/padding_large"
-            android:background="@drawable/bg_button_blue"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/base_cancel" />
     </LinearLayout>

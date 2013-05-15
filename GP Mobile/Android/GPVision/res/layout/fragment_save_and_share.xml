@@ -16,8 +16,7 @@
         android:id="@+id/save_and_share_fragment_image_view"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
-        android:layout_weight="1"
-        android:src="@drawable/ic_launcher" />
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -33,7 +32,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/save_and_share_fragment_save_button_text" />
 
@@ -44,7 +43,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/save_and_share_fragment_share_button_text" />
     </LinearLayout>

@@ -51,7 +51,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_orange"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/choose_file_fragment_upload_button_text" />
 
@@ -62,7 +62,7 @@
             android:layout_marginLeft="@dimen/padding_large"
             android:layout_marginRight="@dimen/padding_large"
             android:layout_weight="1"
-            android:background="@drawable/bg_button_gray"
+            android:background="@drawable/bg_button_red"
             android:padding="@dimen/padding_small"
             android:text="@string/choose_file_fragment_cancel_button_text" />
     </LinearLayout>
