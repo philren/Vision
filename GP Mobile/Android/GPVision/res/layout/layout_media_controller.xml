@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingBottom="@dimen/padding_small"
     android:paddingTop="@dimen/padding_small" >
@@ -17,7 +17,7 @@
             android:layout_width="@dimen/video_player_button_size"
             android:layout_height="@dimen/video_player_button_size"
             android:background="@drawable/icon_media_controller_button_play"
-            android:padding="@dimen/padding_small" />
+            android:scaleType="fitXY" />
 
         <SeekBar
             android:id="@+id/media_controller_play_seek_bar"
@@ -67,7 +67,6 @@
         android:id="@+id/media_controller_volume_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_small"
         android:gravity="center_vertical"
         android:visibility="gone" >
 

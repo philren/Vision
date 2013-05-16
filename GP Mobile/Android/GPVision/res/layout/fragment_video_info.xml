@@ -21,7 +21,7 @@
             android:id="@+id/video_info_fragment_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_button_red"
+            android:background="@drawable/bg_button_blue"
             android:padding="@dimen/padding_small"
             android:text="@string/video_info_fragment_refresh_btn" />
     </LinearLayout>
@@ -48,8 +48,8 @@
 
         <Button
             android:id="@+id/video_info_fragment_upload_more_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
             android:background="@drawable/icon_button_open" />
     </LinearLayout>
 

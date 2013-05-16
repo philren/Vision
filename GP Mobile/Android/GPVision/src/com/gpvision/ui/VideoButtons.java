@@ -20,6 +20,9 @@ public class VideoButtons extends LinearLayout {
 	private int mPosition;
 	private Video mVideo;
 	private VideoStatusChangedListener listener;
+	private LayoutParams layoutParams = new LayoutParams(getResources()
+			.getDimensionPixelSize(R.dimen.button_size), getResources()
+			.getDimensionPixelSize(R.dimen.button_size));
 
 	public void setPosition(int position) {
 		this.mPosition = position;
@@ -72,8 +75,10 @@ public class VideoButtons extends LinearLayout {
 	private void getUploadingButtons() {
 		removeAllViews();
 		Button abortButton = new Button(getContext());
+		abortButton.setLayoutParams(layoutParams);
 		abortButton.setBackgroundResource(R.drawable.icon_button_abort);
 		Button pauseButton = new Button(getContext());
+		pauseButton.setLayoutParams(layoutParams);
 		pauseButton.setBackgroundResource(R.drawable.icon_button_pause);
 		pauseButton.setOnClickListener(pauseListener);
 		abortButton.setOnClickListener(abortListener);
@@ -85,8 +90,10 @@ public class VideoButtons extends LinearLayout {
 	private void getPausedButtons() {
 		removeAllViews();
 		Button abortButton = new Button(getContext());
+		abortButton.setLayoutParams(layoutParams);
 		abortButton.setBackgroundResource(R.drawable.icon_button_abort);
 		Button resumeButton = new Button(getContext());
+		resumeButton.setLayoutParams(layoutParams);
 		resumeButton.setBackgroundResource(R.drawable.icon_button_upload);
 		resumeButton.setOnClickListener(resumeListener);
 		abortButton.setOnClickListener(abortListener);
@@ -97,8 +104,10 @@ public class VideoButtons extends LinearLayout {
 	private void getAnalysedButtons() {
 		removeAllViews();
 		Button playButton = new Button(getContext());
+		playButton.setLayoutParams(layoutParams);
 		playButton.setBackgroundResource(R.drawable.icon_button_play);
 		Button deletedButton = new Button(getContext());
+		deletedButton.setLayoutParams(layoutParams);
 		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
 		playButton.setOnClickListener(playListener);
 		deletedButton.setOnClickListener(deletedListener);
@@ -109,6 +118,7 @@ public class VideoButtons extends LinearLayout {
 	private void getDeletedButtons() {
 		removeAllViews();
 		Button deletedButton = new Button(getContext());
+		deletedButton.setLayoutParams(layoutParams);
 		deletedButton.setBackgroundResource(R.drawable.icon_button_delete);
 		deletedButton.setOnClickListener(deletedListener);
 		addView(deletedButton);
